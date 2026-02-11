@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
-import Header from './components/Header';
-import HeroSection from './components/HeroSection';
-import Projects from './components/Projects';
-import MobileMenuOverlay from './components/MobileMenuOverlay';
-import './App.css'; // Keep existing CSS if it's used elsewhere
+import React, { useState, useEffect } from "react";
+import Header from "./components/Header";
+import HeroSection from "./components/HeroSection";
+import Projects from "./components/Projects";
+import ServicesSection from "./components/ServicesSection"; // Import ServicesSection
+import ExpectationSection from "./components/ExpectationSection"; // Import ExpectationSection
+import MobileMenuOverlay from "./components/MobileMenuOverlay";
+import AnimatedButton from "./components/AnimatedButton"; // Import AnimatedButton
+import VideoShowcase from "./components/VideoShowcase"; // Import VideoShowcase
+import "./App.css"; // Keep existing CSS if it's used elsewhere
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isVideoExpanded, setIsVideoExpanded] = useState(false);
 
   const toggleMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -16,16 +22,66 @@ function App() {
     setIsMobileMenuOpen(false);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 200) {
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+      if (window.scrollY > 500) {
+        setIsVideoExpanded(true);
+      } else {
+        setIsVideoExpanded(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <div className="App">
-      {/* Header and Burger Menu (always visible) */}
-      <div className="fixed top-0 left-0 w-full p-8 z-50 flex justify-between items-center">
-        <img src="/images/Portfolio-logo.svg" alt="Portfolio Logo" className="h-12" />
+    <div className="App bg-[#f2f2f2]">
+      {/* Logo */}
+      <div className="fixed top-0 left-0 px-8 py-10 z-30 flex items-center">
+        <a href="/">
+          <img
+            src="/images/Portfolio-logo.svg"
+            alt="Portfolio Logo"
+            className="h-12 transition-all duration-500"
+          />
+        </a>
+      </div>
+
+      {/* Burger Menu (always visible and on top) */}
+      <div className="fixed top-0 right-0 p-10 z-50">
         <Header isOpen={isMobileMenuOpen} toggleMenu={toggleMenu} />
       </div>
 
+      {/* Scroll-triggered "Get in touch" button */}
+      <div className={`fixed top-10 right-28 z-20 transition-opacity duration-300 ${showScrollButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className="relative overflow-hidden inline-block rounded-full"> {/* Container for clipping the reveal */}
+          <AnimatedButton
+            text="Get in touch"
+            baseBgColor="bg-black"
+            baseTextColor="text-white"
+            hoverTextColor="text-black"
+            className="!h-10 !px-5 !py-2"
+          />
+          {/* Left white box */}
+          <div className={`absolute top-0 bottom-0 left-0 w-1/2 bg-[#f2f2f2] z-30 transition-transform duration-700 ease-out ${showScrollButton ? '-translate-x-full' : 'translate-x-0'}`}></div>
+          {/* Right white box */}
+          <div className={`absolute top-0 bottom-0 right-0 w-1/2 bg-[#f2f2f2] z-30 transition-transform duration-700 ease-out ${showScrollButton ? 'translate-x-full' : 'translate-x-0'}`}></div>
+        </div>
+      </div>
+
       <HeroSection />
+      <VideoShowcase isExpanded={isVideoExpanded} />
       <Projects />
+      <ServicesSection />
+      <ExpectationSection />
 
       {/* Mobile Menu Overlay */}
       <MobileMenuOverlay isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
@@ -33,7 +89,9 @@ function App() {
       {/* Dark Overlay for Mobile Menu */}
       <div
         className={`fixed inset-0 bg-black z-30 transition-opacity duration-500 ${
-          isMobileMenuOpen ? 'opacity-60 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          isMobileMenuOpen
+            ? "opacity-60 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={closeMobileMenu} // Close menu if overlay is clicked
       ></div>
@@ -42,5 +100,3 @@ function App() {
 }
 
 export default App;
-
-
