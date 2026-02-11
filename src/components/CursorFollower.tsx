@@ -10,34 +10,44 @@ const CursorFollower: React.FC<CursorFollowerProps> = ({ x, y, isVisible }) => {
   const [smoothedX, setSmoothedX] = useState(x);
   const [smoothedY, setSmoothedY] = useState(y);
   const animationFrameId = useRef<number | null>(null);
-  const easingFactor = 0.15; // Adjust this value for more or less lag
+  const targetX = useRef(x); // Use ref for target x
+  const targetY = useRef(y); // Use ref for target y
+  const easingFactor = 0.08; // Adjust this value for more or less lag
+  const [isAnimating, setIsAnimating] = useState(false); // New state for animation
+
+  // Update refs whenever x or y props change
+  useEffect(() => {
+    targetX.current = x;
+    targetY.current = y;
+  }, [x, y]);
+
+  useEffect(() => {
+    setIsAnimating(isVisible);
+  }, [isVisible]);
 
   useEffect(() => {
     let currentFrameId: number | null = null;
 
     const animate = () => {
       setSmoothedX((prevX) => {
-        const dx = x - prevX;
-        if (Math.abs(dx) < 0.1 && Math.abs(x - prevX) < 0.1) return x; // Snap to target if very close
+        const dx = targetX.current - prevX;
+        // Removed the snap-to-target condition for smoother easing
         return prevX + dx * easingFactor;
       });
 
       setSmoothedY((prevY) => {
-        const dy = y - prevY;
-        if (Math.abs(dy) < 0.1 && Math.abs(y - prevY) < 0.1) return y; // Snap to target if very close
+        const dy = targetY.current - prevY;
+        // Removed the snap-to-target condition for smoother easing
         return prevY + dy * easingFactor;
       });
 
-      currentFrameId = requestAnimationFrame(animate);
+      if (isVisible) {
+        currentFrameId = requestAnimationFrame(animate);
+      }
     };
 
     if (isVisible) {
-      // Re-initialize smoothed position when becoming visible or target changes significantly
-      // This helps prevent jumping if mouse moves far while hidden
-      if (Math.abs(x - smoothedX) > 50 || Math.abs(y - smoothedY) > 50 || !animationFrameId.current) {
-        setSmoothedX(x);
-        setSmoothedY(y);
-      }
+      // Start the animation frame loop if visible
       currentFrameId = requestAnimationFrame(animate);
     } else {
       if (animationFrameId.current) {
@@ -54,11 +64,11 @@ const CursorFollower: React.FC<CursorFollowerProps> = ({ x, y, isVisible }) => {
         cancelAnimationFrame(currentFrameId);
       }
     };
-  }, [x, y, isVisible, easingFactor]);
+  }, [isVisible, easingFactor]); // Dependencies only include isVisible and easingFactor
 
-  const arrowIcon = (
+  const arrowSvg = (
     <svg
-      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlnsXlink="http://www.w3.org/1999/xlink"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 31 26"
       className="h-4 w-4 text-white transform -rotate-45"
@@ -86,18 +96,21 @@ const CursorFollower: React.FC<CursorFollowerProps> = ({ x, y, isVisible }) => {
       className="fixed z-50 pointer-events-none flex items-center justify-center py-2 px-4 rounded-full"
       style={{
         left: `${smoothedX}px`,
-        top: `${smoothedY + 20}px`, // Re-introducing the +20px offset
+        top: `${smoothedY}px`,
         transform: `translate(-50%, -50%) scaleY(${isVisible ? 1 : 0})`,
         transformOrigin: 'center center', // Explicitly set transform origin
         opacity: isVisible ? 1 : 0,
         transition: "transform 0.3s ease-out, opacity 0.3s ease-out",
-        backgroundColor: "#0a0a0a",
+        backgroundColor: "rgba(10, 10, 10, 0.7)", // Semi-transparent background
+        backdropFilter: "blur(10px)", // Glassmorphism blur
+        border: "1px solid rgba(255, 255, 255, 0.18)", // Subtle border
+        boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)", // Optional: Glassmorphism shadow
         color: "white",
         minWidth: "120px",
       }}
     >
       <span className="mr-2 text-white font-normal">show case</span>
-      {arrowIcon}
+      {arrowSvg}
     </div>
   );
 };

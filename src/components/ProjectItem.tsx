@@ -1,6 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import QuoteSVG from "../assets/quote.svg";
 import CursorFollower from "./CursorFollower";
+import { gsap } from "gsap"; // GSAP import
+import { ScrollTrigger } from "gsap/ScrollTrigger"; // ScrollTrigger import
 
 interface Project {
   id: number;
@@ -18,6 +20,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null); // Ref for this specific image container
+  const itemRef = useRef(null); // Ref for GSAP animation
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -32,22 +35,46 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
     setMousePosition({ x: e.clientX, y: e.clientY });
   };
 
+  useEffect(() => {
+    if (!itemRef.current) return; // Add this check
+
+    // Create a GSAP context to manage animations, preventing conflicts
+    let ctx = gsap.context(() => {
+      gsap.fromTo(itemRef.current,
+        { opacity: 0, y: 50 }, // from these values
+        { // to these values
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: itemRef.current,
+            start: "top bottom-=100", // Start animation when top of element hits 100px from bottom of viewport
+            toggleActions: "play none none none", // Play once on enter
+            // markers: true, // For debugging scroll trigger positions
+          }
+        }
+      );
+    }, itemRef); // <- scope the context to the component's ref
+
+    return () => ctx.revert(); // <- revert all animations in this context on component unmount
+  }, []); // Empty dependency array means this runs once on mount
+
   return (
-    <div>
+    <div ref={itemRef}>
       <div
         ref={imageRef} // Attach ref here to the individual project's image container
-        className="relative w-full aspect-square overflow-hidden cursor-pointer bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-lg font-bold"
+        className="relative w-full aspect-square overflow-hidden cursor-none bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-lg font-bold"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onMouseMove={handleMouseMove}
       >
-        <img src={project.image} alt={project.title} className="absolute inset-0 w-full h-full object-cover" />
-        {/* DEBUG: Display states - Removed in final version, kept for now */}
-        <div className="absolute top-0 left-0 text-xs text-red-500 bg-black bg-opacity-70 p-1">
-          Hovered: {isHovered ? "true" : "false"}
-          <br />
-          Mouse: {mousePosition.x.toFixed(0)}, {mousePosition.y.toFixed(0)}
-        </div>
+        <img
+          src={project.image}
+          alt={project.title}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+
         {isHovered && (
           <CursorFollower
             x={mousePosition.x}

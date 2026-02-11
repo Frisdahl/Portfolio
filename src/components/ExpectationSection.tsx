@@ -15,9 +15,9 @@ const Dropdown: React.FC<DropdownProps> = ({
   onToggle,
 }) => {
   return (
-    <div className="border-b border-gray-300">
+    <>
       <button
-        className="flex justify-between items-center w-full text-lg font-semibold text-gray-800 focus:outline-none py-4 cursor-pointer"
+        className={`flex justify-between items-center w-full text-lg font-semibold text-gray-800 border-gray-300 focus:outline-none py-4 cursor-pointer ${isOpen ? "border-b-0" : "border-b"}`}
         onClick={onToggle}
       >
         <span className="text-xl uppercase font-normal">{title}</span>
@@ -37,13 +37,12 @@ const Dropdown: React.FC<DropdownProps> = ({
       >
         {children}
       </div>
-    </div>
+    </>
   );
 };
 
 const ExpectationSection: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
 
   const dropdownData = [
     {
@@ -140,7 +139,7 @@ const ExpectationSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left Column */}
           <div className="text-left">
-            <h2 className="text-6xl mb-8 uppercase leading-tight">
+            <h2 className="text-6xl mb-8 uppercase color-[#010101] leading-tight">
               <span className="font-bold">What You Can Expect</span> <br></br>{" "}
               Working With Me
             </h2>

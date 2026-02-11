@@ -23,7 +23,7 @@ const projects = [
     title: "Project Three",
     description:
       "A brief description of Project Three, highlighting its key features and technologies used.",
-    image: "https://via.placeholder.com/400x300/00FF00/FFFFFF?text=Project+3", // Placeholder image
+    image: "https://placehold.co/400x300", // Placeholder image
     link: "#",
   },
   {
@@ -31,7 +31,7 @@ const projects = [
     title: "Project Four",
     description:
       "A brief description of Project Four, highlighting its key features and technologies used.",
-    image: "https://via.placeholder.com/400x300/FFFF00/000000?text=Project+4", // Placeholder image
+    image: "https://placehold.co/400x300", // Placeholder image
     link: "#",
   },
 ];

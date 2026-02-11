@@ -19,10 +19,10 @@ const ServiceItem: React.FC<ServiceItemProps> = ({ name, description }) => {
             {description}
         </p>
         {/* Inline SVG for direct fill control */}
-        <svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31 26" 
+        <svg xmlnsXlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31 26" 
              className="h-6 w-6 transition-transform duration-300 transform -rotate-45 group-hover:rotate-0 text-[#12181B] group-hover:text-white" fill="none" >
-            <path d="M18.582 24.6654L29.3737 12.9987L18.582 1.33203" stroke="currentColor" stroke-width="2px" stroke-miterlimit="10"></path>
-            <path d="M29.3737 13L0.0820312 13" stroke="currentColor" stroke-width="2px" stroke-miterlimit="10"></path>
+            <path d="M18.582 24.6654L29.3737 12.9987L18.582 1.33203" stroke="currentColor" strokeWidth="2px" strokeMiterlimit="10"></path>
+            <path d="M29.3737 13L0.0820312 13" stroke="currentColor" strokeWidth="2px" strokeMiterlimit="10"></path>
         </svg>
       </div>
     </div>
