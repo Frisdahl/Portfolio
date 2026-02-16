@@ -1,36 +1,63 @@
 import React from "react";
+import AnimatedButton from "./AnimatedButton"; // Import AnimatedButton
 
 interface HeaderProps {
-  isOpen: boolean;
-  toggleMenu: () => void;
+  showScrollButton: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ isOpen, toggleMenu }) => {
+const Header: React.FC<HeaderProps> = ({
+  showScrollButton,
+}) => {
   return (
-    <button
-      className="group relative w-10 h-10 flex items-center justify-center focus:outline-none z-50 transition-colors duration-600 cursor-pointer"
-      onClick={toggleMenu}
-      aria-label="Toggle menu"
+    <header
+      className={`fixed top-4 left-0 right-0 z-50 flex justify-between items-center py-6 px-8 rounded-full mx-8 transition-colors duration-300 ${
+        showScrollButton ? "backdrop-blur-md bg-white/30" : "bg-transparent"
+      }`}
     >
-      <div className="relative z-20 w-6 h-2 flex flex-col justify-between">
-        <span
-          className={`block h-0.5 bg-[#222531] transition-all duration-600 ease-out group-hover:bg-white  ${
-            isOpen
-              ? "rotate-45 translate-y-[3px] w-full"
-              : "w-full group-hover:w-3/4 group-hover:mx-auto"
-          }`}
-        ></span>
-        <span
-          className={`block h-0.5 bg-[#222531] transition-all duration-600 ease-out group-hover:bg-white ${
-            isOpen
-              ? "-rotate-45 -translate-y-[3px] w-full"
-              : "w-full group-hover:w-3/4 group-hover:mx-auto"
-          }`}
-        ></span>
+      {/* Logo */}
+      <div className="z-50">
+        <a href="/">
+          <img
+            src="/images/Portfolio-logo.svg"
+            alt="Portfolio Logo"
+            className="h-12 transition-all duration-500"
+          />
+        </a>
       </div>
-      {/* Expanding circle background */}
-      <div className="absolute inset-0 rounded-full scale-0 group-hover:scale-100 transition-transform duration-600 ease-out bg-[#121723] z-10"></div>
-    </button>
+
+      <div className="flex items-center gap-8">
+        {/* "Get in touch" button */}
+        <div
+          className={`transition-opacity duration-300 ${
+            showScrollButton ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="relative overflow-hidden inline-block rounded-full">
+            {" "}
+            {/* Container for clipping the reveal */}
+            <AnimatedButton
+              text="Get in touch"
+              baseBgColor="bg-black"
+              baseTextColor="text-white"
+              hoverTextColor="text-black"
+              className="!h-10 !px-5 !py-2"
+            />
+            {/* Left white box */}
+            <div
+              className={`absolute top-0 bottom-0 left-0 w-1/2 bg-[#f2f2f2] z-30 transition-transform duration-700 ease-out ${
+                showScrollButton ? "-translate-x-full" : "translate-x-0"
+              }`}
+            ></div>
+            {/* Right white box */}
+            <div
+              className={`absolute top-0 bottom-0 right-0 w-1/2 bg-[#f2f2f2] z-30 transition-transform duration-700 ease-out ${
+                showScrollButton ? "translate-x-full" : "translate-x-0"
+              }`}
+            ></div>
+          </div>
+        </div>
+      </div>
+    </header>
   );
 };
 

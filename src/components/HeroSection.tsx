@@ -30,14 +30,15 @@ const HeroSection: React.FC = () => {
   const marqueeTween = useRef(null); // Ref to store the GSAP animation instance
 
   // Helper function to create seamless wrapping
-  const wrap = (value: number, max: number) => (value % max + max) % max;
+  const wrap = (value: number, max: number) => ((value % max) + max) % max;
 
   useLayoutEffect(() => {
     const boxes = boxesRef.current;
     if (!boxes) return;
 
     const textToRepeat = "Frisdahl Studio°";
-    const segmentBaseClasses = "uppercase text-4xl font-granary text-gray-800 mx-4 absolute"; // Added absolute
+    const segmentBaseClasses =
+      "uppercase text-4xl font-granary text-gray-800 mx-4 absolute"; // Added absolute
 
     // Measure the width of a single segment dynamically (more robust)
     const tempSpan = document.createElement("span");
@@ -55,7 +56,8 @@ const HeroSection: React.FC = () => {
     const containerWidth = boxes.parentElement.offsetWidth;
 
     // Calculate how many segments are needed to fill the container, plus extra for seamless looping
-    const numSegmentsToFillScreen = Math.ceil(containerWidth / segmentWidth) + 1;
+    const numSegmentsToFillScreen =
+      Math.ceil(containerWidth / segmentWidth) + 1;
     const numClones = numSegmentsToFillScreen * 2; // Enough to fill twice the screen for seamless loop
 
     const allBoxElements = [];
@@ -66,7 +68,7 @@ const HeroSection: React.FC = () => {
       boxes.appendChild(span);
       allBoxElements.push(span);
     }
-    
+
     // Set initial position of each box
     gsap.set(allBoxElements, {
       x: (k) => k * segmentWidth, // Position boxes side by side initially
@@ -84,7 +86,7 @@ const HeroSection: React.FC = () => {
           // This creates the seamless loop: when an element moves past the right edge,
           // it instantly jumps back to the left, but shifted by totalLoopWidth to follow the previous elements.
           return wrap(parseFloat(x), totalLoopWidth) + "px";
-        }
+        },
       },
       repeat: -1,
     });
@@ -98,11 +100,9 @@ const HeroSection: React.FC = () => {
   }, []); // Empty dependency array, runs once on mount
 
   return (
-    <section className="relative min-h-screen w-full bg-transparent text-black overflow-hidden flex flex-col justify-center">
-      {/* Top Left: Brand/Name */}
-
-      {/* Center Left: HUGE Headline */}
-      <div className="flex flex-col items-start justify-center py-8 px-16 md:px-32 lg:px-32 relative">
+    <section className="relative h-screen w-full bg-transparent text-black overflow-hidden flex flex-col">
+      {/* Center Content: HUGE Headline */}
+      <div className="flex-1 flex flex-col items-start justify-center px-16 md:px-32 lg:px-32 -mt-16">
         <h1 className="text-6xl md:text-6xl lg:text-7xl color-[#010101] font-regular text-left pmm uppercase leading-none tracking-tighter animate-fade-in-up text-gray-900 font-granary">
           <span className="font-[700]">Freelance</span> web developer <br></br>&
           creative designer
@@ -123,8 +123,8 @@ const HeroSection: React.FC = () => {
         />
       </div>
 
-      {/* New Bottom Section: Social Links, Paragraph, Divider, Marquee */}
-      <div className="w-full px-16 md:px-32 lg:px-32 mt-16 pb-8">
+      {/* Bottom Section: Social Links, Paragraph, Divider, Marquee */}
+      <div className="w-full px-16 md:px-32 lg:px-32 pb-8">
         {/* Content above divider: Social Links and Paragraph */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-8">
           {/* Social Links */}
@@ -161,8 +161,12 @@ const HeroSection: React.FC = () => {
         <hr className="w-full h-px bg-gray-300 border-0 my-8" />
 
         {/* Marquee Slider */}
-        <div className="relative w-full overflow-hidden flex items-center wrapper"> {/* Removed py-8, added flex items-center */}
-          <div className="boxes relative w-full h-full flex" ref={boxesRef}> {/* Added flex */}
+        <div className="relative w-full overflow-hidden flex items-center wrapper">
+          {" "}
+          {/* Removed py-8, added flex items-center */}
+          <div className="boxes relative w-full h-full flex" ref={boxesRef}>
+            {" "}
+            {/* Added flex */}
             {/* The spans will be generated dynamically by GSAP */}
           </div>
         </div>
