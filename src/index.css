@@ -35,8 +35,42 @@
   font-style: normal;
 }
 
+/* Apparel Font */
+@font-face {
+  font-family: "Apparel";
+  src: url("/fonts/Apparel/Fontspring-DEMO-apparel-light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Apparel";
+  src: url("/fonts/Apparel/Fontspring-DEMO-apparel-regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Apparel";
+  src: url("/fonts/Apparel/Fontspring-DEMO-apparel-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Apparel";
+  src: url("/fonts/Apparel/Fontspring-DEMO-apparel-black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+}
+
 @layer base {
-  body {
+  /* Fonts are configured in tailwind.config.js */
+}
+
+@layer utilities {
+  .font-apparel {
+    font-family: "Apparel", sans-serif;
+  }
+  .font-granary {
     font-family: "Granary", sans-serif;
   }
 }
@@ -114,4 +148,3 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
 }
-

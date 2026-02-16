@@ -87,7 +87,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
           />
         )}
       </div>
-      <h3 className="text-2xl pt-6 font-semibold text-left text-gray-900 mb-2">
+      <h3 className="text-2xl pt-6 font-bold text-left text-gray-900 mb-2">
         {project.title}
       </h3>
 

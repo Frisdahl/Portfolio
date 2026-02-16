@@ -3,22 +3,24 @@
   theme: {
     extend: {
       keyframes: {
-        'fade-in-up': {
-          '0%': {
-            opacity: '0',
-            transform: 'translateY(20px)'
+        "fade-in-up": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(20px)",
           },
-          '100%': {
-            opacity: '1',
-            transform: 'translateY(0)'
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
           },
         },
       },
       animation: {
-        'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+        "fade-in-up": "fade-in-up 0.6s ease-out forwards",
       },
       fontFamily: {
-        granary: ['Granary', 'sans-serif'],
+        sans: ["Granary", "sans-serif"],
+        granary: ["Granary", "sans-serif"],
+        apparel: ["Apparel", "sans-serif"],
       },
     },
   },

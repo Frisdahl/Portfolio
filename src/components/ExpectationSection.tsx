@@ -58,9 +58,30 @@ const ExpectationSection: React.FC = () => {
             and consistent online presence.
           </p>
           <div className="space-y-3 pb-6">
-            <p>✔ Brand positioning & digital identity</p>
-            <p>✔ User journey and product</p>
-            <p>✔ Strategy Design consistency & scalability</p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Brand positioning & digital identity
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              User journey and product
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Strategy Design consistency & scalability
+            </p>
           </div>
         </>
       ),
@@ -75,9 +96,30 @@ const ExpectationSection: React.FC = () => {
             devices.
           </p>
           <div className="space-y-3 pb-6">
-            <p>✔ Responsive UI design</p>
-            <p>✔ User-focused interaction design</p>
-            <p>✔ Design systems & accessibility</p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Responsive UI design
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              User-focused interaction design
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Design systems & accessibility
+            </p>
           </div>
         </>
       ),
@@ -91,9 +133,30 @@ const ExpectationSection: React.FC = () => {
             with a strong focus on performance, security, and maintainability.
           </p>
           <div className="space-y-3 pb-6">
-            <p>✔ Frontend & backend development</p>
-            <p>✔ API integrations & architecture</p>
-            <p>✔ Performance optimization</p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Frontend & backend development
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              API integrations & architecture
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Performance optimization
+            </p>
           </div>
         </>
       ),
@@ -107,9 +170,30 @@ const ExpectationSection: React.FC = () => {
             stable, and continuously improving after launch.
           </p>
           <div className="space-y-3 pb-6">
-            <p>✔ Updates & bug fixes</p>
-            <p>✔ Performance monitoring</p>
-            <p>✔ Security maintenance</p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Updates & bug fixes
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Performance monitoring
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Security maintenance
+            </p>
           </div>
         </>
       ),
@@ -123,9 +207,30 @@ const ExpectationSection: React.FC = () => {
             features, and preparing your system for future growth.
           </p>
           <div className="space-y-3 pb-6">
-            <p>✔ Feature expansion</p>
-            <p>✔ Performance scaling</p>
-            <p>✔ Architecture improvements</p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Feature expansion
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Performance scaling
+            </p>
+            <p>
+              <span
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                ✔
+              </span>{" "}
+              Architecture improvements
+            </p>
           </div>
         </>
       ),

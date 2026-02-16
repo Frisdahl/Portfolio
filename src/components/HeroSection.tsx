@@ -96,9 +96,9 @@ const HeroSection: React.FC = () => {
           alt="Danish Flag"
           className="h-8 mb-4 rounded-full"
         />
-        <h1 className="text-6xl md:text-6xl lg:text-7xl color-[#121723] font-regular text-left pmm uppercase leading-none tracking-tighter animate-fade-in-up text-gray-900 font-granary">
-          <span className="font-[700]">Freelance</span> web developer <br></br>&
-          creative designer
+        <h1 className="text-6xl md:text-6xl lg:text-7xl color-[#121723] text-left uppercase leading-none tracking-tighter animate-fade-in-up text-gray-900">
+          <span className="font-semibold">Freelance</span> web developer{" "}
+          <br></br> &<span className="font-apparel"> creative designer</span>
         </h1>
 
         <p className="mt-6 text-lg md:text-xl max-w-lg text-gray-600 animate-fade-in-up delay-200 text-left">
