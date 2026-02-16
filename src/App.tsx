@@ -48,6 +48,7 @@ function App() {
       <Header showScrollButton={showScrollButton} />
       <BurgerMenuButton isOpen={isMobileMenuOpen} toggleMenu={toggleMenu} />
 
+
       <HeroSection />
       <VideoShowcase isExpanded={isVideoExpanded} />
       <Projects />

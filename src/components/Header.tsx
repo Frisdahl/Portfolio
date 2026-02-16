@@ -5,12 +5,10 @@ interface HeaderProps {
   showScrollButton: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  showScrollButton,
-}) => {
+const Header: React.FC<HeaderProps> = ({ showScrollButton }) => {
   return (
     <header
-      className={`fixed top-4 left-0 right-0 z-50 flex justify-between items-center py-6 px-8 rounded-full mx-8 transition-colors duration-300 ${
+      className={`fixed top-4 left-0 right-0 z-50 flex justify-between items-center py-6 pl-8 pr-16 rounded-full mx-8 transition-colors duration-300 ${
         showScrollButton ? "backdrop-blur-md bg-white/30" : "bg-transparent"
       }`}
     >
@@ -40,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({
               baseBgColor="bg-black"
               baseTextColor="text-white"
               hoverTextColor="text-black"
-              className="!h-10 !px-5 !py-2"
+              className="!h-10 !px-5 !py-2 mr-8"
             />
             {/* Left white box */}
             <div
