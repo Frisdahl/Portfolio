@@ -110,12 +110,13 @@ const ContactSection: React.FC = () => {
       className="bg-[#0a0a0a] text-white rounded-t-[10rem] py-48 px-8 min-h-screen flex items-center"
     >
       <div className="container mx-auto pt-16">
-        <div className="grid max-w-[1400px] mx-auto grid-cols-1 md:grid-cols-2 gap-16">
+        <div className="grid max-w-[1600px] mt-[50px] mx-auto grid-cols-1 md:grid-cols-2 gap-16">
           {/* Left Column */}
           <div className="flex flex-col justify-between">
             <div>
-              <h2 className="text-6xl font-[granary] uppercase text-white w-full text-left mb-12">
-                Have a project in mind?
+              <h2 className="text-6xl font-[granary] uppercase font-light text-white w-full text-left mb-12">
+                Ready to Start Your{" "}
+                <span className="font-semibold">Next Project?</span>
               </h2>
               <div className="flex space-x-4 my-12">
                 <AnimatedButton
@@ -174,7 +175,7 @@ const ContactSection: React.FC = () => {
           {/* Right Column */}
 
           <div className="text-left">
-            <p className="text-white mb-16 text-left">
+            <p className="text-white text-lg mb-16 text-left">
               Before we start, we would like to better understand your needs.
               We'll review your application and schedule a free estimation call.
             </p>

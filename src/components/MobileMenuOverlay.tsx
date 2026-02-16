@@ -28,7 +28,7 @@ const MobileMenuOverlay: React.FC<{
 }> = ({ isOpen, onClose }) => {
   const handleGetInTouchClick = () => {
     onClose();
-    scrollTo("#contact", 2);
+    scrollTo("#contact", 3);
   };
 
   return (

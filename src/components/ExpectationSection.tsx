@@ -137,7 +137,7 @@ const ExpectationSection: React.FC = () => {
   };
 
   return (
-    <section className="py-24 text-gray-800 px-8 w-full">
+    <section className="py-24 text-gray-800 px-8 max-w-[1800px] mx-auto w-full">
       <div className=" mx-auto px-8 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left Column */}
