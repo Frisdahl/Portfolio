@@ -3,7 +3,7 @@ import AnimatedButton from "./AnimatedButton"; // Import AnimatedButton
 
 const CollaborationSection: React.FC = () => {
   return (
-    <section className="py-16 pb-48 w-full max-w-[1800px] mx-auto px-4 md:px-8">
+    <section className="py-16 pb-48 w-full max-w-[1700px] mx-auto px-4 md:px-8">
       {/* Row for Header and Paragraph */}
       <div className="flex flex-col lg:flex-row justify-between items-end mb-12">
         <h2 className="text-6xl font-[granary] uppercase text-[#121723] w-full lg:w-1/2 text-left">
@@ -31,7 +31,7 @@ const CollaborationSection: React.FC = () => {
           </div>
 
           {/* Right Inner Column - for Monthly Subscription */}
-          <div className="w-full md:w-1/2 flex flex-col py-8 pl-8 rounded-3xl border-l border-[#f2f2f2]">
+          <div className="w-full md:w-1/2 flex flex-col py-8 pl-8 rounded-3xl border-l border-[#2d2aed]">
             <h3 className="text-3xl font-[500] italic mb-4 text-left">
               Monthly subscription
             </h3>
@@ -50,10 +50,10 @@ const CollaborationSection: React.FC = () => {
               {/* Push button to bottom */}
               <AnimatedButton
                 text="See offer"
-                baseBgColor="bg-white"
-                baseTextColor="text-black"
-                hoverTextColor="text-white"
-                baseBorderColor="border-white"
+                baseBgColor="bg-[#2d2aed]"
+                baseTextColor="text-[#f2f2f2]"
+                hoverTextColor="text-[#2d2aed]"
+                baseBorderColor="border-[#2d2aed]"
                 hoverBgColor="bg-[#0a0a0a]"
                 hoverBorderColor="group-hover:border-[#0a0a0a]"
                 className="w-full !py-3"

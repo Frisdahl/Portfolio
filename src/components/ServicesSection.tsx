@@ -3,7 +3,7 @@ import ServiceItem from "./ServiceItem";
 
 const ServicesSection: React.FC = () => {
   return (
-    <section className="py-16 px-8 w-full max-w-[1800px] mx-auto">
+    <section className="py-16 px-8 w-full max-w-[1700px] mx-auto">
       {/* Row for Header and Paragraph */}
       <div className="flex flex-col lg:flex-row justify-between items-end mb-12">
         <h2 className="text-6xl font-[granary] uppercase text-[#010101] w-full text-left">
@@ -26,7 +26,7 @@ const ServicesSection: React.FC = () => {
         />
         <hr className=" border-[#dcdcdc] z-10" />
         <ServiceItem
-          name="Fullstack Web Application Development"
+          name="Fullstack Web Application"
           description="End-to-end solutions combining frontend UI with Node.js/Express backend logic."
         />
         <hr className=" border-[#dcdcdc] z-10" />

@@ -34,7 +34,7 @@ const MobileMenuOverlay: React.FC<{
   return (
     // Outermost fixed full-screen container for the overlay
     <div
-      className={`fixed inset-0 z-[150] transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[150] transition-opacity duration-700 ease-in-out ${
         isOpen
           ? "opacity-100 pointer-events-auto bg-[rgba(0,0,0,0.6)]"
           : "opacity-0 pointer-events-none"
@@ -43,8 +43,8 @@ const MobileMenuOverlay: React.FC<{
     >
       {/* The actual menu panel that slides in/out */}
       <div
-        className={`fixed top-0 right-0 w-[30vw] bg-[#f2f2f2] transform transition-transform duration-500 ease-in-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 w-[30vw] bg-[#f2f2f2] transform transition-transform duration-700 ease-in-out ${
+          isOpen ? "translate-x-0" : "translate-x-full transition-delay-300"
         } overflow-y-auto px-8 pt-8 pb-4 text-left rounded-bl-xl rounded-br-xl rounded-tl-xl rounded-tr-none max-h-[80vh]`} // Adjusted padding
         onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing the menu
       >
@@ -67,7 +67,10 @@ const MobileMenuOverlay: React.FC<{
                   ? "opacity-100 translate-y-0 delay-300"
                   : "opacity-0 translate-y-4"
               }`}
-              onClick={onClose}
+              onClick={() => {
+                onClose();
+                scrollTo('#projects', 3);
+              }}
             >
               Works
             </a>

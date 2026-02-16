@@ -18,7 +18,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   text,
   link,
   onClick,
-  padding = "px-6 py-2",
+  padding = "px-6 py-6",
   baseBgColor = "bg-[#0a0a0a]",
   baseTextColor = "text-[#f2f2f2]",
   hoverTextColor = "group-hover:text-[#0a0a0a]",

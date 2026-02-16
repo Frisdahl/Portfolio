@@ -45,7 +45,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 };
 
 const ExpectationSection: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const dropdownData = [
     {
@@ -133,11 +133,17 @@ const ExpectationSection: React.FC = () => {
   ];
 
   const handleToggle = (index: number) => {
-    setActiveIndex(activeIndex === index ? null : index);
+    if (activeIndex === index) {
+      // If clicking the currently open dropdown, open the next one
+      setActiveIndex((activeIndex + 1) % dropdownData.length);
+    } else {
+      // Otherwise, just open the clicked one
+      setActiveIndex(index);
+    }
   };
 
   return (
-    <section className="py-24 text-gray-800 px-8 max-w-[1800px] mx-auto w-full">
+    <section className="py-24 text-gray-800 px-8 max-w-[1700px] mx-auto w-full">
       <div className=" mx-auto px-8 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left Column */}

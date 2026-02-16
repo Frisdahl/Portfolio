@@ -65,10 +65,10 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
   }, []); // Empty dependency array means this runs once on mount
 
   return (
-    <div ref={itemRef}>
+    <div ref={itemRef} className="w-full">
       <div
         ref={imageRef} // Attach ref here to the individual project's image container
-        className="relative w-full aspect-square overflow-hidden cursor-none bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-lg font-bold"
+        className="relative w-full aspect-square overflow-hidden cursor-none bg-gray-200 rounded-3xl flex items-center justify-center text-gray-500 text-lg font-bold"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onMouseMove={handleMouseMove}

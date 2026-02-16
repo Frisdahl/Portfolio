@@ -42,26 +42,22 @@ const Projects: React.FC = () => {
   const rightColumnProjects = projects.slice(mid);
 
   return (
-    <section id="projects" className={`py-16 text-gray-800`}>
+    <section id="projects" className={`text-gray-800 pb-48`}>
       <div className="max-w-[1600px] mx-auto px-16 sm:px-24 lg:px-36">
         <div className="flex flex-col md:flex-row justify-between gap-16 md:gap-36 items-start">
           {/* Left Column */}
           <div className="flex flex-col gap-16 md:gap-36 md:w-1/2">
             {leftColumnProjects.map((project) => (
-              <ProjectItem
-                key={project.id}
-                project={project}
-              />
+              <ProjectItem key={project.id} project={project} />
             ))}
           </div>
 
           {/* Right Column - Staggered */}
-          <div className="flex flex-col gap-16 md:gap-36 md:w-1/2 md:mt-[300px]"> {/* Apply stagger here */}
+          <div className="flex flex-col gap-16 md:gap-36 md:w-1/2 md:mt-[35%]">
+            {" "}
+            {/* Apply stagger here */}
             {rightColumnProjects.map((project) => (
-              <ProjectItem
-                key={project.id}
-                project={project}
-              />
+              <ProjectItem key={project.id} project={project} />
             ))}
           </div>
         </div>
