@@ -31,8 +31,10 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Use viewport coordinates for fixed positioning
-    setMousePosition({ x: e.clientX, y: e.clientY });
+    if (imageRef.current) {
+      const rect = imageRef.current.getBoundingClientRect();
+      setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }
   };
 
   useEffect(() => {
@@ -40,9 +42,11 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
 
     // Create a GSAP context to manage animations, preventing conflicts
     let ctx = gsap.context(() => {
-      gsap.fromTo(itemRef.current,
+      gsap.fromTo(
+        itemRef.current,
         { opacity: 0, y: 50 }, // from these values
-        { // to these values
+        {
+          // to these values
           opacity: 1,
           y: 0,
           duration: 0.8,
@@ -52,8 +56,8 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
             start: "top bottom-=100", // Start animation when top of element hits 100px from bottom of viewport
             toggleActions: "play none none none", // Play once on enter
             // markers: true, // For debugging scroll trigger positions
-          }
-        }
+          },
+        },
       );
     }, itemRef); // <- scope the context to the component's ref
 
@@ -83,7 +87,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
           />
         )}
       </div>
-      <h3 className="text-base pt-6 font-bold text-left text-gray-900 mb-2">
+      <h3 className="text-2xl pt-6 font-semibold text-left text-gray-900 mb-2">
         {project.title}
       </h3>
 

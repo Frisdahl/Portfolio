@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AnimatedButton from "./AnimatedButton";
+import { scrollTo } from "../utils/smoothScroll";
 
 interface DropdownProps {
   title: string;
@@ -20,7 +21,9 @@ const Dropdown: React.FC<DropdownProps> = ({
         className={`flex justify-between items-center w-full text-lg font-semibold text-gray-800 border-gray-300 focus:outline-none py-4 cursor-pointer ${isOpen ? "border-b-0" : "border-b"}`}
         onClick={onToggle}
       >
-        <span className="text-xl uppercase font-normal">{title}</span>
+        <span className="text-xl uppercase font-normal text-[#0a0a0a]">
+          {title}
+        </span>
         <div className="relative w-4 h-4 flex items-center justify-center">
           <span className="absolute h-0.5 w-full bg-gray-800 transition-transform duration-300 ease-out"></span>
           <span
@@ -134,12 +137,12 @@ const ExpectationSection: React.FC = () => {
   };
 
   return (
-    <section className="py-24 text-gray-800">
+    <section className="py-24 text-gray-800 px-8 w-full">
       <div className=" mx-auto px-8 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left Column */}
           <div className="text-left">
-            <h2 className="text-6xl mb-8 uppercase color-[#010101] leading-tight">
+            <h2 className="text-6xl mb-8 uppercase text-[#0a0a0a] leading-tight">
               <span className="font-bold">What You Can Expect</span> <br></br>{" "}
               Working With Me
             </h2>
@@ -151,9 +154,10 @@ const ExpectationSection: React.FC = () => {
             </p>
             <AnimatedButton
               text="Get in touch"
-              baseBgColor="bg-black"
-              baseTextColor="text-white"
-              hoverTextColor="text-black"
+              baseBgColor="bg-[#0a0a0a]"
+              baseTextColor="text-[#f2f2f2]"
+              hoverTextColor="text-[#0a0a0a]"
+              onClick={() => scrollTo("#contact")}
             />
           </div>
 

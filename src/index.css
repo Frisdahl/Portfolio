@@ -61,6 +61,30 @@
   .link-underline-effect:hover::after {
     width: 100%;
   }
+
+  /* Custom Scrollbar for Webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #f2f2f2;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #e0e0e0;
+  }
+
+  /* Custom Scrollbar for Firefox */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #f2f2f2 #0a0a0a;
+  }
 }
 
 @keyframes rotateCircle {
@@ -90,3 +114,4 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
 }
+

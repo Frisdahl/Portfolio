@@ -1,4 +1,4 @@
 <svg xmlnsXlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31 26" fill="none" width="31"  height="26" >
-                                        <path d="M18.582 24.6654L29.3737 12.9987L18.582 1.33203" stroke="#12181B" strokeWidth="2px" strokeMiterlimit="10" fill="none"></path>
-                                        <path d="M29.3737 13L0.0820312 13" stroke="#12181B" strokeWidth="2px" strokeMiterlimit="10" fill="none"></path>
+                                        <path d="M18.582 24.6654L29.3737 12.9987L18.582 1.33203" stroke="#12181B" strokeWidth="10px" strokeMiterlimit="10" fill="none"></path>
+                                        <path d="M29.3737 13L0.0820312 13" stroke="#12181B" strokeWidth="20px" strokeMiterlimit="10" fill="none"></path>
                                     </svg>

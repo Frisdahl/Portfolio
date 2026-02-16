@@ -5,12 +5,12 @@ const ServicesSection: React.FC = () => {
   return (
     <section className="py-16 px-8 w-full">
       {/* Row for Header and Paragraph */}
-      <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+      <div className="flex flex-col lg:flex-row justify-between items-end mb-12">
         <h2 className="text-6xl font-[granary] uppercase text-[#010101] w-full text-left">
           <span className="font-bold">My services</span> <br></br> and areas of
           expertise
         </h2>
-        <p className="text-lg md:w-1/3 text-right">
+        <p className="text-lg w-full text-left lg:w-1/3 lg:text-right">
           Every project is unique. I provide tailor-made solutions with
           meticulous attention to detail. I focus solely on areas where I can
           truly create added value for my clients.
@@ -18,7 +18,7 @@ const ServicesSection: React.FC = () => {
       </div>
 
       {/* Row for Service Lines - now full width, left aligned */}
-      <div className="flex flex-col w-3/4 mt-24 ml-auto">
+      <div className="flex flex-col w-full md:w-3/4 md:ml-auto mt-24">
         <hr className=" border-[#dcdcdc] z-10" />
         <ServiceItem
           name="Responsive Frontend Development"

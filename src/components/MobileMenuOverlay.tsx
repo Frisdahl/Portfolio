@@ -1,6 +1,7 @@
 import React from "react";
 import AnimatedButton from "./AnimatedButton"; // Import AnimatedButton
-import ArrowIcon from "../../arrow-icon.svg"; // Import arrow icon
+import { scrollTo } from "../utils/smoothScroll";
+import ArrowIcon from "./ArrowIcon"; // Import the new component
 
 const Section = ({
   title,
@@ -25,6 +26,11 @@ const MobileMenuOverlay: React.FC<{
   isOpen: boolean;
   onClose: () => void;
 }> = ({ isOpen, onClose }) => {
+  const handleGetInTouchClick = () => {
+    onClose();
+    scrollTo("#contact", 2);
+  };
+
   return (
     // Outermost fixed full-screen container for the overlay
     <div
@@ -90,10 +96,11 @@ const MobileMenuOverlay: React.FC<{
           </nav>
           <AnimatedButton
             text="Get in touch"
-            baseBgColor="bg-black"
-            baseTextColor="text-white"
-            hoverTextColor="text-black"
-            onClick={onClose}
+            baseBgColor="bg-[#0a0a0a]"
+            baseTextColor="text-[#f2f2f2]"
+            hoverTextColor="text-[#0a0a0a]"
+            hoverBgColor="bg-[#f2f2f2]"
+            onClick={handleGetInTouchClick}
             className={`mb-4 transition-all duration-300 ease-out ${
               /* Changed mb-8 to mb-4 */
               isOpen
@@ -131,17 +138,9 @@ const MobileMenuOverlay: React.FC<{
                 {" "}
                 {/* Wrapper for arrows */}
                 {/* Current arrow, slides out top-right */}
-                <img
-                  src={ArrowIcon}
-                  alt="Arrow"
-                  className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0"
-                />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0" />
                 {/* New arrow, slides in bottom-left */}
-                <img
-                  src={ArrowIcon}
-                  alt="Arrow"
-                  className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
-                />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100" />
               </span>
             </a>
             <a
@@ -157,17 +156,9 @@ const MobileMenuOverlay: React.FC<{
                 {" "}
                 {/* Wrapper for arrows */}
                 {/* Current arrow, slides out top-right */}
-                <img
-                  src={ArrowIcon}
-                  alt="Arrow"
-                  className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0"
-                />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0" />
                 {/* New arrow, slides in bottom-left */}
-                <img
-                  src={ArrowIcon}
-                  alt="Arrow"
-                  className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
-                />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100" />
               </span>
             </a>
             <a
@@ -183,17 +174,9 @@ const MobileMenuOverlay: React.FC<{
                 {" "}
                 {/* Wrapper for arrows */}
                 {/* Current arrow, slides out top-right */}
-                <img
-                  src={ArrowIcon}
-                  alt="Arrow"
-                  className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0"
-                />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0" />
                 {/* New arrow, slides in bottom-left */}
-                <img
-                  src={ArrowIcon}
-                  alt="Arrow"
-                  className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
-                />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100" />
               </span>
             </a>
           </Section>

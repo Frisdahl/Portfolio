@@ -31,13 +31,11 @@ const CursorFollower: React.FC<CursorFollowerProps> = ({ x, y, isVisible }) => {
     const animate = () => {
       setSmoothedX((prevX) => {
         const dx = targetX.current - prevX;
-        // Removed the snap-to-target condition for smoother easing
         return prevX + dx * easingFactor;
       });
 
       setSmoothedY((prevY) => {
         const dy = targetY.current - prevY;
-        // Removed the snap-to-target condition for smoother easing
         return prevY + dy * easingFactor;
       });
 
@@ -93,7 +91,7 @@ const CursorFollower: React.FC<CursorFollowerProps> = ({ x, y, isVisible }) => {
 
   return (
     <div
-      className="fixed z-50 pointer-events-none flex items-center justify-center py-2 px-4 rounded-full"
+      className="absolute z-50 pointer-events-none flex items-center justify-center py-2 px-4 rounded-full"
       style={{
         left: `${smoothedX}px`,
         top: `${smoothedY}px`,
@@ -109,7 +107,7 @@ const CursorFollower: React.FC<CursorFollowerProps> = ({ x, y, isVisible }) => {
         minWidth: "120px",
       }}
     >
-      <span className="mr-2 text-white font-normal">show case</span>
+      <span className="mr-2 text-white font-normal whitespace-nowrap">show case</span>
       {arrowSvg}
     </div>
   );
