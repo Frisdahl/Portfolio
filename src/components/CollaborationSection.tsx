@@ -9,7 +9,7 @@ const CollaborationSection: React.FC = () => {
     >
       {/* Row for Header and Paragraph */}
       <div className="flex flex-col lg:flex-row justify-between items-end mb-24">
-        <h2 className="text-6xl md:text-8xl lg:text-7xl xl:text-8xl font-[granary] uppercase text-[var(--foreground)] w-full lg:w-1/2 text-left">
+        <h2 className="text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-[granary] uppercase text-[var(--foreground)] w-full lg:w-1/2 text-left">
           Two ways to <br></br>
           <span className="font-apparel pl-48">collaborate</span>
         </h2>

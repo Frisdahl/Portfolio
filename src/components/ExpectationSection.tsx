@@ -259,7 +259,7 @@ const ExpectationSection: React.FC = () => {
             <p className="font-granary uppercase tracking-[0.3em] text-xs text-[var(--foreground)] mix-blend-difference opacity-50">
               What You Can Expect
             </p>
-            <h2 className="text-6xl md:text-8xl lg:text-7xl xl:text-8xl mb-8 uppercase text-[var(--foreground)] leading-tight whitespace-nowrap">
+            <h2 className="text-6xl md:text-6xl lg:text-7xl xl:text-8xl mb-8 uppercase text-[var(--foreground)] leading-tight whitespace-nowrap">
               Why Work <br></br>{" "}
               <span className="font-apparel pl-48">Together</span>
             </h2>
