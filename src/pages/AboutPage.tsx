@@ -55,12 +55,12 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="pt-32 pb-64">
-      <section id="about-me" className="text-white w-full px-8 md:px-16 lg:px-24">
+      <section id="about-me" className="text-[var(--foreground)] w-full px-8 md:px-16 lg:px-24">
         <div ref={containerRef} className="relative">
           
           <h2 
             ref={headingRef1}
-            className="text-8xl font-[granary] text-[#f2f2f2] w-full text-left leading-tight mb-4"
+            className="text-8xl font-[granary] text-[var(--foreground)] w-full text-left leading-tight mb-4"
           >
             As a <span className="font-apparel">creative designer</span>, I help
             brands and companies connect with their audience,
@@ -74,12 +74,12 @@ const AboutPage: React.FC = () => {
 
           <h2 
             ref={headingRef2}
-            className="text-8xl font-[granary] text-[#f2f2f2] w-full text-left leading-tight"
+            className="text-8xl font-[granary] text-[var(--foreground)] w-full text-left leading-tight"
           >
             achieve their business goals, and leave a mark in a fast-moving world
           </h2>
 
-          <p className="text-2xl text-left mt-10 clear-none">
+          <p className="text-2xl text-left mt-10 clear-none text-[var(--foreground)] opacity-90">
             My name is Alexander. I’m a passionate creative who works closely with
             companies to help them unlock their full potential and solve specific
             business problems with effective and memorable design solutions.

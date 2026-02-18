@@ -8,16 +8,16 @@ interface ServiceItemProps {
 const ServiceItem: React.FC<ServiceItemProps> = ({ name, description }) => {
   return (
     <div className="relative group overflow-hidden cursor-pointer py-4">
-      {/* The black box that slides up */}
-      <div className="absolute inset-0 bg-[#0a0a0a] transition-transform duration-200 translate-y-full group-hover:translate-y-0 z-0"></div>
+      {/* The background box that slides up */}
+      <div className="absolute inset-0 bg-[var(--foreground)] transition-transform duration-200 translate-y-full group-hover:translate-y-0 z-0"></div>
 
       <div className="flex justify-between items-center relative z-10 pl-2 pr-2 w-full">
-        <p className="text-xl uppercase text-[#0a0a0a] transition-colors duration-300 group-hover:text-white text-left">
+        <p className="text-xl uppercase text-[var(--foreground)] transition-colors duration-300 group-hover:text-[var(--background)] text-left">
           {name}
         </p>
-        <p className="text-sm text-[#f2f2f2] mx-4">
+        <p className="text-sm text-[var(--foreground-muted)] mx-4">
           {" "}
-          {/* Description is now a fixed color */}
+          {/* Description uses muted variable */}
           {description}
         </p>
         {/* Inline SVG for direct fill control */}
@@ -25,7 +25,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({ name, description }) => {
           xmlnsXlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 31 26"
-          className="h-6 w-6 transition-transform duration-300 transform -rotate-45 group-hover:rotate-0 text-[#12181B] group-hover:text-white"
+          className="h-6 w-6 transition-transform duration-300 transform -rotate-45 group-hover:rotate-0 text-[var(--foreground)] group-hover:text-[var(--background)]"
           fill="none"
         >
           <path

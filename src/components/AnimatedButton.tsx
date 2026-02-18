@@ -19,12 +19,12 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   link,
   onClick,
   padding = "px-6 py-6",
-  baseBgColor = "bg-[#0a0a0a]",
-  baseTextColor = "text-[#f2f2f2]",
-  hoverTextColor = "group-hover:text-[#0a0a0a]",
-  hoverBgColor = "bg-[#f2f2f2]", // Default to bg-white if not provided
-  baseBorderColor = "border-[#0a0a0a]", // Default to border-black
-  hoverBorderColor = "group-hover:border-[#0a0a0a]", // Default to border-black on hover
+  baseBgColor = "bg-[var(--foreground)]",
+  baseTextColor = "text-[var(--background)]",
+  hoverTextColor = "group-hover:text-[var(--foreground)]",
+  hoverBgColor = "bg-[var(--background)]", // Default to bg-white if not provided
+  baseBorderColor = "border-[var(--foreground)]", // Default to border-black
+  hoverBorderColor = "group-hover:border-[var(--foreground)]", // Default to border-black on hover
   className = "",
 }) => {
   const ButtonComponent = link ? "a" : "button";

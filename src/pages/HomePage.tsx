@@ -5,7 +5,6 @@ import ServicesSection from "../components/ServicesSection";
 import ExpectationSection from "../components/ExpectationSection";
 import CollaborationSection from "../components/CollaborationSection";
 import VideoShowcase from "../components/VideoShowcase";
-import ThemeTransitionCircle from "../components/ThemeTransitionCircle";
 
 function HomePage() {
   const [isVideoExpanded, setIsVideoExpanded] = useState(false);
@@ -30,9 +29,6 @@ function HomePage() {
       <HeroSection />
       <VideoShowcase isExpanded={isVideoExpanded} />
       <Projects />
-      
-      {/* Circle Transition Component */}
-      <ThemeTransitionCircle />
       
       <ServicesSection />
       

@@ -12,8 +12,8 @@
 .dark {
   --background: #0a0a0a;
   --background-rgb: 10, 10, 10;
-  --foreground: #f2f2f2;
-  --foreground-rgb: 242, 242, 242;
+  --foreground: #e4e3de;
+  --foreground-rgb: 228, 227, 222;
   --foreground-muted: #a0a0a0;
   --divider: rgba(255, 255, 255, 0.1);
 }
@@ -129,18 +129,18 @@ body {
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #f2f2f2;
+    background: var(--foreground);
     border-radius: 10px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #e0e0e0;
+    background: var(--foreground-muted);
   }
 
   /* Custom Scrollbar for Firefox */
   html {
     scrollbar-width: thin;
-    scrollbar-color: #f2f2f2 #0a0a0a;
+    scrollbar-color: var(--foreground) var(--background);
   }
 }
 

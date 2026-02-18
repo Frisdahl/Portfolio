@@ -44,9 +44,9 @@ const MobileMenuOverlay: React.FC<{
     >
       {/* The actual menu panel that slides in/out */}
       <div
-        className={`fixed top-0 right-0 w-[30vw] bg-[#f2f2f2] transform transition-transform duration-700 ease-in-out ${
+        className={`fixed top-0 right-0 w-[30vw] bg-[#e4e2dd] transform transition-transform duration-700 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full transition-delay-300"
-        } overflow-y-auto px-8 pt-8 pb-4 text-left rounded-bl-xl rounded-br-xl rounded-tl-xl rounded-tr-none max-h-[80vh]`} // Adjusted padding
+        } overflow-y-auto px-8 pt-8 pb-4 text-left rounded-bl-xl rounded-br-xl rounded-tl-xl rounded-tr-none max-h-[80vh] text-[#0a0a0a]`} // Adjusted padding
         onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing the menu
       >
         {/* Left side: Main Nav - now at the top of the single column */}
@@ -60,10 +60,10 @@ const MobileMenuOverlay: React.FC<{
           >
             Menu
           </h3>
-          <nav className="text-4xl text-[#131623] font-[300] flex flex-col space-y-8 mb-8">
+          <nav className="text-4xl text-[#0a0a0a] font-[300] flex flex-col space-y-8 mb-8">
             <Link
               to="/"
-              className={`hover:text-gray-600 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
+              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-300"
                   : "opacity-0 translate-y-4"
@@ -76,7 +76,7 @@ const MobileMenuOverlay: React.FC<{
             </Link>
             <Link
               to="/about"
-              className={`hover:text-gray-600 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
+              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-400"
                   : "opacity-0 translate-y-4"
@@ -87,7 +87,7 @@ const MobileMenuOverlay: React.FC<{
             </Link>
             <Link
               to="/"
-              className={`hover:text-gray-600 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
+              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-500"
                   : "opacity-0 translate-y-4"
@@ -100,9 +100,9 @@ const MobileMenuOverlay: React.FC<{
           <AnimatedButton
             text="Get in touch"
             baseBgColor="bg-[#0a0a0a]"
-            baseTextColor="text-[#f2f2f2]"
-            hoverTextColor="text-[#0a0a0a]"
-            hoverBgColor="bg-[#f2f2f2]"
+            baseTextColor="text-[#e4e2dd]"
+            hoverTextColor="group-hover:text-[#0a0a0a]"
+            hoverBgColor="bg-[#e4e2dd]"
             onClick={handleGetInTouchClick}
             className={`mb-4 transition-all duration-300 ease-out ${
               /* Changed mb-8 to mb-4 */
@@ -125,12 +125,11 @@ const MobileMenuOverlay: React.FC<{
           >
             <hr className="border-t border-gray-300 my-4" />
           </div>
-          <Section>
-            {" "}
-            {/* Removed title="Social" */}
+          <Section title="">
+             {/* Note: Section component needs title prop if we want to follow its definition */}
             <a
               href="#facebook"
-              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out ${
+              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out text-[#0a0a0a] ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-800"
                   : "opacity-0 translate-y-4"
@@ -138,17 +137,13 @@ const MobileMenuOverlay: React.FC<{
             >
               <span>Facebook</span>
               <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
-                {" "}
-                {/* Wrapper for arrows */}
-                {/* Current arrow, slides out top-right */}
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0" />
-                {/* New arrow, slides in bottom-left */}
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100" />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0 brightness-0" />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 brightness-0" />
               </span>
             </a>
             <a
               href="#linkedin"
-              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out ${
+              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out text-[#0a0a0a] ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-900"
                   : "opacity-0 translate-y-4"
@@ -156,17 +151,13 @@ const MobileMenuOverlay: React.FC<{
             >
               <span>LinkedIn</span>
               <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
-                {" "}
-                {/* Wrapper for arrows */}
-                {/* Current arrow, slides out top-right */}
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0" />
-                {/* New arrow, slides in bottom-left */}
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100" />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0 brightness-0" />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 brightness-0" />
               </span>
             </a>
             <a
               href="#email"
-              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out ${
+              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out text-[#0a0a0a] ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-1000"
                   : "opacity-0 translate-y-4"
@@ -174,12 +165,8 @@ const MobileMenuOverlay: React.FC<{
             >
               <span>Email</span>
               <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
-                {" "}
-                {/* Wrapper for arrows */}
-                {/* Current arrow, slides out top-right */}
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0" />
-                {/* New arrow, slides in bottom-left */}
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100" />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0 brightness-0" />
+                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 brightness-0" />
               </span>
             </a>
           </Section>

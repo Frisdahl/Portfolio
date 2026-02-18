@@ -18,21 +18,21 @@ const Dropdown: React.FC<DropdownProps> = ({
   return (
     <>
       <button
-        className={`flex justify-between items-center w-full text-lg font-semibold text-gray-800 border-gray-300 focus:outline-none py-4 cursor-pointer ${isOpen ? "border-b-0" : "border-b"}`}
+        className={`flex justify-between items-center w-full text-lg font-semibold text-[var(--foreground)] border-[var(--divider)] focus:outline-none py-4 cursor-pointer ${isOpen ? "border-b-0" : "border-b"}`}
         onClick={onToggle}
       >
-        <span className="text-xl uppercase font-normal text-[#0a0a0a]">
+        <span className="text-xl uppercase font-normal text-[var(--foreground)]">
           {title}
         </span>
         <div className="relative w-4 h-4 flex items-center justify-center">
-          <span className="absolute h-0.5 w-full bg-gray-800 transition-transform duration-300 ease-out"></span>
+          <span className="absolute h-0.5 w-full bg-[var(--foreground)] transition-transform duration-300 ease-out"></span>
           <span
-            className={`absolute h-0.5 w-full bg-gray-800 transition-transform duration-300 ease-out ${isOpen ? "rotate-180" : "rotate-90"}`}
+            className={`absolute h-0.5 w-full bg-[var(--foreground)] transition-transform duration-300 ease-out ${isOpen ? "rotate-180" : "rotate-90"}`}
           ></span>
         </div>
       </button>
       <div
-        className={`mt-2 text-gray-600 text-left overflow-hidden transition-all duration-300 ease-in-out`}
+        className={`mt-2 text-[var(--foreground-muted)] text-left overflow-hidden transition-all duration-300 ease-in-out`}
         style={{
           maxHeight: isOpen ? "200px" : "0",
           opacity: isOpen ? "1" : "0",
@@ -248,32 +248,25 @@ const ExpectationSection: React.FC = () => {
   };
 
   return (
-    <section className="py-24 text-gray-800 px-8 max-w-[1700px] mx-auto w-full">
+    <section
+      id="expectations"
+      className="text-[var(--foreground)] mb-64 px-24 mx-auto w-full"
+    >
       <div className=" mx-auto px-8 sm:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-24 xl:gap-32 items-start">
           {/* Left Column */}
-          <div className="text-left">
-            <h2 className="text-6xl mb-8 uppercase text-[#0a0a0a] leading-tight">
-              <span className="font-bold">What You Can Expect</span> <br></br>{" "}
-              Working With Me
-            </h2>
-            <p className="text-lg mb-12 max-w-lg">
-              Clear communication, thoughtful design decisions, and a focus on
-              building fast, scalable web solutions. I combine technical
-              expertise with a user-first mindset to deliver reliable and modern
-              digital experiences — from concept to launch.
+          <div className="text-left lg:-mt-24 lg:col-span-1">
+            <p className="font-granary uppercase tracking-[0.3em] text-xs text-[var(--foreground)] mix-blend-difference opacity-50">
+              What You Can Expect
             </p>
-            <AnimatedButton
-              text="Get in touch"
-              baseBgColor="bg-[#0a0a0a]"
-              baseTextColor="text-[#f2f2f2]"
-              hoverTextColor="text-[#0a0a0a]"
-              onClick={() => scrollTo("#contact")}
-            />
+            <h2 className="text-6xl md:text-8xl lg:text-7xl xl:text-8xl mb-8 uppercase text-[var(--foreground)] leading-tight whitespace-nowrap">
+              Why Work <br></br>{" "}
+              <span className="font-apparel pl-48">Together</span>
+            </h2>
           </div>
 
           {/* Right Column - Dropdowns */}
-          <div>
+          <div className="lg:col-span-3 lg:col-start-2 mt-48">
             {dropdownData.map((item, index) => (
               <Dropdown
                 key={index}

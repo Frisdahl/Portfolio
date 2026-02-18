@@ -19,7 +19,7 @@ const BurgerMenuButton: React.FC<BurgerMenuButtonProps> = ({
   // Use dynamic theme variables
   
   const barColor = isOpen 
-    ? 'bg-[#0a0a0a] group-hover:bg-[#f2f2f2]' 
+    ? 'bg-[#0a0a0a] group-hover:bg-[#e4e2dd]' 
     : 'bg-[var(--foreground)] group-hover:bg-[var(--background)]';
   
   const circleColor = isOpen

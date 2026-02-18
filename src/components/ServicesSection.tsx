@@ -63,15 +63,18 @@ const ServicesSection: React.FC = () => {
       <div className="flex mb-32">
         <div className="flex flex-col gap-4 w-full">
           {items.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-12 relative">
+            <div
+              key={idx}
+              className="flex items-center text-[var(--foreground)] gap-12 relative"
+            >
               <div
-                className={`w-32 md:w-48 lg:w-64 font-apparel italic text-2xl md:text-3xl text-right whitespace-nowrap mix-blend-difference text-white z-20 ${
+                className={`w-32 md:w-48 lg:w-64 font-apparel italic text-2xl md:text-3xl whitespace-nowrap mix-blend-difference z-20 ${
                   idx === 0 ? "opacity-100" : "opacity-0 pointer-events-none"
                 }`}
               >
                 {title}
               </div>
-              <div className="flex-1 font-granary text-3xl md:text-3xl lg:text-4xl text-left uppercase tracking-tighter leading-tight hover:opacity-50 transition-opacity cursor-default mix-blend-difference text-white z-20">
+              <div className="flex-1 font-granary text-3xl md:text-3xl lg:text-4xl text-left uppercase tracking-tighter leading-tight hover:opacity-50 transition-opacity cursor-default mix-blend-difference z-20">
                 {item}
               </div>
             </div>
@@ -84,28 +87,29 @@ const ServicesSection: React.FC = () => {
   return (
     <section
       ref={containerRef}
-      className="relative px-8 w-full bg-transparent overflow-visible"
+      id="services"
+      className="relative px-24 w-full mb-64 bg-transparent overflow-visible"
     >
       <div className="relative z-10">
         {/* Main Content Area - Shifted to the right */}
         <div className="relative ">
           {/* Intro Header */}
-          <div className="mb-24 text-center  lg:text-left py-32">
-            <p className="font-granary uppercase tracking-[0.3em] text-xs mb-8 text-white mix-blend-difference opacity-50">
+          <div className=" text-center  lg:text-left py-32">
+            <p className="font-granary uppercase tracking-[0.3em] text-xs mb-8 text-[var(--foreground)] mix-blend-difference opacity-50">
               (my areas of focus)
             </p>
-            <h3 className="text-6xl md:text-8xl lg:text-8xl font-granary uppercase tracking-tighter font-normal leading-[1] text-white mix-blend-difference">
+            <h3 className="text-6xl md:text-8xl lg:text-8xl font-granary uppercase tracking-tighter font-normal leading-[1] text-[var(--foreground)] mix-blend-difference">
               key skills<br></br>
-              <span className="pl-32">
+              <span className="pl-48">
                 & <span className="font-apparel">interests</span>
               </span>
             </h3>
           </div>
 
           {/* Main Content Container */}
-          <div className="max-w-7xl w-full mx-auto flex flex-col lg:flex-row items-start justify-center relative">
+          <div className="max-w-7xl w-full mx-auto py-12 flex flex-col lg:flex-row items-start justify-center relative pb-32">
             {/* Left Column: Scrolling Image */}
-            <div className="w-full lg:w-[40%] sticky top-32 overflow-hidden rounded-xl aspect-[4/5] bg-neutral-900 z-10 lg:-mr-24 xl:-mr-32">
+            <div className="w-full lg:w-[40%] sticky top-32 overflow-hidden rounded-xl aspect-[4/5] bg-neutral-900 z-10 lg:-mr-24 xl:-mr-32 lg:-mt-32">
               <img
                 ref={imageRef}
                 src={images[0]}
@@ -115,7 +119,7 @@ const ServicesSection: React.FC = () => {
             </div>
 
             {/* Right Column: Categories */}
-            <div className="w-full lg:w-[60%] flex flex-col z-20">
+            <div className="w-full lg:w-[60%] flex flex-col z-20 pt-32">
               <SkillList
                 title="capabilities"
                 items={[

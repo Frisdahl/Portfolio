@@ -31,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   useLayoutEffect(() => {
     // Clear existing triggers
-    ScrollTrigger.getAll().forEach(st => st.kill());
+    ScrollTrigger.getAll().forEach((st) => st.kill());
 
     if (location.pathname === "/") {
       // Home page scroll logic
@@ -69,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
 
     return () => {
-      ScrollTrigger.getAll().forEach(st => st.kill());
+      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
   }, [location.pathname]);
 
@@ -77,7 +77,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div
       ref={layoutRef}
       className={`flex flex-col min-h-screen ${isHeaderInverted ? "dark" : ""}`}
-      style={{ backgroundColor: location.pathname === "/" ? "#E4E2DD" : "#0a0a0a" }}
+      style={{
+        backgroundColor: location.pathname === "/" ? "#EFE9E1" : "#0a0a0a",
+      }}
     >
       <Header isInverted={isHeaderInverted} />
       <BurgerMenuButton
