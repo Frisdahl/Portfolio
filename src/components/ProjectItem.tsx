@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import QuoteSVG from "../assets/quote.svg";
 import CursorFollower from "./CursorFollower";
 import { gsap } from "gsap"; // GSAP import
 import { ScrollTrigger } from "gsap/ScrollTrigger"; // ScrollTrigger import
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface Project {
   id: number;
@@ -14,13 +15,23 @@ interface Project {
 
 interface ProjectItemProps {
   project: Project;
+  index: number;
+  speed?: number;
+  aspectClassName?: string;
 }
 
-const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
+const ProjectItem: React.FC<ProjectItemProps> = ({
+  project,
+  index,
+  speed = 1,
+  aspectClassName = "aspect-square",
+}) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isPreviewOn, setIsPreviewOn] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null); // Ref for this specific image container
   const itemRef = useRef(null); // Ref for GSAP animation
+  const parallaxRef = useRef(null);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -38,75 +49,94 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
   };
 
   useEffect(() => {
-    if (!itemRef.current) return; // Add this check
+    if (!itemRef.current) return;
 
-    // Create a GSAP context to manage animations, preventing conflicts
     let ctx = gsap.context(() => {
+      // Parallax effect
+      if (parallaxRef.current) {
+        gsap.to(parallaxRef.current, {
+          y: (i, target) => -((speed - 1) * 400), // Reduced multiplier from 1000 to 400
+          ease: "none",
+          scrollTrigger: {
+            trigger: itemRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+
+      // Initial fade-in
       gsap.fromTo(
         itemRef.current,
-        { opacity: 0, y: 50 }, // from these values
+        { opacity: 100, y: 50 },
         {
-          // to these values
           opacity: 1,
           y: 0,
           duration: 0.8,
           ease: "power2.out",
           scrollTrigger: {
             trigger: itemRef.current,
-            start: "top bottom-=100", // Start animation when top of element hits 100px from bottom of viewport
-            toggleActions: "play none none none", // Play once on enter
-            // markers: true, // For debugging scroll trigger positions
+            start: "top bottom-=100",
+            toggleActions: "play none none none",
           },
         },
       );
-    }, itemRef); // <- scope the context to the component's ref
+    }, itemRef);
 
-    return () => ctx.revert(); // <- revert all animations in this context on component unmount
-  }, []); // Empty dependency array means this runs once on mount
+    return () => ctx.revert();
+  }, [speed]);
+
+  const projectNumber = `00-${index + 1}`;
 
   return (
     <div ref={itemRef} className="w-full">
-      <div
-        ref={imageRef} // Attach ref here to the individual project's image container
-        className="relative w-full aspect-square overflow-hidden cursor-none bg-gray-200 rounded-3xl flex items-center justify-center text-gray-500 text-lg font-bold"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onMouseMove={handleMouseMove}
-      >
-        <img
-          src={project.image}
-          alt={project.title}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      <div ref={parallaxRef} className="w-full">
+        {/* Top Header */}
+        <div
+          className="flex justify-between items-center mb-6 font-granary uppercase tracking-wider text-base"
+          style={{ color: "var(--foreground)" }}
+        >
+          <div style={{ color: "var(--foreground-muted)" }}>
+            {projectNumber}
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="opacity-60">PREVIEW</span>
+            <button
+              onClick={() => setIsPreviewOn(!isPreviewOn)}
+              className="w-10 h-5 rounded-full border relative flex items-center px-0.5 cursor-pointer transition-colors duration-300"
+              style={{ borderColor: "var(--divider)" }}
+            >
+              <div
+                className={`w-3.5 h-3.5 rounded-full transition-all duration-300 transform ${
+                  isPreviewOn ? "translate-x-5" : "translate-x-0 opacity-40"
+                }`}
+                style={{ backgroundColor: "var(--foreground)" }}
+              ></div>
+            </button>
+          </div>
+        </div>
 
-        {isHovered && (
-          <CursorFollower
-            x={mousePosition.x}
-            y={mousePosition.y}
-            isVisible={isHovered}
+        <div
+          ref={imageRef}
+          className={`relative w-full ${aspectClassName} overflow-hidden cursor-none flex items-center justify-center text-gray-500 text-lg font-bold`}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onMouseMove={handleMouseMove}
+        >
+          <img
+            src={project.image}
+            alt={project.title}
+            className="absolute inset-0 w-full h-full object-cover rounded-md"
           />
-        )}
-      </div>
-      <h3 className="text-2xl pt-6 font-bold text-left text-gray-900 mb-2">
-        {project.title}
-      </h3>
 
-      <div className="py-6  text-left flex-col justify-start">
-        <div className="flex justify-center ">
-          <div className="flex flex-col justify-center items-center pr-6">
-            <img src={QuoteSVG} alt="Quote symbol" className="w-8 h-8 mb-2" />
-            <div
-              className="h-full w-[2px]"
-              style={{ backgroundColor: "#d2d5e1" }}
-            ></div>
-          </div>
-          <div>
-            <p className="text-gray-600 mb-4 text-[1.25rem]">
-              {project.description}
-            </p>
-            <p className="font-bold mt-4 text-base">John Doe</p>
-            <p className="text-gray-500 text-sm">Project Lead</p>
-          </div>
+          {isHovered && (
+            <CursorFollower
+              x={mousePosition.x}
+              y={mousePosition.y}
+              isVisible={isHovered}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -5,60 +5,70 @@ const projects = [
   {
     id: 1,
     title: "Bang & Olufsen",
-    description:
-      "A brief description of Project One, highlighting its key features and technologies used.",
-    image: "/images/Bang&Olufsen.webp", // New image
+    image: "/images/Bang&Olufsen.webp",
     link: "#",
   },
   {
     id: 2,
     title: "Visuel Atelier",
-    description:
-      "A brief description of Project Two, highlighting its key features and technologies used.",
-    image: "/images/Visuel-Atelier.webp", // New image
+    image: "/images/Visuel-Atelier.webp",
     link: "#",
   },
   {
     id: 3,
     title: "Project Three",
-    description:
-      "A brief description of Project Three, highlighting its key features and technologies used.",
-    image: "https://placehold.co/400x300", // Placeholder image
+    image: "https://placehold.co/1200x600",
     link: "#",
   },
   {
     id: 4,
     title: "Project Four",
-    description:
-      "A brief description of Project Four, highlighting its key features and technologies used.",
-    image: "https://placehold.co/400x300", // Placeholder image
+    image: "https://placehold.co/800x800",
+    link: "#",
+  },
+  {
+    id: 5,
+    title: "Project Five",
+    image: "https://placehold.co/400x400",
     link: "#",
   },
 ];
 
 const Projects: React.FC = () => {
-  const mid = Math.ceil(projects.length / 2);
-  const leftColumnProjects = projects.slice(0, mid);
-  const rightColumnProjects = projects.slice(mid);
-
   return (
-    <section id="projects" className={`text-gray-800 pb-48`}>
-      <div className="max-w-[1600px] mx-auto px-16 sm:px-24 lg:px-36">
-        <div className="flex flex-col md:flex-row justify-between gap-16 md:gap-36 items-start">
-          {/* Left Column */}
-          <div className="flex flex-col gap-16 md:gap-36 md:w-1/2">
-            {leftColumnProjects.map((project) => (
-              <ProjectItem key={project.id} project={project} />
-            ))}
+    <section id="projects" className={`mb-64 w-full`}>
+      <div className="w-full px-8 md:px-16 lg:px-24">
+        <div className="flex flex-col gap-32 md:gap-64">
+          {/* Row 1: Two projects, pushed to sides */}
+          <div className="flex flex-col md:flex-row items-start justify-between gap-16">
+            <div className="md:w-3/12 md:mt-32">
+              <ProjectItem project={projects[0]} index={0} speed={1.4} />
+            </div>
+            <div className="md:w-6/12">
+              <ProjectItem project={projects[1]} index={1} speed={1.1} />
+            </div>
           </div>
 
-          {/* Right Column - Staggered */}
-          <div className="flex flex-col gap-16 md:gap-36 md:w-1/2 md:mt-[35%]">
-            {" "}
-            {/* Apply stagger here */}
-            {rightColumnProjects.map((project) => (
-              <ProjectItem key={project.id} project={project} />
-            ))}
+          {/* Row 2: Horizontal project shifted left */}
+          <div className="flex justify-start">
+            <div className="w-full md:w-8/12">
+              <ProjectItem
+                project={projects[2]}
+                index={2}
+                speed={1.2}
+                aspectClassName="aspect-video"
+              />
+            </div>
+          </div>
+
+          {/* Row 3: Pushed to sides, big on left, smaller on right/lower */}
+          <div className="flex flex-col md:flex-row items-start justify-between gap-16">
+            <div className="md:w-6/12">
+              <ProjectItem project={projects[3]} index={3} speed={0.9} />
+            </div>
+            <div className="md:w-3/12 md:mt-48">
+              <ProjectItem project={projects[4]} index={4} speed={1.6} />
+            </div>
           </div>
         </div>
       </div>

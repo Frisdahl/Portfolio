@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import AnimatedButton from "./AnimatedButton"; // Import AnimatedButton
 import { scrollTo } from "../utils/smoothScroll";
 import ArrowIcon from "./ArrowIcon"; // Import the new component
@@ -60,8 +61,8 @@ const MobileMenuOverlay: React.FC<{
             Menu
           </h3>
           <nav className="text-4xl text-[#131623] font-[300] flex flex-col space-y-8 mb-8">
-            <a
-              href="#works"
+            <Link
+              to="/"
               className={`hover:text-gray-600 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-300"
@@ -69,13 +70,12 @@ const MobileMenuOverlay: React.FC<{
               }`}
               onClick={() => {
                 onClose();
-                scrollTo('#projects', 3);
               }}
             >
               Works
-            </a>
-            <a
-              href="#about"
+            </Link>
+            <Link
+              to="/about"
               className={`hover:text-gray-600 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-400"
@@ -84,9 +84,9 @@ const MobileMenuOverlay: React.FC<{
               onClick={onClose}
             >
               About us
-            </a>
-            <a
-              href="#blog"
+            </Link>
+            <Link
+              to="/"
               className={`hover:text-gray-600 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-500"
@@ -95,7 +95,7 @@ const MobileMenuOverlay: React.FC<{
               onClick={onClose}
             >
               Blog
-            </a>
+            </Link>
           </nav>
           <AnimatedButton
             text="Get in touch"

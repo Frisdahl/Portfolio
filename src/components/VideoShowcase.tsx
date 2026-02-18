@@ -6,9 +6,9 @@ interface VideoShowcaseProps {
 
 const VideoShowcase: React.FC<VideoShowcaseProps> = ({ isExpanded }) => {
   return (
-    <section className="py-16">
+    <section className="mb-64">
       <div
-        className={`mx-auto overflow-hidden rounded-3xl px-8 pb-48 transition-[width,opacity,transform] duration-1000 ease-in-out ${
+        className={`mx-auto overflow-hidden rounded-3xl px-8  transition-[width,opacity,transform] duration-1000 ease-in-out ${
           isExpanded ? "w-full" : "w-[50vw]"
         }`}
       >
