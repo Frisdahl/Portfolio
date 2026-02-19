@@ -28,36 +28,55 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   aspectClassName = "aspect-square",
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isPreviewToggled, setIsPreviewToggled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const imageRef = useRef<HTMLDivElement>(null); // Ref for this specific image container
-  const itemRef = useRef(null); // Ref for GSAP animation
+  const imageRef = useRef<HTMLDivElement>(null);
+  const itemRef = useRef(null);
   const parallaxRef = useRef(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+
+  const titleRevealRef = useRef<HTMLDivElement>(null);
+  const categoriesRevealRef = useRef<HTMLDivElement>(null);
+  const titleTextRef = useRef<HTMLHeadingElement>(null);
+  const categoriesTextRef = useRef<HTMLParagraphElement>(null);
 
   const getVideoSrc = (src?: string) => {
     if (!src) return undefined;
-    // Ensure the path starts with a single /
     return src.startsWith("/") ? src : `/${src}`;
   };
 
   const videoSrc = getVideoSrc(project.video);
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
 
-  const handleMouseLeave = () => {
-    setIsHovered(false);
+  // Master playback control
+  useEffect(() => {
+    if (isHovered || isPreviewToggled) {
+      setIsPlaying(true);
+    } else if (!videoSrc) {
+      // Immediate stop if no video
+      setIsPlaying(false);
+    }
+    // If there is a video, we let handleVideoEnded manage the stop
+  }, [isHovered, isPreviewToggled, videoSrc]);
+
+  const handleVideoEnded = () => {
+    if (isHovered || isPreviewToggled) {
+      videoRef.current?.play().catch(() => undefined);
+    } else {
+      setIsPlaying(false);
+    }
   };
 
   useEffect(() => {
     if (!itemRef.current) return;
 
     let ctx = gsap.context(() => {
-      // Parallax effect
       if (parallaxRef.current) {
         gsap.to(parallaxRef.current, {
-          y: (i, target) => -((speed - 1) * 400), // Reduced multiplier from 1000 to 400
+          y: (i, target) => -((speed - 1) * 400),
           ease: "none",
           scrollTrigger: {
             trigger: itemRef.current,
@@ -68,10 +87,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         });
       }
 
-      // Initial fade-in
       gsap.fromTo(
         itemRef.current,
-        { opacity: 100, y: 50 },
+        { opacity: 1, y: 50 },
         {
           opacity: 1,
           y: 0,
@@ -89,98 +107,106 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     return () => ctx.revert();
   }, [speed]);
 
+  // Consolidated Video and Animation Logic
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    const titleText = titleTextRef.current;
+    const categoriesText = categoriesTextRef.current;
+    const titleReveal = titleRevealRef.current;
+    const categoriesReveal = categoriesRevealRef.current;
 
-    if (isHovered) {
-      setIsPlaying(true);
-      video.play().catch(() => undefined);
-    }
-  }, [isHovered]);
+    if (!titleText || !categoriesText || !titleReveal || !categoriesReveal) return;
 
-  const handleVideoEnded = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (!isHovered) {
-      video.pause();
-      video.currentTime = 0;
-      setIsPlaying(false);
-    } else {
-      video.play().catch(() => undefined);
-    }
-  };
-
-  const titleRevealRef = useRef<HTMLDivElement>(null);
-  const categoriesRevealRef = useRef<HTMLDivElement>(null);
-  const titleTextRef = useRef<HTMLHeadingElement>(null);
-  const categoriesTextRef = useRef<HTMLParagraphElement>(null);
-
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
-
-  useEffect(() => {
-    if (
-      !titleRevealRef.current ||
-      !categoriesRevealRef.current ||
-      !titleTextRef.current ||
-      !categoriesTextRef.current
-    )
-      return;
+    // Kill any stray animations on these specific elements before starting new ones
+    gsap.killTweensOf([titleText, categoriesText, titleReveal, categoriesReveal]);
+    if (tlRef.current) tlRef.current.kill();
 
     if (isPlaying) {
-      if (tlRef.current) tlRef.current.kill();
-      
-      const tl = gsap.timeline();
+      // Handle Video Playback
+      if (video) {
+        video.play().catch(() => undefined);
+      }
+
+      // Create a new timeline
+      const tl = gsap.timeline({
+        repeat: isPreviewToggled ? -1 : 0,
+        repeatDelay: 3,
+      });
       tlRef.current = tl;
 
-      // Initial state
-      tl.set([titleTextRef.current, categoriesTextRef.current], {
-        opacity: 0,
-        y: "0%",
-      })
-      .set([titleRevealRef.current, categoriesRevealRef.current], {
-        x: "100%",
-      })
-      // Title Animation
-      .to(titleRevealRef.current, {
-        x: "0%",
-        duration: 0.4,
-        ease: "power2.inOut",
-      })
-      .set(titleTextRef.current, { opacity: 1 })
-      .to(titleRevealRef.current, {
-        x: "-105%", // Increased to -105% to ensure it's fully hidden
-        duration: 0.4,
-        ease: "power2.inOut",
-      })
-      // Categories Animation
-      .to(
-        categoriesRevealRef.current,
-        {
+      // Reset to initial state immediately
+      tl.set([titleText, categoriesText], { opacity: 0, y: "0%", x: "0%" })
+        .set([titleReveal, categoriesReveal], { x: "100%" })
+        
+        // Sequential Entry
+        .to(titleReveal, {
           x: "0%",
           duration: 0.4,
           ease: "power2.inOut",
-        },
-        "-=0.2",
-      )
-      .set(categoriesTextRef.current, { opacity: 1 })
-      .to(categoriesRevealRef.current, {
-        x: "-105%", // Increased to -105% to ensure it's fully hidden
-        duration: 0.4,
-        ease: "power2.inOut",
-      });
+        })
+        .set(titleText, { opacity: 1 })
+        .to(titleReveal, {
+          x: "-105%",
+          duration: 0.4,
+          ease: "power2.inOut",
+        })
+        
+        // Categories reveal sequence
+        .to(categoriesReveal, {
+          x: "0%",
+          duration: 0.4,
+          ease: "power2.inOut",
+        })
+        .set(categoriesText, { opacity: 1 })
+        .to(categoriesReveal, {
+          x: "-105%",
+          duration: 0.4,
+          ease: "power2.inOut",
+        });
     } else {
-      // Exit animation: slide down and fade out
-      gsap.to([titleTextRef.current, categoriesTextRef.current], {
-        y: "150%",
-        opacity: 0,
-        duration: 0.4,
-        ease: "power2.in",
-        stagger: 0.05,
-      });
+      // Handle Video Stop
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+
+      // Sequential Exit: Title first, then categories
+      // Ensure text is visible for the cover animation if it was already showing
+      const exitTl = gsap.timeline();
+      
+      exitTl.set([titleReveal, categoriesReveal], { x: "100%" })
+        // 1. Cover Title
+        .to(titleReveal, {
+          x: "0%",
+          duration: 0.3,
+          ease: "power2.inOut",
+        })
+        // 2. Slide Title Out Left
+        .to([titleReveal, titleText], {
+          x: "-105%",
+          duration: 0.3,
+          ease: "power2.in",
+        })
+        // 3. Cover Categories
+        .to(categoriesReveal, {
+          x: "0%",
+          duration: 0.3,
+          ease: "power2.inOut",
+        }, "-=0.1")
+        // 4. Slide Categories Out Left
+        .to([categoriesReveal, categoriesText], {
+          x: "-105%",
+          duration: 0.3,
+          ease: "power2.in",
+        })
+        .set([titleText, categoriesText], { opacity: 0, x: "0%" })
+        .set([titleReveal, categoriesReveal], { x: "100%" });
     }
-  }, [isPlaying]);
+
+    return () => {
+      if (tlRef.current) tlRef.current.kill();
+    };
+  }, [isPlaying, isPreviewToggled]);
 
   const projectNumber = `00-${index + 1}`;
 
@@ -195,20 +221,31 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           <div style={{ color: "var(--foreground-muted)" }}>
             {projectNumber}
           </div>
-          <div className="flex items-center gap-4">
-            <span className="opacity-60">PREVIEW</span>
+          <button 
+            className="flex items-center gap-4 cursor-pointer group focus:outline-none"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsPreviewToggled(!isPreviewToggled);
+            }}
+          >
+            <span className={`transition-all duration-300 ${isPlaying ? 'opacity-100 font-medium' : 'opacity-60 group-hover:opacity-100'}`}>
+              PREVIEW
+            </span>
             <div
-              className="w-10 h-5 rounded-full border relative flex items-center px-0.5 transition-colors duration-300"
-              style={{ borderColor: "var(--divider)" }}
+              className="w-10 h-5 rounded-full border relative flex items-center px-0.5 transition-all duration-300"
+              style={{ 
+                borderColor: isPlaying ? "var(--foreground)" : "var(--divider)",
+                backgroundColor: isPlaying ? "var(--foreground)" : "transparent"
+              }}
             >
               <div
-                className={`w-3.5 h-3.5 rounded-full transition-all duration-700 ease-in-out transform ${
-                  isPlaying ? "translate-x-5" : "translate-x-0 opacity-40"
+                className={`w-3.5 h-3.5 rounded-full transition-all duration-500 ease-in-out transform ${
+                  isPlaying ? "translate-x-5" : "translate-x-0"
                 }`}
-                style={{ backgroundColor: "var(--foreground)" }}
+                style={{ backgroundColor: isPlaying ? "var(--background)" : "var(--foreground)", opacity: isPlaying ? 1 : 0.4 }}
               ></div>
             </div>
-          </div>
+          </button>
         </div>
 
         <div
@@ -224,8 +261,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
               src={videoSrc}
               muted
               playsInline
-              preload="auto"
+              loop={false}
               onEnded={handleVideoEnded}
+              preload="auto"
             />
           ) : (
             <img
