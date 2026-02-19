@@ -101,6 +101,7 @@ const MobileMenuOverlay: React.FC<{
             text="Get in touch"
             baseBgColor="bg-[#0a0a0a]"
             baseTextColor="text-[#e4e2dd]"
+            baseBorderColor="border-[#0a0a0a]"
             hoverTextColor="group-hover:text-[#0a0a0a]"
             hoverBgColor="bg-[#e4e2dd]"
             onClick={handleGetInTouchClick}
@@ -126,7 +127,7 @@ const MobileMenuOverlay: React.FC<{
             <hr className="border-t border-gray-300 my-4" />
           </div>
           <Section title="">
-             {/* Note: Section component needs title prop if we want to follow its definition */}
+            {/* Note: Section component needs title prop if we want to follow its definition */}
             <a
               href="#facebook"
               className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out text-[#0a0a0a] ${

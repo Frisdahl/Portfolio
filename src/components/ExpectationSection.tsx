@@ -21,7 +21,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         className={`flex justify-between items-center w-full text-lg font-semibold text-[var(--foreground)] border-[var(--divider)] focus:outline-none py-4 cursor-pointer ${isOpen ? "border-b-0" : "border-b"}`}
         onClick={onToggle}
       >
-        <span className="text-xl uppercase font-normal text-[var(--foreground)]">
+        <span className="text-2xl uppercase font-normal text-[var(--foreground)]">
           {title}
         </span>
         <div className="relative w-4 h-4 flex items-center justify-center">

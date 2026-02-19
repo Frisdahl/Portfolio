@@ -115,10 +115,10 @@ const ContactSection: React.FC = () => {
     <section
       ref={sectionRef}
       id="contact"
-      className="bg-[#e4e3de] text-[#0a0a0a] py-36 px-8 min-h-screen flex items-center overflow-hidden"
+      className="bg-[#e4e3de] text-[#0a0a0a] py-24 px-8 min-h-screen flex items-center overflow-hidden"
       style={{ borderTopLeftRadius: "160px", borderTopRightRadius: "160px" }}
     >
-      <div className="container mx-auto pt-16">
+      <div className="container mx-auto">
         <div className="grid max-w-[1800px] mx-auto grid-cols-1 md:grid-cols-2 gap-auto">
           {/* Left Column */}
           <div className="flex flex-col justify-between">

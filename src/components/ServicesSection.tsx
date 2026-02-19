@@ -63,18 +63,15 @@ const ServicesSection: React.FC = () => {
       <div className="flex mb-32">
         <div className="flex flex-col gap-4 w-full">
           {items.map((item, idx) => (
-            <div
-              key={idx}
-              className="flex items-center text-[var(--foreground)] gap-12 relative"
-            >
+            <div key={idx} className="flex items-center gap-12 relative">
               <div
-                className={`w-32 md:w-48 lg:w-64 font-apparel italic text-2xl md:text-3xl whitespace-nowrap mix-blend-difference z-20 ${
+                className={`w-32 md:w-48 lg:w-64 font-apparel italic text-2xl md:text-3xl whitespace-nowrap text-white mix-blend-difference z-20 ${
                   idx === 0 ? "opacity-100" : "opacity-0 pointer-events-none"
                 }`}
               >
                 {title}
               </div>
-              <div className="flex-1 font-granary text-3xl md:text-3xl lg:text-4xl text-left uppercase tracking-tighter leading-tight hover:opacity-50 transition-opacity cursor-default mix-blend-difference z-20">
+              <div className="flex-1 font-granary text-3xl md:text-3xl lg:text-4xl text-left uppercase tracking-tighter leading-tight hover:opacity-50 transition-opacity cursor-default text-white mix-blend-difference z-20">
                 {item}
               </div>
             </div>
@@ -95,10 +92,10 @@ const ServicesSection: React.FC = () => {
         <div className="relative ">
           {/* Intro Header */}
           <div className=" text-center  lg:text-left py-32">
-            <p className="font-granary uppercase tracking-[0.3em] text-xs mb-8 text-[var(--foreground)] mix-blend-difference opacity-50">
+            <p className="font-granary uppercase tracking-[0.3em] text-xs mb-8 text-white mix-blend-difference opacity-50">
               (my areas of focus)
             </p>
-            <h3 className="text-6xl md:text-8xl lg:text-8xl font-granary uppercase tracking-tighter font-normal leading-[1] text-[var(--foreground)] mix-blend-difference">
+            <h3 className="text-6xl md:text-8xl lg:text-8xl font-granary uppercase tracking-tighter font-normal leading-[1] text-white mix-blend-difference">
               key skills<br></br>
               <span className="pl-48">
                 & <span className="font-apparel">interests</span>
@@ -114,7 +111,7 @@ const ServicesSection: React.FC = () => {
                 ref={imageRef}
                 src={images[0]}
                 alt="Services"
-                className="w-full h-[140%] object-cover scale-110"
+                className="w-full h-[140%] object-cover scale-110 "
               />
             </div>
 
