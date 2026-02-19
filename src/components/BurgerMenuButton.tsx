@@ -27,11 +27,11 @@ const BurgerMenuButton: React.FC<BurgerMenuButtonProps> = ({
     : 'bg-[var(--foreground)]';
 
   return (
-    <div className="fixed top-4 right-8 py-6 z-[200]">
+    <div className="fixed top-4 right-8 py-6 z-[200] pointer-events-none">
       <button
         onClick={toggleMenu}
         aria-label="Toggle menu"
-        className="group relative w-12 h-12 flex items-center justify-center focus:outline-none cursor-pointer"
+        className="group relative w-12 h-12 flex items-center justify-center focus:outline-none cursor-pointer pointer-events-auto"
       >
         <div className="relative w-6 h-2 flex flex-col justify-between z-10">
           <span

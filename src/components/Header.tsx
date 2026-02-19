@@ -21,8 +21,8 @@ const Header: React.FC<HeaderProps> = ({ isInverted }) => {
   };
 
   return (
-    <header className="fixed top-4 left-0 right-0 z-50 flex justify-between items-center py-6 px-8 rounded-full transition-colors duration-300 bg-transparent">
-      <div className="z-50">
+    <header className="fixed top-4 left-0 right-0 z-50 flex justify-between items-center py-6 px-8 rounded-full transition-colors duration-300 bg-transparent pointer-events-none">
+      <div className="z-50 pointer-events-auto">
         <Link to="/" onClick={handleLogoClick}>
           <img
             src="/images/Portfolio-logo.svg"
