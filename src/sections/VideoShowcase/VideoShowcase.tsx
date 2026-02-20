@@ -1,13 +1,37 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useEffect } from "react";
 import { initVideoShowcaseAnimations } from "./VideoShowcase.anim";
 
 const VideoShowcase: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoWrapperRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const longTextRef = useRef<HTMLParagraphElement>(null);
   const smallTextRef = useRef<HTMLParagraphElement>(null);
+
+  // Pause video when not visible for better performance
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {}); // Resume playback
+          } else {
+            video.pause(); // Pause when off-screen
+          }
+        });
+      },
+      { threshold: 0.25 }, // Trigger when 25% visible
+    );
+
+    observer.observe(video);
+
+    return () => observer.disconnect();
+  }, []);
 
   useLayoutEffect(() => {
     if (
@@ -44,6 +68,7 @@ const VideoShowcase: React.FC = () => {
             className="relative w-[50vw] aspect-video overflow-hidden rounded-3xl z-10 bg-neutral-900"
           >
             <video
+              ref={videoRef}
               className="w-full h-full object-cover"
               autoPlay
               muted
