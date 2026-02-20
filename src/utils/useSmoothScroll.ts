@@ -9,7 +9,12 @@ const useSmoothScroll = () => {
 
     // Connect GSAP's ScrollTrigger to the Lenis instance
     lenis.on('scroll', ScrollTrigger.update);
-    lenis.scrollTo(0, { immediate: true });
+    
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+      lenis?.scrollTo(0, { immediate: true });
+      ScrollTrigger.refresh();
+    }, 100);
 
     const ticker = (time: number) => {
       lenis.raf(time * 1000);
