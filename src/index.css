@@ -193,6 +193,8 @@ body {
   opacity: 0.15; /* dial 0.05–0.15 */
   mix-blend-mode: overlay; /* overlay is better for visible texture on dark/light */
   transform: translateZ(0); /* GPU hint */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   transition: opacity 0.8s ease-in-out, background 0.8s ease-in-out;
 }
 

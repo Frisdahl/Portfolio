@@ -115,10 +115,16 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     const titleReveal = titleRevealRef.current;
     const categoriesReveal = categoriesRevealRef.current;
 
-    if (!titleText || !categoriesText || !titleReveal || !categoriesReveal) return;
+    if (!titleText || !categoriesText || !titleReveal || !categoriesReveal)
+      return;
 
     // Kill any stray animations on these specific elements before starting new ones
-    gsap.killTweensOf([titleText, categoriesText, titleReveal, categoriesReveal]);
+    gsap.killTweensOf([
+      titleText,
+      categoriesText,
+      titleReveal,
+      categoriesReveal,
+    ]);
     if (tlRef.current) tlRef.current.kill();
 
     if (isPlaying) {
@@ -137,7 +143,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       // Reset to initial state immediately
       tl.set([titleText, categoriesText], { opacity: 0, y: "0%", x: "0%" })
         .set([titleReveal, categoriesReveal], { x: "100%" })
-        
+
         // Sequential Entry
         .to(titleReveal, {
           x: "0%",
@@ -150,7 +156,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           duration: 0.4,
           ease: "power2.inOut",
         })
-        
+
         // Categories reveal sequence
         .to(categoriesReveal, {
           x: "0%",
@@ -173,8 +179,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       // Sequential Exit: Title first, then categories
       // Ensure text is visible for the cover animation if it was already showing
       const exitTl = gsap.timeline();
-      
-      exitTl.set([titleReveal, categoriesReveal], { x: "100%" })
+
+      exitTl
+        .set([titleReveal, categoriesReveal], { x: "100%" })
         // 1. Cover Title
         .to(titleReveal, {
           x: "0%",
@@ -188,11 +195,15 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           ease: "power2.in",
         })
         // 3. Cover Categories
-        .to(categoriesReveal, {
-          x: "0%",
-          duration: 0.3,
-          ease: "power2.inOut",
-        }, "-=0.1")
+        .to(
+          categoriesReveal,
+          {
+            x: "0%",
+            duration: 0.3,
+            ease: "power2.inOut",
+          },
+          "-=0.1",
+        )
         // 4. Slide Categories Out Left
         .to([categoriesReveal, categoriesText], {
           x: "-105%",
@@ -212,7 +223,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   return (
     <div ref={itemRef} className="w-full">
-      <div ref={parallaxRef} className="w-full">
+      <div ref={parallaxRef} className="w-full will-change-transform">
         {/* Top Header */}
         <div
           className="flex justify-between items-center mb-6 font-granary uppercase tracking-wider text-base"
@@ -221,28 +232,37 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           <div style={{ color: "var(--foreground-muted)" }}>
             {projectNumber}
           </div>
-          <button 
+          <button
             className="flex items-center gap-4 cursor-pointer group focus:outline-none"
             onClick={(e) => {
               e.stopPropagation();
               setIsPreviewToggled(!isPreviewToggled);
             }}
           >
-            <span className={`transition-all duration-300 ${isPlaying ? 'opacity-100 font-medium' : 'opacity-60 group-hover:opacity-100'}`}>
+            <span
+              className={`transition-all duration-300 ${isPlaying ? "opacity-100 font-medium" : "opacity-60 group-hover:opacity-100"}`}
+            >
               PREVIEW
             </span>
             <div
               className="w-10 h-5 rounded-full border relative flex items-center px-0.5 transition-all duration-300"
-              style={{ 
+              style={{
                 borderColor: isPlaying ? "var(--foreground)" : "var(--divider)",
-                backgroundColor: isPlaying ? "var(--foreground)" : "transparent"
+                backgroundColor: isPlaying
+                  ? "var(--foreground)"
+                  : "transparent",
               }}
             >
               <div
                 className={`w-3.5 h-3.5 rounded-full transition-all duration-500 ease-in-out transform ${
                   isPlaying ? "translate-x-5" : "translate-x-0"
                 }`}
-                style={{ backgroundColor: isPlaying ? "var(--background)" : "var(--foreground)", opacity: isPlaying ? 1 : 0.4 }}
+                style={{
+                  backgroundColor: isPlaying
+                    ? "var(--background)"
+                    : "var(--foreground)",
+                  opacity: isPlaying ? 1 : 0.4,
+                }}
               ></div>
             </div>
           </button>
@@ -263,7 +283,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
               playsInline
               loop={false}
               onEnded={handleVideoEnded}
-              preload="auto"
+              preload="metadata"
             />
           ) : (
             <img
@@ -275,11 +295,11 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         </div>
 
         {/* Project Info Underneath */}
-        <div className="mt-4 text-left">
-          <div className="relative inline-block overflow-hidden py-1">
+        <div className="mt-6 text-left">
+          <div className="relative inline-block overflow-hidden">
             <h3
               ref={titleTextRef}
-              className="font-granary uppercase text-2xl mb-1 text-[var(--foreground)] leading-tight opacity-0"
+              className="font-granary uppercase text-2xl text-[var(--foreground)] leading-tight opacity-0"
             >
               {project.title}
             </h3>
@@ -289,7 +309,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             />
           </div>
           <br />
-          <div className="relative inline-block overflow-hidden py-1">
+          <div className="relative inline-block overflow-hidden">
             <p
               ref={categoriesTextRef}
               className="font-granary uppercase text-xs tracking-widest text-[var(--foreground-muted)] opacity-80 leading-tight opacity-0"

@@ -24,7 +24,6 @@ const AboutPage: React.FC = () => {
           display: "block",
           overflow: "hidden",
           clipPath: "inset(0 100% 0 0)",
-          filter: "blur(20px)",
           opacity: 0,
         });
       });
@@ -40,7 +39,6 @@ const AboutPage: React.FC = () => {
 
       tl.to(allLines, {
         clipPath: "inset(0 0% 0 0)",
-        filter: "blur(0px)",
         opacity: 1,
         stagger: 0.5,
         ease: "power2.out",
