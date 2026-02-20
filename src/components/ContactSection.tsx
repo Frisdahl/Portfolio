@@ -49,8 +49,6 @@ const ContactSection: React.FC = () => {
       },
     });
 
-    ScrollTrigger.refresh();
-
     return () => {
       tween.kill();
     };
@@ -115,7 +113,7 @@ const ContactSection: React.FC = () => {
     <section
       ref={sectionRef}
       id="contact"
-      className="bg-[#e4e3de] text-[#0a0a0a] py-24 px-8 min-h-screen flex items-center overflow-hidden"
+      className="bg-[#0a0a0a] text-[var(--foreground)] py-24 px-8 min-h-screen flex items-center overflow-hidden"
       style={{ borderTopLeftRadius: "160px", borderTopRightRadius: "160px" }}
     >
       <div className="container mx-auto">
@@ -123,14 +121,14 @@ const ContactSection: React.FC = () => {
           {/* Left Column */}
           <div className="flex flex-col justify-between">
             <div>
-              <h2 className="text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-[granary] uppercase font-normal text-[#0a0a0a] w-full text-left mb-12">
+              <h2 className="text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-[granary] uppercase font-normal text-[var(--foreground)] w-full text-left mb-12">
                 Let’s Work <span className="font-apparel">Together</span>
               </h2>
             </div>
             <div className="flex space-x-6 mt-12">
               <a
                 href="#facebook"
-                className="inline-flex text-xl items-center group relative overflow-hidden text-[#0a0a0a]"
+                className="inline-flex text-xl items-center group relative overflow-hidden text-[var(--foreground)]"
               >
                 <span>Facebook</span>
                 <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
@@ -140,7 +138,7 @@ const ContactSection: React.FC = () => {
               </a>
               <a
                 href="#linkedin"
-                className="inline-flex text-xl items-center group relative overflow-hidden text-[#0a0a0a]"
+                className="inline-flex text-xl items-center group relative overflow-hidden text-[var(--foreground)]"
               >
                 <span>LinkedIn</span>
                 <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
@@ -150,7 +148,7 @@ const ContactSection: React.FC = () => {
               </a>
               <a
                 href="#email"
-                className="inline-flex text-xl items-center group relative overflow-hidden text-[#0a0a0a]"
+                className="inline-flex text-xl items-center group relative overflow-hidden text-[var(--foreground)]"
               >
                 <span>Email</span>
                 <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
@@ -164,7 +162,7 @@ const ContactSection: React.FC = () => {
           {/* Right Column */}
 
           <div className="text-left">
-            <p className="text-[#0a0a0a] text-xl mb-20 text-left opacity-80">
+            <p className="text-[var(--foreground)] text-xl mb-20 text-left opacity-80">
               Before we start, we would like to better understand your needs.
               We'll review your application and schedule a free estimation call.
             </p>
@@ -177,7 +175,7 @@ const ContactSection: React.FC = () => {
                   placeholder="Your name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`bg-transparent border-b focus:outline-none py-2 w-full text-[#0a0a0a] autofill:bg-transparent autofill:text-[#0a0a0a] autofill:shadow-[inset_0_0_0px_1000px_#e4e3de] ${errors.name ? "border-red-400" : "border-[#0a0a0a]"}`}
+                  className={`bg-transparent border-b focus:outline-none py-2 w-full text-[var(--foreground)] autofill:bg-transparent autofill:text-[var(--foreground)] autofill:shadow-[inset_0_0_0px_1000px_#0a0a0a] ${errors.name ? "border-red-400" : "border-[var(--foreground)]"}`}
                 />
                 {errors.name && (
                   <p className="text-red-400 text-sm mt-2">{errors.name}</p>
@@ -192,7 +190,7 @@ const ContactSection: React.FC = () => {
                     placeholder="Email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`bg-transparent border-b focus:outline-none py-2 w-full text-[#0a0a0a] autofill:bg-transparent autofill:text-[#0a0a0a] autofill:shadow-[inset_0_0_0px_1000px_#e4e3de] ${errors.email ? "border-red-400" : "border-[#0a0a0a]"}`}
+                    className={`bg-transparent border-b focus:outline-none py-2 w-full text-[var(--foreground)] autofill:bg-transparent autofill:text-[var(--foreground)] autofill:shadow-[inset_0_0_0px_1000px_#0a0a0a] ${errors.email ? "border-red-400" : "border-[var(--foreground)]"}`}
                   />
                   {errors.email && (
                     <p className="text-red-400 text-sm mt-2">{errors.email}</p>
@@ -205,7 +203,7 @@ const ContactSection: React.FC = () => {
                     placeholder="Phone number"
                     value={formData.phone}
                     onChange={handleChange}
-                    className={`bg-transparent border-b focus:outline-none py-2 w-full text-[#0a0a0a] autofill:bg-transparent autofill:text-[#0a0a0a] autofill:shadow-[inset_0_0_0px_1000px_#e4e3de] ${errors.phone ? "border-red-400" : "border-[#0a0a0a]"}`}
+                    className={`bg-transparent border-b focus:outline-none py-2 w-full text-[var(--foreground)] autofill:bg-transparent autofill:text-[var(--foreground)] autofill:shadow-[inset_0_0_0px_1000px_#0a0a0a] ${errors.phone ? "border-red-400" : "border-[var(--foreground)]"}`}
                   />
                   {errors.phone && (
                     <p className="text-red-400 text-sm mt-2">{errors.phone}</p>
@@ -219,7 +217,7 @@ const ContactSection: React.FC = () => {
                   placeholder="Tell us about your project"
                   value={formData.project}
                   onChange={handleChange}
-                  className={`bg-transparent border-b focus:outline-none p-0 pb-2 w-full text-[#0a0a0a] resize-none peer focus:ring-0 overflow-hidden autofill:bg-transparent autofill:text-[#0a0a0a] autofill:shadow-[inset_0_0_0px_1000px_#e4e3de] ${errors.project ? "border-red-400" : "border-[#0a0a0a]"}`}
+                  className={`bg-transparent border-b focus:outline-none p-0 pb-2 w-full text-[var(--foreground)] resize-none peer focus:ring-0 overflow-hidden autofill:bg-transparent autofill:text-[var(--foreground)] autofill:shadow-[inset_0_0_0px_1000px_#0a0a0a] ${errors.project ? "border-red-400" : "border-[var(--foreground)]"}`}
                   rows={1}
                   onInput={(e) => {
                     e.currentTarget.style.height = "auto";
@@ -233,7 +231,7 @@ const ContactSection: React.FC = () => {
               </div>
 
               <div className="mb-20 text-left">
-                <p className="text-[#0a0a0a] mb-8 text-xl">Project budget</p>
+                <p className="text-[var(--foreground)] mb-8 text-xl">Project budget</p>
 
                 <div className="flex flex-wrap gap-4">
                   <ValueBtn
@@ -265,11 +263,11 @@ const ContactSection: React.FC = () => {
                 <AnimatedButton
                   text="Send request"
                   padding="px-8 py-8"
-                  baseBgColor="bg-[#0a0a0a]"
-                  baseTextColor="text-[#e4e2dd]"
-                  hoverTextColor="group-hover:text-[#0a0a0a]"
-                  hoverBgColor="bg-[#e4e3de]"
-                  hoverBorderColor="border-[#0a0a0a]"
+                  baseBgColor="bg-[var(--foreground)]"
+                  baseTextColor="text-[#0a0a0a]"
+                  hoverTextColor="group-hover:text-[var(--foreground)]"
+                  hoverBgColor="bg-[#0a0a0a]"
+                  hoverBorderColor="border-[var(--foreground)]"
                 />
               </div>
             </form>

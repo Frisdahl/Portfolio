@@ -17,7 +17,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isHeaderInverted, setIsHeaderInverted] = useState(false);
   const layoutRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -31,56 +30,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Initial background color
+      // Permanent dark theme background
       gsap.set(layoutRef.current, {
-        backgroundColor: location.pathname === "/" ? "#E4E2DD" : "#0a0a0a",
+        backgroundColor: "#0a0a0a",
       });
 
-      if (location.pathname === "/") {
-        // 1. Projects Transition (Light -> Dark)
-        const projectsSection = document.querySelector("#projects");
-        if (projectsSection) {
-          ScrollTrigger.create({
-            trigger: projectsSection,
-            start: "top 40%",
-            onEnter: () => {
-              setIsHeaderInverted(true);
-              gsap.to(layoutRef.current, {
-                backgroundColor: "#0a0a0a",
-                duration: 0.8,
-                ease: "power2.inOut",
-              });
-            },
-            onLeaveBack: () => {
-              setIsHeaderInverted(false);
-              gsap.to(layoutRef.current, {
-                backgroundColor: "#E4E2DD",
-                duration: 0.8,
-                ease: "power2.inOut",
-              });
-            },
-          });
-        }
-
-        // 2. Contact Header Inversion
-        // The footer is light theme, so we need dark header items.
-        const contactSection = document.querySelector("#contact");
-        if (contactSection) {
-          ScrollTrigger.create({
-            trigger: contactSection,
-            start: "top 80px", // Invert when section hits the header
-            onEnter: () => setIsHeaderInverted(false),
-            onLeaveBack: () => setIsHeaderInverted(true),
-          });
-        }
-      } else {
-        // For other pages like /about
-        setIsHeaderInverted(true);
-        gsap.to(layoutRef.current, {
-          backgroundColor: "#0a0a0a",
-          duration: 0,
-        });
-      }
+      // Refresh ScrollTrigger to ensure pins are calculated
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 100);
     }, layoutRef);
 
     return () => {
@@ -91,13 +49,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div
       ref={layoutRef}
-      className={`flex flex-col min-h-screen ${isHeaderInverted ? "dark" : ""}`}
+      className="flex flex-col min-h-screen dark"
     >
-      <Header isInverted={isHeaderInverted} />
+      <Header isInverted={true} />
       <BurgerMenuButton
         isOpen={isMobileMenuOpen}
         toggleMenu={toggleMenu}
-        isInverted={isHeaderInverted}
+        isInverted={true}
       />
       <MobileMenuOverlay isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
       <LuxuryGrainBackground />

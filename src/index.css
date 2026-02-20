@@ -1,15 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  --background: #e4e2dd;
-  --background-rgb: 228, 226, 221;
-  --foreground: #0a0a0a;
-  --foreground-rgb: 10, 10, 10;
-  --foreground-muted: #606060;
-  --divider: rgba(0, 0, 0, 0.1);
-}
-
-.dark {
   --background: #0a0a0a;
   --background-rgb: 10, 10, 10;
   --foreground: #e4e3de;
@@ -19,8 +10,8 @@
 }
 
 body {
+  background-color: var(--background);
   color: var(--foreground);
-  transition: color 0.5s ease-in-out;
 }
 
 @font-face {
@@ -179,19 +170,19 @@ body {
   pointer-events: none;
   z-index: 1; /* Above background, below content */
 
-  /* 1) super subtle shading (not a visible gradient) */
+  /* subtle shading for dark theme */
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.018),
-    rgba(0, 0, 0, 0.028)
+    rgba(255, 255, 255, 0.015),
+    rgba(255, 255, 255, 0.01)
   );
 
   /* 2) grain overlay via svg filter */
   filter: url(#grain);
 
   /* 3) make it feel like paper, not static TV noise */
-  opacity: 0.15; /* dial 0.05–0.15 */
-  mix-blend-mode: overlay; /* overlay is better for visible texture on dark/light */
+  opacity: 0.06;
+  mix-blend-mode: screen; /* grain becomes “lifted” instead of dirty */
   transform: translateZ(0); /* GPU hint */
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -201,17 +192,6 @@ body {
 /* Optional: reduce grain on small screens if you want it even cleaner */
 @media (max-width: 768px) {
   .lux-grain {
-    opacity: 0.06;
+    opacity: 0.04;
   }
-}
-
-/* Dark mode overrides for grain */
-.dark .lux-grain {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  opacity: 0.06;
-  mix-blend-mode: screen; /* grain becomes “lifted” instead of dirty */
 }
