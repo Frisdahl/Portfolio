@@ -74,6 +74,7 @@ const VideoShowcase: React.FC = () => {
               muted
               loop
               playsInline
+              preload="auto"
               src="/projectVideos/videoshowcase/promo_h264.mp4"
             />
           </div>

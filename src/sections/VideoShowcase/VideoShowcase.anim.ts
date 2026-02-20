@@ -50,7 +50,7 @@ export const initVideoShowcaseAnimations = (
         start: "top top",
         end: "+=200%",
         pin: true,
-        scrub: 0.8,
+        scrub: 1, // Reduced from 0.8 for better performance on laptops
         onRefresh: (self) => {
           if (self.pin) self.pin.style.zIndex = "10";
         },
@@ -62,6 +62,7 @@ export const initVideoShowcaseAnimations = (
       borderRadius: "1rem",
       duration: 1,
       ease: "power2.inOut",
+      force3D: true,
     })
       .to({}, { duration: 0.2 })
       .to(videoWrapper, {
@@ -71,6 +72,7 @@ export const initVideoShowcaseAnimations = (
         borderRadius: "1rem",
         duration: 1,
         ease: "power2.inOut",
+        force3D: true,
       })
       .set(textContainer, { visibility: "visible", yPercent: -25 }, "-=0.1")
       .to(
@@ -81,6 +83,7 @@ export const initVideoShowcaseAnimations = (
           duration: 0.8,
           stagger: 0.1,
           ease: "power3.out",
+          force3D: true,
         },
         "+=0.1",
       )
@@ -92,6 +95,7 @@ export const initVideoShowcaseAnimations = (
           duration: 0.8,
           stagger: 0.1,
           ease: "power3.out",
+          force3D: true,
         },
         "-=0.4",
       )
@@ -103,6 +107,7 @@ export const initVideoShowcaseAnimations = (
           duration: 0.8,
           stagger: 0.1,
           ease: "power3.out",
+          force3D: true,
         },
         "-=0.4",
       )

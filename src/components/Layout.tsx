@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import BurgerMenuButton from "./BurgerMenuButton";
 import MobileMenuOverlay from "./MobileMenuOverlay";
-import LuxuryGrainBackground from "./LuxuryGrainBackground";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
@@ -37,13 +36,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       // PROGRESSIVE REFRESH STRATEGY
       // 1. Immediate
       ScrollTrigger.refresh();
-      
+
       // 2. Short delay (DOM ready)
       const t1 = setTimeout(() => ScrollTrigger.refresh(), 200);
-      
+
       // 3. Medium delay (Images/Videos likely rendered)
       const t2 = setTimeout(() => ScrollTrigger.refresh(), 1000);
-      
+
       // 4. Long delay (Safety fallback for slower hardware)
       const t3 = setTimeout(() => ScrollTrigger.refresh(), 3000);
 
@@ -68,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         isInverted={true}
       />
       <MobileMenuOverlay isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
-      <LuxuryGrainBackground />
+
       <main className="flex-grow">{children}</main>
     </div>
   );

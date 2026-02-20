@@ -32,18 +32,44 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   const [isHoverPlaying, setIsHoverPlaying] = useState(false);
   const [isPreviewToggled, setIsPreviewToggled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isInView, setIsInView] = useState(false);
 
   const itemRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
   const titleTextRef = useRef<HTMLHeadingElement>(null);
   const categoriesTextRef = useRef<HTMLParagraphElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
 
+  // Cache split instances to avoid expensive re-creation
+  const splitCacheRef = useRef<{ title: any; categories: any }>({
+    title: null,
+    categories: null,
+  });
+
   const videoSrc = project.video?.startsWith("/")
     ? project.video
     : `/${project.video}`;
+
+  // Pause video when not visible for better performance
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsInView(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.1 }, // Trigger when 10% visible
+    );
+
+    observer.observe(video);
+
+    return () => observer.disconnect();
+  }, []);
 
   // 1. Master playback control
   useEffect(() => {
@@ -74,7 +100,11 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   // 2. Parallax
   useEffect(() => {
     if (!itemRef.current || !parallaxRef.current) return;
-    const ctx = initProjectParallax(itemRef.current, parallaxRef.current, speed);
+    const ctx = initProjectParallax(
+      itemRef.current,
+      parallaxRef.current,
+      speed,
+    );
     return () => ctx.revert();
   }, [speed]);
 
@@ -87,17 +117,29 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     )
       return;
 
-    const controller = initProjectItemAnimations(isPlaying, {
-      video: videoRef.current,
-      titleText: titleTextRef.current,
-      categoriesText: categoriesTextRef.current,
-      actions: actionsRef.current,
-    });
+    // Only play if both in view and should be playing
+    const shouldPlay = isPlaying && isInView;
+
+    const result = initProjectItemAnimations(
+      shouldPlay,
+      {
+        video: videoRef.current,
+        titleText: titleTextRef.current,
+        categoriesText: categoriesTextRef.current,
+        actions: actionsRef.current,
+      },
+      splitCacheRef.current,
+    );
+
+    // Update cache with split instances
+    if (result.splitTitle) splitCacheRef.current.title = result.splitTitle;
+    if (result.splitCategories)
+      splitCacheRef.current.categories = result.splitCategories;
 
     return () => {
-      controller.revert();
+      result.ctx.revert();
     };
-  }, [isPlaying]);
+  }, [isPlaying, isInView]);
 
   const projectNumber = `00-${index + 1}`;
 
@@ -178,7 +220,12 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             className="absolute bottom-6 left-6 flex gap-3 z-20 pointer-events-auto"
             style={{ opacity: 0 }}
           >
-            <a href={project.link} target="_blank" rel="noopener noreferrer" className="block">
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
               <AnimatedButton
                 text="See Live"
                 padding="px-4 py-2"
