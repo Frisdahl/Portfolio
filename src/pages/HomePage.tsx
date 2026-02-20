@@ -1,22 +1,20 @@
 import React from "react";
-import HeroSection from "../components/HeroSection";
-import Projects from "../components/Projects";
-import ServicesSection from "../components/ServicesSection";
-import ExpectationSection from "../components/ExpectationSection";
-import CollaborationSection from "../components/CollaborationSection";
-import VideoShowcase from "../components/VideoShowcase";
+import Hero from "../sections/Hero/Hero";
+import Projects from "../sections/Projects/Projects";
+import Services from "../sections/Services/Services";
+import Expectations from "../sections/Expectations/Expectations";
+import Collaboration from "../sections/Collaboration/Collaboration";
+import VideoShowcase from "../sections/VideoShowcase/VideoShowcase";
 
 function HomePage() {
   return (
     <div className="HomePage">
-      <HeroSection />
+      <Hero />
       <VideoShowcase />
       <Projects />
-      
-      <ServicesSection />
-      
-      <ExpectationSection />
-      <CollaborationSection />
+      <Services />
+      <Expectations />
+      <Collaboration />
     </div>
   );
 }

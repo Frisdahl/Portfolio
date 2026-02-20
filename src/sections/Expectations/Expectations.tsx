@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import AnimatedButton from "./AnimatedButton";
-import { scrollTo } from "../utils/smoothScroll";
 
 interface DropdownProps {
   title: string;
@@ -34,7 +32,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       <div
         className={`mt-2 text-[var(--foreground-muted)] text-left overflow-hidden transition-all duration-300 ease-in-out`}
         style={{
-          maxHeight: isOpen ? "200px" : "0",
+          maxHeight: isOpen ? "1000px" : "0", // Increased for complex content
           opacity: isOpen ? "1" : "0",
         }}
       >
@@ -44,7 +42,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   );
 };
 
-const ExpectationSection: React.FC = () => {
+const Expectations: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const dropdownData = [
@@ -239,10 +237,8 @@ const ExpectationSection: React.FC = () => {
 
   const handleToggle = (index: number) => {
     if (activeIndex === index) {
-      // If clicking the currently open dropdown, open the next one
       setActiveIndex((activeIndex + 1) % dropdownData.length);
     } else {
-      // Otherwise, just open the clicked one
       setActiveIndex(index);
     }
   };
@@ -254,7 +250,6 @@ const ExpectationSection: React.FC = () => {
     >
       <div className=" mx-auto px-8 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-24 xl:gap-32 items-start">
-          {/* Left Column */}
           <div className="text-left lg:-mt-24 lg:col-span-1">
             <p className="font-granary uppercase tracking-[0.3em] text-xs text-[var(--foreground)] mix-blend-difference opacity-50">
               What You Can Expect
@@ -265,7 +260,6 @@ const ExpectationSection: React.FC = () => {
             </h2>
           </div>
 
-          {/* Right Column - Dropdowns */}
           <div className="lg:col-span-3 lg:col-start-2 mt-48">
             {dropdownData.map((item, index) => (
               <Dropdown
@@ -284,4 +278,4 @@ const ExpectationSection: React.FC = () => {
   );
 };
 
-export default ExpectationSection;
+export default Expectations;

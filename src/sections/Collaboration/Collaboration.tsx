@@ -1,13 +1,12 @@
 import React from "react";
-import AnimatedButton from "./AnimatedButton"; // Import AnimatedButton
+import AnimatedButton from "../../components/AnimatedButton";
 
-const CollaborationSection: React.FC = () => {
+const Collaboration: React.FC = () => {
   return (
     <section
       id="collaboration"
       className="py-16 pb-48 w-full max-w-[1700px] mx-auto px-4 md:px-8 text-[var(--foreground)]"
     >
-      {/* Row for Header and Paragraph */}
       <div className="flex flex-col lg:flex-row justify-between items-end mb-24">
         <h2 className="text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-[granary] uppercase text-[var(--foreground)] w-full lg:w-1/2 text-left">
           Two ways to <br></br>
@@ -19,11 +18,8 @@ const CollaborationSection: React.FC = () => {
         </p>
       </div>
 
-      {/* Columns for collaboration options */}
       <div className="flex flex-col md:flex-row mt-12 gap-8 items-stretch">
-        {/* 66% width main column, now contains two inner columns */}
         <div className="w-full md:w-2/3 bg-[var(--foreground)] px-8 rounded-2xl text-[var(--background)] flex flex-col md:flex-row gap-8">
-          {/* Left Inner Column - for "2 strategies" and "Two ways of working together" */}
           <div className="w-full md:w-1/2 flex flex-col justify-between py-8">
             <div className="bg-[var(--background)] text-[var(--foreground)] px-4 py-2 rounded-full text-sm self-start">
               2 strategies, 100% results
@@ -33,7 +29,6 @@ const CollaborationSection: React.FC = () => {
             </p>
           </div>
 
-          {/* Right Inner Column - for Monthly Subscription */}
           <div className="w-full md:w-1/2 flex flex-col py-8 pl-8 rounded-3xl border-l border-[var(--background)]">
             <h3 className="text-3xl font-[500] italic mb-4 text-left text-[var(--background)]">
               Monthly subscription
@@ -49,8 +44,6 @@ const CollaborationSection: React.FC = () => {
               <li>✔ Can be combined with packages.</li>
             </ul>
             <div className="mt-auto">
-              {" "}
-              {/* Push button to bottom */}
               <AnimatedButton
                 text="See offer"
                 baseBgColor="bg-[var(--background)]"
@@ -63,11 +56,6 @@ const CollaborationSection: React.FC = () => {
               />
             </div>
           </div>
-        </div>
-
-        {/* 33% width column (reverted to placeholder) */}
-        <div className="w-full md:w-1/3 bg-[var(--foreground-muted)] opacity-20 rounded-lg flex flex-col justify-between hidden">
-          {/* Placeholder hidden as per actual code structure but updated variables */}
         </div>
 
         <div className="w-full md:w-1/3 bg-[var(--foreground)] rounded-lg flex flex-col justify-between">
@@ -86,8 +74,6 @@ const CollaborationSection: React.FC = () => {
               <li>✔ Can be combined with packages.</li>
             </ul>
             <div className="mt-auto">
-              {" "}
-              {/* Push button to bottom */}
               <AnimatedButton
                 text="See offer"
                 baseBgColor="bg-[var(--foreground)]"
@@ -104,4 +90,4 @@ const CollaborationSection: React.FC = () => {
   );
 };
 
-export default CollaborationSection;
+export default Collaboration;

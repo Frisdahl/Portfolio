@@ -1,5 +1,5 @@
 import React from "react";
-import ProjectItem from "./ProjectItem"; // Import the new ProjectItem component
+import ProjectItem from "./ProjectItem";
 
 const projects = [
   {
@@ -47,10 +47,9 @@ const projects = [
 
 const Projects: React.FC = () => {
   return (
-    <section id="projects" className={`mb-64 w-full`}>
+    <section id="projects" className="mb-64 w-full">
       <div className="w-full px-8 md:px-16 lg:px-24">
         <div className="flex flex-col gap-32 md:gap-64">
-          {/* Row 1: Two projects, pushed to sides */}
           <div className="flex flex-col md:flex-row items-start justify-between gap-16">
             <div className="md:w-3/12 md:mt-32">
               <ProjectItem project={projects[0]} index={0} speed={1.4} />
@@ -60,19 +59,12 @@ const Projects: React.FC = () => {
             </div>
           </div>
 
-          {/* Row 2: Horizontal project shifted left */}
           <div className="flex justify-start">
             <div className="w-full md:w-8/12">
-              <ProjectItem
-                project={projects[2]}
-                index={2}
-                speed={1.2}
-                aspectClassName="aspect-video"
-              />
+              <ProjectItem project={projects[2]} index={2} speed={1.2} aspectClassName="aspect-video" />
             </div>
           </div>
 
-          {/* Row 3: Pushed to sides, big on left, smaller on right/lower */}
           <div className="flex flex-col md:flex-row items-start justify-between gap-16">
             <div className="md:w-6/12">
               <ProjectItem project={projects[3]} index={3} speed={0.9} />

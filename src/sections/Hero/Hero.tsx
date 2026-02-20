@@ -1,26 +1,28 @@
 import React from "react";
-import AnimatedButton from "./AnimatedButton";
 
 const SocialIcon = ({
   href,
   children,
   className,
+  style,
 }: {
   href: string;
   children: React.ReactNode;
   className: string;
+  style?: React.CSSProperties;
 }) => (
   <a
     href={href}
     target="_blank"
     rel="noopener noreferrer"
     className={`transition-colors duration-300 ${className}`}
+    style={style}
   >
     {children}
   </a>
 );
 
-const HeroSection: React.FC = () => {
+const Hero: React.FC = () => {
   return (
     <section
       className="hero-section relative h-screen w-full bg-transparent mb-64 overflow-hidden flex flex-col justify-end"
@@ -98,4 +100,4 @@ const HeroSection: React.FC = () => {
   );
 };
 
-export default HeroSection;
+export default Hero;
