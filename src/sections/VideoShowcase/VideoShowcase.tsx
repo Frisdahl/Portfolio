@@ -26,7 +26,7 @@ const VideoShowcase: React.FC = () => {
       textContainerRef.current,
       headingRef.current,
       longTextRef.current,
-      smallTextRef.current
+      smallTextRef.current,
     );
 
     return () => ctx.revert();
@@ -68,7 +68,7 @@ const VideoShowcase: React.FC = () => {
 
             <p
               ref={longTextRef}
-              className="font-granary text-xl md:text-2xl uppercase tracking-tight text-[var(--foreground)] max-w-xl"
+              className="font-granary text-xl md:text-2xl tracking-tight text-[var(--foreground)] w-full"
             >
               Focused on creating digital experiences that bridge the gap
               between visual aesthetics and technical excellence.

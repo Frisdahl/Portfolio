@@ -10,13 +10,22 @@ export const initVideoShowcaseAnimations = (
   textContainer: HTMLElement,
   heading: HTMLElement,
   longText: HTMLElement,
-  smallText: HTMLElement
+  smallText: HTMLElement,
 ) => {
   const ctx = gsap.context(() => {
     // 1. Split text into lines
-    const splitHeading = new SplitType(heading, { types: "lines", tagName: "span" });
-    const splitLongText = new SplitType(longText, { types: "lines", tagName: "span" });
-    const splitSmallText = new SplitType(smallText, { types: "lines", tagName: "span" });
+    const splitHeading = new SplitType(heading, {
+      types: "lines",
+      tagName: "span",
+    });
+    const splitLongText = new SplitType(longText, {
+      types: "lines",
+      tagName: "span",
+    });
+    const splitSmallText = new SplitType(smallText, {
+      types: "lines",
+      tagName: "span",
+    });
 
     // Wrap each line in an overflow-hidden container
     [splitHeading, splitLongText, splitSmallText].forEach((split) => {
@@ -49,8 +58,8 @@ export const initVideoShowcaseAnimations = (
     });
 
     tl.to(videoWrapper, {
-      width: "100%",
-      borderRadius: "0rem",
+      width: "90%",
+      borderRadius: "1rem",
       duration: 1,
       ease: "power2.inOut",
     })
@@ -59,32 +68,44 @@ export const initVideoShowcaseAnimations = (
         width: "42%",
         xPercent: -60,
         yPercent: 30,
-        borderRadius: "4rem",
+        borderRadius: "1rem",
         duration: 1,
         ease: "power2.inOut",
       })
-      .set(textContainer, { visibility: "visible", yPercent: -45 }, "-=0.1")
-      .to(splitHeading.lines!, {
-        yPercent: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-      }, "+=0.1")
-      .to(splitLongText.lines!, {
-        yPercent: 0,
-        opacity: 0.8,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-      }, "-=0.4")
-      .to(splitSmallText.lines!, {
-        yPercent: 0,
-        opacity: 0.6,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-      }, "-=0.4")
+      .set(textContainer, { visibility: "visible", yPercent: -25 }, "-=0.1")
+      .to(
+        splitHeading.lines!,
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power3.out",
+        },
+        "+=0.1",
+      )
+      .to(
+        splitLongText.lines!,
+        {
+          yPercent: 0,
+          opacity: 0.8,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power3.out",
+        },
+        "-=0.4",
+      )
+      .to(
+        splitSmallText.lines!,
+        {
+          yPercent: 0,
+          opacity: 0.6,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power3.out",
+        },
+        "-=0.4",
+      )
       .to({}, { duration: 0.5 })
       .add(() => {
         ScrollTrigger.refresh();
