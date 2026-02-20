@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -8,16 +9,54 @@ const VideoShowcase: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const videoWrapperRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
+  const textContainerRef = useRef<HTMLDivElement>(null);
+
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const longTextRef = useRef<HTMLParagraphElement>(null);
+  const smallTextRef = useRef<HTMLParagraphElement>(null);
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
-      // Create a master timeline for the sequence
+      // 1. Split text into lines for the reveal effect
+      const splitHeading = new SplitType(headingRef.current!, {
+        types: "lines",
+        tagName: "span",
+      });
+      const splitLongText = new SplitType(longTextRef.current!, {
+        types: "lines",
+        tagName: "span",
+      });
+      const splitSmallText = new SplitType(smallTextRef.current!, {
+        types: "lines",
+        tagName: "span",
+      });
+
+      // Wrap each line in an overflow-hidden container for the "reveal from bottom" effect
+      [splitHeading, splitLongText, splitSmallText].forEach((split) => {
+        split.lines?.forEach((line) => {
+          const wrapper = document.createElement("div");
+          wrapper.style.overflow = "hidden";
+          // Add small padding to prevent font clipping on tall characters
+          wrapper.style.paddingTop = "0.1em";
+          wrapper.style.paddingBottom = "0.1em";
+          wrapper.style.marginTop = "-0.1em";
+
+          line.style.display = "inline-block";
+
+          line.parentNode?.insertBefore(wrapper, line);
+          wrapper.appendChild(line);
+
+          // Initial state for lines
+          gsap.set(line, { yPercent: 100, opacity: 0 });
+        });
+      });
+
+      // 2. Create the master timeline
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: "+=150%", // How long the sticky effect lasts
+          end: "+=250%", // Slightly longer for staggered text
           pin: true,
           scrub: 0.8,
           onRefresh: (self) => {
@@ -26,51 +65,81 @@ const VideoShowcase: React.FC = () => {
         },
       });
 
-      // Phase 1: Expand to Full Screen (from initial 50vw)
+      // Phase 1: Expand Video
       tl.to(videoWrapperRef.current, {
         width: "100%",
         borderRadius: "0rem",
         duration: 1,
         ease: "power2.inOut",
       })
-        // Pause slightly at full screen
-        .to({}, { duration: 0.3 })
-        // Phase 2: Shrink, move to BOTTOM LEFT, and round corners
+        .to({}, { duration: 0.2 })
+
+        // Phase 2: Shrink and move to BOTTOM LEFT
         .to(videoWrapperRef.current, {
           width: "42%",
-          xPercent: -60, // Move left
-          yPercent: 30, // Move down
+          xPercent: -60,
+          yPercent: 30,
           borderRadius: "4rem",
           duration: 1,
           ease: "power2.inOut",
         })
-        // Phase 3: Reveal Text on TOP RIGHT
-        .fromTo(
-          textRef.current,
-          {
-            opacity: 0,
-            xPercent: 40,
-            yPercent: -60,
-            visibility: "hidden",
-          },
-          {
-            opacity: 1,
-            xPercent: 0,
-            yPercent: -45, // Anchored in the top half
-            visibility: "visible",
-            duration: 0.8,
-            ease: "power2.out",
-          },
-          "-=0.6", // Start before video finishes moving
+
+        // Phase 3: Reveal Text Container (Start just as video finishes)
+        .set(
+          textContainerRef.current,
+          { visibility: "visible", yPercent: -45 },
+          "-=0.1",
         )
-        // Phase 4: Handle theme transition refresh
+
+        // Phase 4: Staggered Line Reveals
+        // Reveal Heading Lines (100% Opacity)
+        .to(
+          splitHeading.lines!,
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out",
+          },
+          "+=0.1", // Small delay after video stops
+        )
+
+        // Reveal Long Text Lines (80% Opacity)
+        .to(
+          splitLongText.lines!,
+          {
+            yPercent: 0,
+            opacity: 0.8,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out",
+          },
+          "-=0.4",
+        )
+
+        // Reveal Small Text Lines (60% Opacity)
+        .to(
+          splitSmallText.lines!,
+          {
+            yPercent: 0,
+            opacity: 0.6,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out",
+          },
+          "-=0.4",
+        )
+
+        // Phase 5: Dead-zone (Keep everything visible for 1 more unit of scroll)
+        .to({}, { duration: 1.5 })
+
+        // Phase 6: Handle theme transition refresh
         .add(() => {
           ScrollTrigger.refresh();
         });
 
-      // Crucial: Refresh immediately
       ScrollTrigger.refresh();
-      setTimeout(() => ScrollTrigger.refresh(), 500);
     });
 
     return () => ctx.revert();
@@ -101,23 +170,33 @@ const VideoShowcase: React.FC = () => {
             />
           </div>
 
-          {/* Text Container - Positioned Top Right */}
+          {/* Text Container */}
           <div
-            ref={textRef}
-            className="absolute right-0 top-30 w-[50%] text-left pointer-events-none pr-12"
+            ref={textContainerRef}
+            className="absolute right-0 w-[50%] text-left pointer-events-none pr-12 flex flex-col gap-8"
             style={{ visibility: "hidden" }}
           >
-            <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-granary uppercase leading-[1] tracking-tighter text-[var(--foreground)]">
-              <span className="font-apparel">i design </span> &
-              <br />
+            <h2
+              ref={headingRef}
+              className="text-6xl md:text-6xl lg:text-7xl font-granary uppercase leading-[0.85] tracking-tighter text-[var(--foreground)]"
+            >
+              <span className="font-apparel">i design</span> &<br />
               build websites
             </h2>
-            <p className="pt-[5%] text-2xl text-[var(--foreground-muted)] max-w-xl opacity-80">
-              Passionate about design and web development — crafting modern
-              digital experiences for years.
+
+            <p
+              ref={longTextRef}
+              className="font-granary text-xl md:text-2xl tracking-tight text-[var(--foreground)] max-w-2xl"
+            >
+              Focused on creating digital experiences that bridge the gap
+              between visual aesthetics and technical excellence.
             </p>
-            <p className="pt-[5%] text-sm text-[var(--foreground-muted)] max-w-xl opacity-60">
-              Explore my selected work below.
+
+            <p
+              ref={smallTextRef}
+              className="font-granary text-sm uppercase tracking-[0.2em] text-[var(--foreground-muted)]"
+            >
+              ( Creative Direction & Web Development )
             </p>
           </div>
         </div>
