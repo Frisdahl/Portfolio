@@ -1,7 +1,6 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "./Header";
-import ContactSection from "./ContactSection";
 import BurgerMenuButton from "./BurgerMenuButton";
 import MobileMenuOverlay from "./MobileMenuOverlay";
 import LuxuryGrainBackground from "./LuxuryGrainBackground";
@@ -38,7 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       // Refresh ScrollTrigger to ensure pins are calculated
       setTimeout(() => {
         ScrollTrigger.refresh();
-      }, 100);
+      }, 500);
     }, layoutRef);
 
     return () => {
@@ -47,10 +46,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [location.pathname]);
 
   return (
-    <div
-      ref={layoutRef}
-      className="flex flex-col min-h-screen dark"
-    >
+    <div ref={layoutRef} className="flex flex-col min-h-screen dark">
       <Header isInverted={true} />
       <BurgerMenuButton
         isOpen={isMobileMenuOpen}
@@ -60,7 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <MobileMenuOverlay isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
       <LuxuryGrainBackground />
       <main className="flex-grow">{children}</main>
-      <ContactSection />
+      {/* Contact is moved to App.tsx inside Suspense */}
     </div>
   );
 };
