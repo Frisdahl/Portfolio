@@ -290,6 +290,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
               src={project.image}
               alt={project.title}
               className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
             />
           )}
         </div>

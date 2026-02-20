@@ -111,7 +111,7 @@ const ServicesSection: React.FC = () => {
                 ref={imageRef}
                 src={images[0]}
                 alt="Services"
-                className="w-full h-[140%] object-cover scale-110 "
+                className="w-full h-[140%] object-cover scale-110 will-change-transform"
               />
             </div>
 

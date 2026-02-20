@@ -6,25 +6,22 @@ interface VideoShowcaseProps {
 
 const VideoShowcase: React.FC<VideoShowcaseProps> = ({ isExpanded }) => {
   return (
-    <section className="mb-64">
+    <section className="mb-64 w-full flex justify-center px-8 md:px-16 lg:px-24">
       <div
-        className={`mx-auto overflow-hidden rounded-3xl px-8  transition-[width,opacity,transform] duration-1000 ease-in-out ${
+        className={`overflow-hidden rounded-3xl transition-all duration-1000 ease-in-out ${
           isExpanded ? "w-full" : "w-[50vw]"
         }`}
       >
-        {/* Placeholder for video */}
-        <div className="bg-gray-200 flex rounded-3xl items-center justify-center text-gray-600 font-bold h-[80svh]">
-          <p className="text-xl">
-            Video Showcase Placeholder (16:9 Aspect Ratio)
-          </p>
-        </div>
-        {/*
-          When the video is ready, replace the div above with:
-          <video controls className="w-full h-full object-cover rounded-3xl" poster="path/to/poster.jpg">
-            <source src="path/to/your/video.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        */}
+        <video
+          className="w-full aspect-video object-cover rounded-3xl"
+          autoPlay
+          muted
+          loop
+          playsInline
+          src="/projectVideos/videoshowcase/promo_h264.mp4"
+        >
+          Your browser does not support the video tag.
+        </video>
       </div>
     </section>
   );

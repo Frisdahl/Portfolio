@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import HeroSection from "../components/HeroSection";
 import Projects from "../components/Projects";
 import ServicesSection from "../components/ServicesSection";
 import ExpectationSection from "../components/ExpectationSection";
 import CollaborationSection from "../components/CollaborationSection";
 import VideoShowcase from "../components/VideoShowcase";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 function HomePage() {
   const [isVideoExpanded, setIsVideoExpanded] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 500) {
-        setIsVideoExpanded(true);
-      } else {
-        setIsVideoExpanded(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+  useLayoutEffect(() => {
+    let ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        start: 500,
+        onEnter: () => setIsVideoExpanded(true),
+        onLeaveBack: () => setIsVideoExpanded(false),
+      });
+    });
+    return () => ctx.revert();
   }, []);
 
   return (
