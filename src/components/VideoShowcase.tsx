@@ -131,8 +131,8 @@ const VideoShowcase: React.FC = () => {
           "-=0.4",
         )
 
-        // Phase 5: Dead-zone (Keep everything visible for 1 more unit of scroll)
-        .to({}, { duration: 1.5 })
+        // Phase 5: Dead-zone (Briefly hold the final state)
+        .to({}, { duration: 0.5 })
 
         // Phase 6: Handle theme transition refresh
         .add(() => {
