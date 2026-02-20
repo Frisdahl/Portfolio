@@ -7,6 +7,9 @@ const useSmoothScroll = () => {
   useEffect(() => {
     if (!lenis) return;
 
+    // Start Lenis
+    lenis.start();
+
     // Connect GSAP's ScrollTrigger to the Lenis instance
     lenis.on("scroll", ScrollTrigger.update);
 
@@ -32,6 +35,7 @@ const useSmoothScroll = () => {
       gsap.ticker.remove(ticker);
       lenis.off("scroll", ScrollTrigger.update);
       window.removeEventListener("resize", onResize);
+      lenis.stop();
     };
   }, []);
 };
