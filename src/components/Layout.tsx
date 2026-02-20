@@ -34,10 +34,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         backgroundColor: "#0a0a0a",
       });
 
-      // Refresh ScrollTrigger to ensure pins are calculated
-      setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 500);
+      // PROGRESSIVE REFRESH STRATEGY
+      // 1. Immediate
+      ScrollTrigger.refresh();
+      
+      // 2. Short delay (DOM ready)
+      const t1 = setTimeout(() => ScrollTrigger.refresh(), 200);
+      
+      // 3. Medium delay (Images/Videos likely rendered)
+      const t2 = setTimeout(() => ScrollTrigger.refresh(), 1000);
+      
+      // 4. Long delay (Safety fallback for slower hardware)
+      const t3 = setTimeout(() => ScrollTrigger.refresh(), 3000);
+
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
     }, layoutRef);
 
     return () => {
@@ -56,7 +70,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <MobileMenuOverlay isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
       <LuxuryGrainBackground />
       <main className="flex-grow">{children}</main>
-      {/* Contact is moved to App.tsx inside Suspense */}
     </div>
   );
 };
