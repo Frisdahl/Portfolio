@@ -48,178 +48,126 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   const videoSrc = getVideoSrc(project.video);
 
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => setIsHovered(false);
-
-  // Master playback control
-  useEffect(() => {
-    if (isHovered || isPreviewToggled) {
-      setIsPlaying(true);
-    } else if (!videoSrc) {
-      // Immediate stop if no video
-      setIsPlaying(false);
-    }
-    // If there is a video, we let handleVideoEnded manage the stop
-  }, [isHovered, isPreviewToggled, videoSrc]);
-
-  const handleVideoEnded = () => {
-    if (isHovered || isPreviewToggled) {
-      videoRef.current?.play().catch(() => undefined);
-    } else {
-      setIsPlaying(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!itemRef.current) return;
-
-    let ctx = gsap.context(() => {
-      if (parallaxRef.current) {
-        gsap.to(parallaxRef.current, {
-          y: (i, target) => -((speed - 1) * 400),
-          ease: "none",
-          scrollTrigger: {
-            trigger: itemRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
+    // 1. Separate state for Hover-playback (auto-stops) and Toggle-playback (permanent)
+    const [isHoverPlaying, setIsHoverPlaying] = useState(false);
+  
+    // 2. Master playback control
+    useEffect(() => {
+      // If toggle is ON, we are playing.
+      // If hover is active AND we aren't already toggled ON, we are playing.
+      setIsPlaying(isPreviewToggled || isHoverPlaying);
+    }, [isPreviewToggled, isHoverPlaying]);
+  
+    const handleMouseEnter = () => {
+      if (!isPreviewToggled) {
+        setIsHoverPlaying(true);
       }
-
-      gsap.fromTo(
-        itemRef.current,
-        { opacity: 1, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: itemRef.current,
-            start: "top bottom-=100",
-            toggleActions: "play none none none",
-          },
-        },
-      );
-    }, itemRef);
-
-    return () => ctx.revert();
-  }, [speed]);
-
-  // Consolidated Video and Animation Logic
-  useEffect(() => {
-    const video = videoRef.current;
-    const titleText = titleTextRef.current;
-    const categoriesText = categoriesTextRef.current;
-    const titleReveal = titleRevealRef.current;
-    const categoriesReveal = categoriesRevealRef.current;
-
-    if (!titleText || !categoriesText || !titleReveal || !categoriesReveal)
-      return;
-
-    // Kill any stray animations on these specific elements before starting new ones
-    gsap.killTweensOf([
-      titleText,
-      categoriesText,
-      titleReveal,
-      categoriesReveal,
-    ]);
-    if (tlRef.current) tlRef.current.kill();
-
-    if (isPlaying) {
-      // Handle Video Playback
-      if (video) {
-        video.play().catch(() => undefined);
-      }
-
-      // Create a new timeline
-      const tl = gsap.timeline({
-        repeat: isPreviewToggled ? -1 : 0,
-        repeatDelay: 3,
-      });
-      tlRef.current = tl;
-
-      // Reset to initial state immediately
-      tl.set([titleText, categoriesText], { opacity: 0, y: "0%", x: "0%" })
-        .set([titleReveal, categoriesReveal], { x: "100%" })
-
-        // Sequential Entry
-        .to(titleReveal, {
-          x: "0%",
-          duration: 0.4,
-          ease: "power2.inOut",
-        })
-        .set(titleText, { opacity: 1 })
-        .to(titleReveal, {
-          x: "-105%",
-          duration: 0.4,
-          ease: "power2.inOut",
-        })
-
-        // Categories reveal sequence
-        .to(categoriesReveal, {
-          x: "0%",
-          duration: 0.4,
-          ease: "power2.inOut",
-        })
-        .set(categoriesText, { opacity: 1 })
-        .to(categoriesReveal, {
-          x: "-105%",
-          duration: 0.4,
-          ease: "power2.inOut",
-        });
-    } else {
-      // Handle Video Stop
-      if (video) {
-        video.pause();
-        video.currentTime = 0;
-      }
-
-      // Sequential Exit: Title first, then categories
-      // Ensure text is visible for the cover animation if it was already showing
-      const exitTl = gsap.timeline();
-
-      exitTl
-        .set([titleReveal, categoriesReveal], { x: "100%" })
-        // 1. Cover Title
-        .to(titleReveal, {
-          x: "0%",
-          duration: 0.3,
-          ease: "power2.inOut",
-        })
-        // 2. Slide Title Out Left
-        .to([titleReveal, titleText], {
-          x: "-105%",
-          duration: 0.3,
-          ease: "power2.in",
-        })
-        // 3. Cover Categories
-        .to(
-          categoriesReveal,
-          {
-            x: "0%",
-            duration: 0.3,
-            ease: "power2.inOut",
-          },
-          "-=0.1",
-        )
-        // 4. Slide Categories Out Left
-        .to([categoriesReveal, categoriesText], {
-          x: "-105%",
-          duration: 0.3,
-          ease: "power2.in",
-        })
-        .set([titleText, categoriesText], { opacity: 0, x: "0%" })
-        .set([titleReveal, categoriesReveal], { x: "100%" });
-    }
-
-    return () => {
-      if (tlRef.current) tlRef.current.kill();
     };
-  }, [isPlaying, isPreviewToggled]);
-
-  const projectNumber = `00-${index + 1}`;
+    
+    const handleMouseLeave = () => {
+      // We don't stop on leave because we want it to finish the "one play"
+    };
+  
+    const handleVideoEnded = () => {
+      // If it was a hover-initiated play, stop now.
+      // If it's the permanent toggle, keep looping.
+      if (isPreviewToggled && videoRef.current) {
+        videoRef.current.play().catch(() => undefined);
+      } else {
+        setIsHoverPlaying(false);
+      }
+    };
+  
+    useEffect(() => {
+      if (!itemRef.current) return;
+  
+      let ctx = gsap.context(() => {
+        if (parallaxRef.current) {
+          gsap.to(parallaxRef.current, {
+            y: (i, target) => -((speed - 1) * 400),
+            ease: "none",
+            scrollTrigger: {
+              trigger: itemRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          });
+        }
+  
+        gsap.fromTo(
+          itemRef.current,
+          { opacity: 1, y: 50 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: itemRef.current,
+              start: "top bottom-=100",
+              toggleActions: "play none none none",
+            },
+          },
+        );
+      }, itemRef);
+  
+      return () => ctx.revert();
+    }, [speed]);
+  
+    // Consolidated Video and Animation Logic
+    useEffect(() => {
+      const video = videoRef.current;
+      const titleText = titleTextRef.current;
+      const categoriesText = categoriesTextRef.current;
+      const titleReveal = titleRevealRef.current;
+      const categoriesReveal = categoriesRevealRef.current;
+  
+      if (!titleText || !categoriesText || !titleReveal || !categoriesReveal)
+        return;
+  
+      // Kill ANY existing animation (enter or exit) when the state changes
+      if (tlRef.current) tlRef.current.kill();
+      gsap.killTweensOf([titleText, categoriesText, titleReveal, categoriesReveal]);
+  
+      if (isPlaying) {
+        if (video) video.play().catch(() => undefined);
+  
+        const tl = gsap.timeline();
+        tlRef.current = tl;
+  
+        tl.set([titleText, categoriesText], { opacity: 0, x: "0%" })
+          .set([titleReveal, categoriesReveal], { x: "100%", opacity: 1 })
+          // Entry Sequence
+          .to(titleReveal, { x: "0%", duration: 0.4, ease: "power2.inOut" })
+          .set(titleText, { opacity: 1 })
+          .to(titleReveal, { x: "-105%", duration: 0.4, ease: "power2.inOut" })
+          .to(categoriesReveal, { x: "0%", duration: 0.4, ease: "power2.inOut" }, "-=0.2")
+          .set(categoriesText, { opacity: 1 })
+          .to(categoriesReveal, { x: "-105%", duration: 0.4, ease: "power2.inOut" });
+      } else {
+        // Exit sequence
+        if (video) {
+          video.pause();
+          video.currentTime = 0;
+        }
+        
+        const exitTl = gsap.timeline();
+        tlRef.current = exitTl;
+        
+        exitTl.set([titleReveal, categoriesReveal], { x: "100%", opacity: 1 })
+          .to(titleReveal, { x: "0%", duration: 0.3, ease: "power2.inOut" })
+          .to([titleReveal, titleText], { x: "-105%", duration: 0.3, ease: "power2.in" })
+          .to(categoriesReveal, { x: "0%", duration: 0.3, ease: "power2.inOut" }, "-=0.1")
+          .to([categoriesReveal, categoriesText], { x: "-105%", duration: 0.3, ease: "power2.in" })
+          .set([titleText, categoriesText], { opacity: 0, x: "0%" })
+          .set([titleReveal, categoriesReveal], { x: "100%" });
+      }
+  
+      return () => {
+        if (tlRef.current) tlRef.current.kill();
+      };
+    }, [isPlaying]);  const projectNumber = `00-${index + 1}`;
 
   return (
     <div ref={itemRef} className="w-full">
@@ -233,10 +181,12 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             {projectNumber}
           </div>
           <button
-            className="flex items-center gap-4 cursor-pointer group focus:outline-none"
+            className="flex items-center gap-4 cursor-pointer group focus:outline-none z-30 relative"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
-              setIsPreviewToggled(!isPreviewToggled);
+              const newState = !isPreviewToggled;
+              setIsPreviewToggled(newState);
             }}
           >
             <span
