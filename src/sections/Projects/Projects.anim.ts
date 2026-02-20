@@ -1,5 +1,6 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,7 +22,7 @@ export const initProjectParallax = (
       },
     });
 
-    // Reveal animation
+    // Reveal animation for the whole item container
     gsap.fromTo(
       item,
       { opacity: 1, y: 50 },
@@ -42,55 +43,76 @@ export const initProjectParallax = (
   return ctx;
 };
 
-export const createProjectItemTimeline = (
+export const initProjectItemAnimations = (
   isPlaying: boolean,
   elements: {
     video: HTMLVideoElement | null;
     titleText: HTMLElement;
     categoriesText: HTMLElement;
-    titleReveal: HTMLElement;
-    categoriesReveal: HTMLElement;
     actions: HTMLElement;
   }
 ) => {
-  const { video, titleText, categoriesText, titleReveal, categoriesReveal, actions } = elements;
-  
-  // Kill any existing animations on these elements
-  gsap.killTweensOf([titleText, categoriesText, titleReveal, categoriesReveal, actions]);
+  const { video, titleText, categoriesText, actions } = elements;
 
-  if (isPlaying) {
-    if (video) video.play().catch(() => undefined);
+  const ctx = gsap.context(() => {
+    // 1. Split text into lines
+    const splitTitle = new SplitType(titleText, { types: "lines" });
+    const splitCategories = new SplitType(categoriesText, { types: "lines" });
 
-    const tl = gsap.timeline();
-    tl.set([titleText, categoriesText, actions], { opacity: 0, x: "0%" })
-      .set([titleReveal, categoriesReveal], { x: "100%", opacity: 1 })
-      .to(titleReveal, { x: "0%", duration: 0.4, ease: "power2.inOut" })
-      .set(titleText, { opacity: 1 })
-      .to(titleReveal, { x: "-105%", duration: 0.4, ease: "power2.inOut" })
-      .to(categoriesReveal, { x: "0%", duration: 0.4, ease: "power2.inOut" }, "-=0.2")
-      .set(categoriesText, { opacity: 1 })
-      .to(categoriesReveal, { x: "-105%", duration: 0.4, ease: "power2.inOut" })
-      .to(actions, { opacity: 1, duration: 0.4, ease: "power2.out" }, "-=0.2");
-    
-    return tl;
-  } else {
-    const exitTl = gsap.timeline({ delay: 0.8 });
-    exitTl
-      .to(actions, { opacity: 0, duration: 0.2, ease: "power2.in" })
-      .add(() => {
-        if (video) {
-          video.pause();
-          video.currentTime = 0;
-        }
+    // Initial state: ensure lines are hidden if playing
+    if (isPlaying) {
+      if (video) video.play().catch(() => undefined);
+
+      const tl = gsap.timeline();
+      
+      tl.set([splitTitle.lines, splitCategories.lines], { yPercent: 105 })
+        .set(actions, { opacity: 0 });
+
+      tl.to(splitTitle.lines!, {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power3.out"
       })
-      .set([titleReveal, categoriesReveal], { x: "100%", opacity: 1 })
-      .to(titleReveal, { x: "0%", duration: 0.3, ease: "power2.inOut" })
-      .to([titleReveal, titleText], { x: "-105%", duration: 0.3, ease: "power2.in" })
-      .to(categoriesReveal, { x: "0%", duration: 0.3, ease: "power2.inOut" }, "-=0.1")
-      .to([categoriesReveal, categoriesText], { x: "-105%", duration: 0.3, ease: "power2.in" })
-      .set([titleText, categoriesText], { opacity: 0, x: "0%" })
-      .set([titleReveal, categoriesReveal], { x: "100%" });
-    
-    return exitTl;
-  }
+      .to(splitCategories.lines!, {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.05,
+        ease: "power3.out"
+      }, "-=0.4")
+      .to(actions, {
+        opacity: 1,
+        duration: 0.4,
+        ease: "power2.out"
+      }, "-=0.3");
+    } else {
+      // Exit sequence
+      const exitTl = gsap.timeline();
+      
+      exitTl
+        .to(actions, { opacity: 0, duration: 0.2, ease: "power2.in" })
+        .to(splitCategories.lines!, {
+          yPercent: 105,
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "power3.in"
+        })
+        .to(splitTitle.lines!, {
+          yPercent: 105,
+          duration: 0.4,
+          stagger: 0.1,
+          ease: "power3.in"
+        }, "-=0.3")
+        .add(() => {
+          if (video) {
+            video.pause();
+            video.currentTime = 0;
+          }
+        });
+    }
+  });
+
+  return ctx;
 };
