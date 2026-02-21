@@ -86,7 +86,7 @@ const VideoShowcase: React.FC = () => {
           >
             <h2
               ref={headingRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-granary uppercase leading-[0.85] tracking-tighter text-[var(--foreground)]"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-granary uppercase leading-[1] tracking-tighter text-[var(--foreground)]"
             >
               <span className="font-apparel">i design</span> &<br />
               build websites

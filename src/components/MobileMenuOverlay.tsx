@@ -44,15 +44,15 @@ const MobileMenuOverlay: React.FC<{
     >
       {/* The actual menu panel that slides in/out */}
       <div
-        className={`fixed top-0 right-0 w-[30vw] bg-[#e4e2dd] transform transition-transform duration-700 ease-in-out ${
-          isOpen ? "translate-x-0" : "translate-x-full transition-delay-300"
-        } overflow-y-auto px-8 pt-8 pb-4 text-left rounded-bl-xl rounded-br-xl rounded-tl-xl rounded-tr-none max-h-[80vh] text-[#0a0a0a]`} // Adjusted padding
+        className={`fixed top-0 right-0 w-full sm:w-[500px] h-full sm:h-auto sm:max-h-[calc(100vh-2rem)] sm:top-4 sm:right-4 bg-[#e4e2dd] transform transition-transform duration-700 ease-in-out ${
+          isOpen ? "translate-x-0" : "translate-x-[110%]"
+        } overflow-y-auto px-6 sm:px-12 pt-24 sm:pt-16 pb-12 text-left text-[#0a0a0a] shadow-2xl sm:rounded-2xl`}
         onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing the menu
       >
-        {/* Left side: Main Nav - now at the top of the single column */}
-        <div className="mb-16">
+        {/* Main Nav */}
+        <div className="mb-12 sm:mb-16">
           <h3
-            className={`text-2xl text-[#9d9dad] text-sm mb-8 transition-all duration-300 ease-out ${
+            className={`text-[10px] uppercase tracking-[0.2em] text-[#9d9dad] mb-8 sm:mb-12 transition-all duration-500 ease-out ${
               isOpen
                 ? "opacity-100 translate-y-0 delay-200"
                 : "opacity-0 translate-y-4"
@@ -60,117 +60,93 @@ const MobileMenuOverlay: React.FC<{
           >
             Menu
           </h3>
-          <nav className="text-4xl text-[#0a0a0a] font-[300] flex flex-col space-y-8 mb-8">
+          <nav className="text-3xl sm:text-4xl text-[#0a0a0a] font-light flex flex-col space-y-4 sm:space-y-6 mb-12 sm:mb-16">
             <Link
               to="/"
-              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
+              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-500 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-300"
                   : "opacity-0 translate-y-4"
               }`}
-              onClick={() => {
-                onClose();
-              }}
+              onClick={onClose}
             >
               Works
             </Link>
             <Link
               to="/about"
-              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
+              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-500 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-400"
                   : "opacity-0 translate-y-4"
               }`}
               onClick={onClose}
             >
-              About us
+              About
             </Link>
             <Link
               to="/"
-              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-300 ease-out ${
+              className={`hover:opacity-70 w-fit inline-block link-underline-effect transition-all duration-500 ease-out ${
                 isOpen
                   ? "opacity-100 translate-y-0 delay-500"
                   : "opacity-0 translate-y-4"
               }`}
               onClick={onClose}
             >
-              Blog
+              Contact
             </Link>
           </nav>
-          <AnimatedButton
-            text="Get in touch"
-            baseBgColor="bg-[#0a0a0a]"
-            baseTextColor="text-[#e4e2dd]"
-            baseBorderColor="border-[#0a0a0a]"
-            hoverTextColor="group-hover:text-[#0a0a0a]"
-            hoverBgColor="bg-[#e4e2dd]"
-            onClick={handleGetInTouchClick}
-            className={`mb-4 transition-all duration-300 ease-out ${
-              /* Changed mb-8 to mb-4 */
+
+          <div
+            className={`transition-all duration-500 ease-out ${
               isOpen
                 ? "opacity-100 translate-y-0 delay-600"
                 : "opacity-0 translate-y-4"
             }`}
-          />
+          >
+            <AnimatedButton
+              text="Let's Talk"
+              baseBgColor="bg-[#0a0a0a]"
+              baseTextColor="text-[#e4e2dd]"
+              baseBorderColor="border-[#0a0a0a]"
+              hoverTextColor="group-hover:text-[#0a0a0a]"
+              hoverBgColor="bg-[#e4e2dd]"
+              onClick={handleGetInTouchClick}
+              className="w-full sm:w-auto text-base py-3 px-6"
+            />
+          </div>
         </div>
 
-        {/* Right side: Detailed Links - now below the main nav */}
-        <div>
+        {/* Social / Footer Info */}
+        <div className="mt-auto">
           <div
-            className={`transition-all duration-500 ease-out ${
-              /* Changed duration-300 to duration-500 */
+            className={`transition-all duration-700 ease-out border-t border-black/10 pt-8 sm:pt-10 ${
               isOpen
-                ? "opacity-100 translate-y-0 w-full delay-700"
-                : "opacity-0 translate-y-4 w-0"
+                ? "opacity-100 translate-y-0 delay-700"
+                : "opacity-0 translate-y-4"
             }`}
           >
-            <hr className="border-t border-gray-300 my-4" />
+            <div className="flex flex-wrap gap-x-8 gap-y-4">
+              {["Facebook", "LinkedIn", "Instagram"].map((social, index) => (
+                <a
+                  key={social}
+                  href={`#${social.toLowerCase()}`}
+                  className={`inline-flex items-center text-lg font-normal tracking-wider group relative transition-all duration-500 ease-out text-[#0a0a0a] delay-[${800 + index * 100}ms] ${
+                    isOpen
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-4"
+                  }`}
+                >
+                  <span className="hover:opacity-60 transition-opacity">
+                    {social}
+                  </span>
+                  <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
+                    <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0 brightness-0" />
+                    <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 brightness-0" />
+                  </span>
+                </a>
+              ))}
+            </div>
           </div>
-          <Section title="">
-            {/* Note: Section component needs title prop if we want to follow its definition */}
-            <a
-              href="#facebook"
-              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out text-[#0a0a0a] ${
-                isOpen
-                  ? "opacity-100 translate-y-0 delay-800"
-                  : "opacity-0 translate-y-4"
-              }`}
-            >
-              <span>Facebook</span>
-              <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0 brightness-0" />
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 brightness-0" />
-              </span>
-            </a>
-            <a
-              href="#linkedin"
-              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out text-[#0a0a0a] ${
-                isOpen
-                  ? "opacity-100 translate-y-0 delay-900"
-                  : "opacity-0 translate-y-4"
-              }`}
-            >
-              <span>LinkedIn</span>
-              <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0 brightness-0" />
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 brightness-0" />
-              </span>
-            </a>
-            <a
-              href="#email"
-              className={`inline-flex items-center link-underline-effect px-2 py-1 group relative overflow-hidden transition-all duration-300 ease-out text-[#0a0a0a] ${
-                isOpen
-                  ? "opacity-100 translate-y-0 delay-1000"
-                  : "opacity-0 translate-y-4"
-              }`}
-            >
-              <span>Email</span>
-              <span className="relative w-6 h-6 ml-1 inline-flex items-center justify-center">
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0 brightness-0" />
-                <ArrowIcon className="absolute w-4 h-4 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 brightness-0" />
-              </span>
-            </a>
-          </Section>
         </div>
       </div>
     </div>

@@ -2,116 +2,9 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
+import Marquee from "../../components/Marquee";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// Helper function for seamless horizontal loop from GSAP
-function horizontalLoop(items: any[], config: any) {
-  items = gsap.utils.toArray(items);
-  config = config || {};
-  let tl = gsap.timeline({
-      repeat: config.repeat,
-      paused: config.paused,
-      defaults: { ease: "none" },
-      onReverseComplete: () => {
-        tl.totalTime(tl.rawTime() + tl.duration() * 100);
-      },
-    }),
-    length = items.length,
-    startX = items[0].offsetLeft,
-    times: number[] = [],
-    widths: number[] = [],
-    xPercents: number[] = [],
-    curIndex = 0,
-    pixelsPerSecond = (config.speed || 1) * 100,
-    snap =
-      config.snap === false ? (v: any) => v : gsap.utils.snap(config.snap || 1),
-    totalWidth: number,
-    curX: number,
-    distanceToStart: number,
-    distanceToLoop: number,
-    item: any,
-    i: number;
-
-  gsap.set(items, {
-    xPercent: (i, el) => {
-      let w = (widths[i] = parseFloat(
-        gsap.getProperty(el, "width", "px") as string,
-      ));
-      xPercents[i] = snap(
-        (parseFloat(gsap.getProperty(el, "x", "px") as string) / w) * 100 +
-          (gsap.getProperty(el, "xPercent") as number),
-      );
-      return xPercents[i];
-    },
-  });
-  gsap.set(items, { x: 0 });
-  totalWidth =
-    items[length - 1].offsetLeft +
-    (xPercents[length - 1] / 100) * widths[length - 1] -
-    startX +
-    items[length - 1].offsetWidth *
-      (gsap.getProperty(items[length - 1], "scaleX") as number) +
-    (parseFloat(config.paddingRight) || 0);
-  for (i = 0; i < length; i++) {
-    item = items[i];
-    curX = (xPercents[i] / 100) * widths[i];
-    distanceToStart = item.offsetLeft + curX - startX;
-    distanceToLoop =
-      distanceToStart +
-      widths[i] * (gsap.getProperty(item, "scaleX") as number);
-    tl.to(
-      item,
-      {
-        xPercent: snap(((curX - distanceToLoop) / widths[i]) * 100),
-        duration: distanceToLoop / pixelsPerSecond,
-      },
-      0,
-    )
-      .fromTo(
-        item,
-        {
-          xPercent: snap(
-            ((curX - distanceToLoop + totalWidth) / widths[i]) * 100,
-          ),
-        },
-        {
-          xPercent: xPercents[i],
-          duration:
-            (curX - distanceToLoop + totalWidth - curX) / pixelsPerSecond,
-          immediateRender: false,
-        },
-        distanceToLoop / pixelsPerSecond,
-      )
-      .add("label" + i, distanceToStart / pixelsPerSecond);
-    times[i] = distanceToStart / pixelsPerSecond;
-  }
-  function toIndex(index: number, vars: any) {
-    vars = vars || {};
-    Math.abs(index - curIndex) > length / 2 &&
-      (index += index > curIndex ? -length : length);
-    let newIndex = gsap.utils.wrap(0, length, index),
-      time = times[newIndex];
-    if (time > tl.time() !== index > curIndex) {
-      vars.modifiers = { time: gsap.utils.wrap(0, tl.duration()) };
-      time += tl.duration() * (index > curIndex ? 1 : -1);
-    }
-    curIndex = newIndex;
-    vars.overwrite = true;
-    return tl.tweenTo(time, vars);
-  }
-  tl.next = (vars: any) => toIndex(curIndex + 1, vars);
-  tl.previous = (vars: any) => toIndex(curIndex - 1, vars);
-  tl.current = () => curIndex;
-  tl.toIndex = (index: number, vars: any) => toIndex(index, vars);
-  tl.times = times;
-  tl.progress(1, true).progress(0, true);
-  if (config.reversed) {
-    tl.vars.onReverseComplete?.();
-    tl.reverse();
-  }
-  return tl;
-}
 
 const SocialIcon = ({
   href,
@@ -142,7 +35,6 @@ const Hero: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
-  const marqueeRailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!heroRef.current || !containerRef.current) return;
@@ -181,43 +73,6 @@ const Hero: React.FC = () => {
       { opacity: 1, y: 0, duration: 1.2 },
       "-=1.2",
     );
-
-    // Marquee Animation
-    if (marqueeRailRef.current) {
-      const marqueeItems = Array.from(
-        marqueeRailRef.current.querySelectorAll("h4"),
-      );
-      const marqueeLoop = horizontalLoop(marqueeItems, {
-        repeat: -1,
-        speed: 1,
-        paddingRight: 100,
-      });
-
-      let speedTween: gsap.core.Timeline | null = null;
-
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top bottom",
-        end: "bottom top",
-        onUpdate: (self) => {
-          speedTween && speedTween.kill();
-          speedTween = gsap
-            .timeline()
-            .to(marqueeLoop, {
-              timeScale: 3 * self.direction,
-              duration: 0.25,
-            })
-            .to(
-              marqueeLoop,
-              {
-                timeScale: 1 * self.direction,
-                duration: 1.5,
-              },
-              "+=0.5",
-            );
-        },
-      });
-    }
 
     // Scroll-driven Wipe Transition
     gsap.to(heroRef.current, {
@@ -304,13 +159,10 @@ const Hero: React.FC = () => {
           <div className="flex flex-col items-start text-left gap-8 md:gap-10">
             <h1
               ref={headlineRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-granary uppercase leading-[1] tracking-tighter text-[var(--foreground)]"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-granary text-[#fff] font-semibold uppercase leading-[1] tracking-tighter"
             >
               Freelance web developer <br />&
-              <span className="font-apparel italic text-[#e4e3de]">
-                {" "}
-                creative designer.
-              </span>
+              <span className="font-apparel italic"> creative designer.</span>
             </h1>
           </div>
         </div>
@@ -352,24 +204,18 @@ const Hero: React.FC = () => {
 
               {/* Divider (Also aligned to sides) */}
               <hr
-                className="w-full h-px border-0"
+                className="w-full h-px border-0 opacity-10"
                 style={{ backgroundColor: "var(--divider)" }}
               />
             </div>
 
             {/* Marquee Section (Full screen width) */}
-            <div className="scrolling-text relative overflow-hidden w-full pt-8">
-              <div ref={marqueeRailRef} className="rail flex whitespace-nowrap">
-                {[...Array(8)].map((_, i) => (
-                  <h4
-                    key={i}
-                    className="text-5xl md:text-7xl lg:text-[7vw] font-granary font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] opacity-[0.07] leading-none"
-                  >
-                    Frisdahl Studio°
-                  </h4>
-                ))}
-              </div>
-            </div>
+            <Marquee
+              text="Frisdahl Studio°"
+              className="pt-8"
+              itemClassName="text-5xl md:text-7xl lg:text-[7vw] font-granary font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] opacity-[0.05] leading-none"
+              speed={1}
+            />
           </div>
         </div>
 

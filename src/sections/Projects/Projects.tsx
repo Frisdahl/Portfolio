@@ -1,5 +1,6 @@
 import React from "react";
 import ProjectItem from "./ProjectItem";
+import Marquee from "../../components/Marquee";
 
 const projects = [
   {
@@ -48,34 +49,54 @@ const projects = [
 const Projects: React.FC = () => {
   return (
     <section id="projects" className="mb-64 w-full">
-      <div className="w-full px-8 md:px-16 lg:px-24">
-        <div className="flex flex-col gap-32 md:gap-64">
-          <div className="flex flex-col md:flex-row items-start justify-between gap-16">
-            <div className="md:w-3/12 md:mt-32">
-              <ProjectItem project={projects[0]} index={0} speed={1.4} />
-            </div>
-            <div className="md:w-6/12">
-              <ProjectItem project={projects[1]} index={1} speed={1.1} />
-            </div>
-          </div>
-
-          <div className="flex justify-start">
-            <div className="w-full md:w-8/12">
-              <ProjectItem project={projects[2]} index={2} speed={1.2} aspectClassName="aspect-video" />
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-start justify-between gap-16">
-            <div className="md:w-6/12">
-              <ProjectItem project={projects[3]} index={3} speed={0.9} />
-            </div>
-            <div className="md:w-3/12 md:mt-48">
-              <ProjectItem project={projects[4]} index={4} speed={1.6} />
-            </div>
-          </div>
+      {/* Section Header with Marquee */}
+      <div className="w-full mb-24 md:mb-32">
+        <div className="px-8 mb-8">
+          <hr
+            className="w-full h-[1px] border-0"
+            style={{ backgroundColor: "var(--divider)" }}
+          />
         </div>
+        <Marquee
+          text="Selected Projects°"
+          className="pt-8 "
+          itemClassName="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-granary font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] leading-none"
+          speed={1}
+        />
       </div>
-    </section>
+
+                              <div className="w-full px-8 md:px-16 lg:px-24 mt-32 md:mt-64">
+                                <div className="flex flex-col gap-48 md:gap-96">
+                                  <div className="flex flex-col md:flex-row items-start justify-between gap-24 md:gap-48">
+                                    <div className="md:w-3/12 md:mt-48">
+                                      <ProjectItem project={projects[0]} index={0} speed={2.2} />
+                                    </div>
+                                    <div className="md:w-6/12">
+                                      <ProjectItem project={projects[1]} index={1} speed={1.15} />
+                                    </div>
+                                  </div>
+                        
+                                  <div className="flex justify-start md:mt-32">
+                                    <div className="w-full md:w-8/12">
+                                      <ProjectItem
+                                        project={projects[2]}
+                                        index={2}
+                                        speed={1.08}
+                                        aspectClassName="aspect-video"
+                                      />
+                                    </div>
+                                  </div>
+                        
+                                  <div className="flex flex-col md:flex-row items-start justify-between gap-24 md:gap-48">
+                                    <div className="md:w-6/12">
+                                      <ProjectItem project={projects[3]} index={3} speed={1.2} />
+                                    </div>
+                                    <div className="md:w-3/12 md:mt-80">
+                                      <ProjectItem project={projects[4]} index={4} speed={2.5} />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>    </section>
   );
 };
 

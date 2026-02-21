@@ -10,32 +10,38 @@ export const initProjectParallax = (
   speed: number,
 ) => {
   const ctx = gsap.context(() => {
-    // Parallax effect with GPU acceleration
-    gsap.to(parallaxTarget, {
-      y: (i, target) => -((speed - 1) * 400),
-      ease: "none",
-      force3D: true,
-      scrollTrigger: {
-        trigger: item,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: 1,
-      },
-    });
+    // Strengthened parallax effect using yPercent for relative movement
+    // A speed of 1.0 means no parallax, >1.0 moves faster/further
+    const movement = (speed - 1) * 100; // e.g., speed 1.5 -> 50% movement
+
+    gsap.fromTo(parallaxTarget, 
+      { yPercent: movement },
+      {
+        yPercent: -movement,
+        ease: "none",
+        force3D: true,
+        scrollTrigger: {
+          trigger: item,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      }
+    );
 
     // Reveal animation for the whole item container
     gsap.fromTo(
       item,
-      { opacity: 1, y: 50 },
+      { opacity: 0, y: 100 },
       {
         opacity: 1,
         y: 0,
-        duration: 0.8,
-        ease: "power2.out",
+        duration: 1.2,
+        ease: "power3.out",
         force3D: true,
         scrollTrigger: {
           trigger: item,
-          start: "top bottom-=100",
+          start: "top bottom-=150",
           toggleActions: "play none none none",
         },
       },
