@@ -5,6 +5,114 @@ import SplitType from "split-type";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Helper function for seamless horizontal loop from GSAP
+function horizontalLoop(items: any[], config: any) {
+  items = gsap.utils.toArray(items);
+  config = config || {};
+  let tl = gsap.timeline({
+      repeat: config.repeat,
+      paused: config.paused,
+      defaults: { ease: "none" },
+      onReverseComplete: () => {
+        tl.totalTime(tl.rawTime() + tl.duration() * 100);
+      },
+    }),
+    length = items.length,
+    startX = items[0].offsetLeft,
+    times: number[] = [],
+    widths: number[] = [],
+    xPercents: number[] = [],
+    curIndex = 0,
+    pixelsPerSecond = (config.speed || 1) * 100,
+    snap =
+      config.snap === false ? (v: any) => v : gsap.utils.snap(config.snap || 1),
+    totalWidth: number,
+    curX: number,
+    distanceToStart: number,
+    distanceToLoop: number,
+    item: any,
+    i: number;
+
+  gsap.set(items, {
+    xPercent: (i, el) => {
+      let w = (widths[i] = parseFloat(
+        gsap.getProperty(el, "width", "px") as string,
+      ));
+      xPercents[i] = snap(
+        (parseFloat(gsap.getProperty(el, "x", "px") as string) / w) * 100 +
+          (gsap.getProperty(el, "xPercent") as number),
+      );
+      return xPercents[i];
+    },
+  });
+  gsap.set(items, { x: 0 });
+  totalWidth =
+    items[length - 1].offsetLeft +
+    (xPercents[length - 1] / 100) * widths[length - 1] -
+    startX +
+    items[length - 1].offsetWidth *
+      (gsap.getProperty(items[length - 1], "scaleX") as number) +
+    (parseFloat(config.paddingRight) || 0);
+  for (i = 0; i < length; i++) {
+    item = items[i];
+    curX = (xPercents[i] / 100) * widths[i];
+    distanceToStart = item.offsetLeft + curX - startX;
+    distanceToLoop =
+      distanceToStart +
+      widths[i] * (gsap.getProperty(item, "scaleX") as number);
+    tl.to(
+      item,
+      {
+        xPercent: snap(((curX - distanceToLoop) / widths[i]) * 100),
+        duration: distanceToLoop / pixelsPerSecond,
+      },
+      0,
+    )
+      .fromTo(
+        item,
+        {
+          xPercent: snap(
+            ((curX - distanceToLoop + totalWidth) / widths[i]) * 100,
+          ),
+        },
+        {
+          xPercent: xPercents[i],
+          duration:
+            (curX - distanceToLoop + totalWidth - curX) / pixelsPerSecond,
+          immediateRender: false,
+        },
+        distanceToLoop / pixelsPerSecond,
+      )
+      .add("label" + i, distanceToStart / pixelsPerSecond);
+    times[i] = distanceToStart / pixelsPerSecond;
+  }
+  function toIndex(index: number, vars: any) {
+    vars = vars || {};
+    Math.abs(index - curIndex) > length / 2 &&
+      (index += index > curIndex ? -length : length);
+    let newIndex = gsap.utils.wrap(0, length, index),
+      time = times[newIndex];
+    if (time > tl.time() !== index > curIndex) {
+      vars.modifiers = { time: gsap.utils.wrap(0, tl.duration()) };
+      time += tl.duration() * (index > curIndex ? 1 : -1);
+    }
+    curIndex = newIndex;
+    vars.overwrite = true;
+    return tl.tweenTo(time, vars);
+  }
+  tl.next = (vars: any) => toIndex(curIndex + 1, vars);
+  tl.previous = (vars: any) => toIndex(curIndex - 1, vars);
+  tl.current = () => curIndex;
+  tl.toIndex = (index: number, vars: any) => toIndex(index, vars);
+  tl.times = times;
+  tl.progress(1, true).progress(0, true);
+  if (config.reversed) {
+    tl.vars.onReverseComplete?.();
+    tl.reverse();
+  }
+  return tl;
+}
+
 const SocialIcon = ({
   href,
   children,
@@ -33,8 +141,8 @@ const Hero: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-  const labelRef = useRef<HTMLSpanElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
+  const marqueeRailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!heroRef.current || !containerRef.current) return;
@@ -66,15 +174,52 @@ const Hero: React.FC = () => {
       );
     }
 
-    // Fade in other elements
+    // Fade in footer area
     tl.fromTo(
-      [labelRef.current, footerRef.current],
+      footerRef.current,
       { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 1.2, stagger: 0.15 },
+      { opacity: 1, y: 0, duration: 1.2 },
       "-=1.2",
     );
 
-    // Scroll-driven Wipe Transition (Erasing from bottom to top)
+    // Marquee Animation
+    if (marqueeRailRef.current) {
+      const marqueeItems = Array.from(
+        marqueeRailRef.current.querySelectorAll("h4"),
+      );
+      const marqueeLoop = horizontalLoop(marqueeItems, {
+        repeat: -1,
+        speed: 1,
+        paddingRight: 100,
+      });
+
+      let speedTween: gsap.core.Timeline | null = null;
+
+      ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        onUpdate: (self) => {
+          speedTween && speedTween.kill();
+          speedTween = gsap
+            .timeline()
+            .to(marqueeLoop, {
+              timeScale: 3 * self.direction,
+              duration: 0.25,
+            })
+            .to(
+              marqueeLoop,
+              {
+                timeScale: 1 * self.direction,
+                duration: 1.5,
+              },
+              "+=0.5",
+            );
+        },
+      });
+    }
+
+    // Scroll-driven Wipe Transition
     gsap.to(heroRef.current, {
       scrollTrigger: {
         trigger: containerRef.current,
@@ -82,13 +227,13 @@ const Hero: React.FC = () => {
         end: "bottom top",
         scrub: true,
         pin: true,
-        pinSpacing: false, // Reveal next section underneath
+        pinSpacing: false,
       },
       clipPath: "inset(0% 0% 100% 0%)",
       ease: "none",
     });
 
-    // Subtle Parallax for video inside the wipe
+    // Subtle Parallax for video
     gsap.to(videoRef.current, {
       scrollTrigger: {
         trigger: containerRef.current,
@@ -112,7 +257,7 @@ const Hero: React.FC = () => {
     >
       <section
         ref={heroRef}
-        className="relative h-[100vh] w-full bg-[#0a0a0a] overflow-hidden flex flex-col justify-end px-6 md:px-12 lg:px-24 will-change-[clip-path]"
+        className="relative h-[100vh] w-full bg-[#0a0a0a] overflow-hidden flex flex-col justify-between pt-44 pb-4 md:pb-8 will-change-[clip-path]"
         style={{ clipPath: "inset(0% 0% 0% 0%)" }}
       >
         {/* Layer B: Video Background */}
@@ -154,23 +299,12 @@ const Hero: React.FC = () => {
           }}
         />
 
-        {/* Main Content Area */}
-        <div
-          ref={contentRef}
-          className="relative z-[10] w-full max-w-[1800px] mx-auto pb-8 md:pb-12"
-        >
-          <div className="flex flex-col items-start text-left gap-8 md:gap-10 mb-12 md:mb-20">
-            <span
-              ref={labelRef}
-              className="text-[10px] md:text-xs tracking-[0.4em] font-granary font-medium uppercase opacity-0 text-[#a0a0a0] flex items-center gap-4"
-            >
-              <span className="w-8 h-px bg-[#a0a0a0]/40" />
-              Design + Development Studio
-            </span>
-
+        {/* Top Content: Headline Wrap */}
+        <div className="relative z-[10] px-8">
+          <div className="flex flex-col items-start text-left gap-8 md:gap-10">
             <h1
               ref={headlineRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-granary uppercase leading-[0.85] tracking-tighter text-[var(--foreground)]"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-granary uppercase leading-[1] tracking-tighter text-[var(--foreground)]"
             >
               Freelance web developer <br />&
               <span className="font-apparel italic text-[#e4e3de]">
@@ -179,67 +313,62 @@ const Hero: React.FC = () => {
               </span>
             </h1>
           </div>
+        </div>
 
-          {/* Bottom Divider Content */}
+        {/* Bottom Content Area */}
+        <div ref={contentRef} className="relative z-[10] w-full">
           <div ref={footerRef} className="w-full opacity-0">
-            <hr
-              className="w-full h-px border-0 mb-8"
-              style={{ backgroundColor: "var(--divider)" }}
-            />
-
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-              <div className="flex items-center space-x-6">
-                <img
-                  src="/images/danish-flag.svg"
-                  alt="Danish Flag"
-                  className="h-6 rounded-full"
-                />
-                <div className="flex space-x-6">
-                  <SocialIcon
-                    href="#"
-                    className="hover:opacity-70 transition-opacity font-granary text-xs uppercase tracking-widest"
-                    style={{ color: "var(--foreground-muted)" }}
-                  >
-                    IG
-                  </SocialIcon>
-                  <SocialIcon
-                    href="#"
-                    className="hover:opacity-70 transition-opacity font-granary text-xs uppercase tracking-widest"
-                    style={{ color: "var(--foreground-muted)" }}
-                  >
-                    FB
-                  </SocialIcon>
-                  <SocialIcon
-                    href="#"
-                    className="hover:opacity-70 transition-opacity font-granary text-xs uppercase tracking-widest"
-                    style={{ color: "var(--foreground-muted)" }}
-                  >
-                    LK
-                  </SocialIcon>
-                  <SocialIcon
-                    href="#"
-                    className="hover:opacity-70 transition-opacity font-granary text-xs uppercase tracking-widest"
-                    style={{ color: "var(--foreground-muted)" }}
-                  >
-                    TEL
-                  </SocialIcon>
-                  <SocialIcon
-                    href="#"
-                    className="hover:opacity-70 transition-opacity font-granary text-xs uppercase tracking-widest"
-                    style={{ color: "var(--foreground-muted)" }}
-                  >
-                    MAIL
-                  </SocialIcon>
+            {/* Elements ABOVE the divider */}
+            <div className="px-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+                <div className="flex items-center space-x-6">
+                  <img
+                    src="/images/danish-flag.svg"
+                    alt="Danish Flag"
+                    className="h-6 rounded-full"
+                  />
+                  <div className="flex space-x-6">
+                    {["IG", "FB", "LK", "TEL", "MAIL"].map((label) => (
+                      <SocialIcon
+                        key={label}
+                        href="#"
+                        className="hover:opacity-70 transition-opacity font-granary text-xs uppercase tracking-widest"
+                        style={{ color: "var(--foreground-muted)" }}
+                      >
+                        {label}
+                      </SocialIcon>
+                    ))}
+                  </div>
                 </div>
+
+                <p
+                  className="text-xs md:text-sm max-w-sm text-left md:text-right leading-relaxed font-granary font-light uppercase tracking-wider"
+                  style={{ color: "var(--foreground-muted)" }}
+                >
+                  I help ambitious brands launch digital experiences and
+                  strengthen their identity through strategic, custom design.
+                </p>
               </div>
 
-              <p
-                className="text-xs md:text-sm max-w-sm text-left md:text-right leading-relaxed font-granary font-light"
-                style={{ color: "var(--foreground-muted)" }}
-              >
-                I help ambitious brands launch digital experiences and
-                strengthen their identity through strategic, custom design.
-              </p>
+              {/* Divider (Also aligned to sides) */}
+              <hr
+                className="w-full h-px border-0"
+                style={{ backgroundColor: "var(--divider)" }}
+              />
+            </div>
+
+            {/* Marquee Section (Full screen width) */}
+            <div className="scrolling-text relative overflow-hidden w-full pt-8">
+              <div ref={marqueeRailRef} className="rail flex whitespace-nowrap">
+                {[...Array(8)].map((_, i) => (
+                  <h4
+                    key={i}
+                    className="text-5xl md:text-7xl lg:text-[7vw] font-granary font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] opacity-[0.07] leading-none"
+                  >
+                    Frisdahl Studio°
+                  </h4>
+                ))}
+              </div>
             </div>
           </div>
         </div>
