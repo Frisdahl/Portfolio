@@ -1,43 +1,138 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import AnimatedButton from "../../components/AnimatedButton";
 import ArrowIcon from "../../components/ArrowIcon";
 import ValueBtn from "../../components/valueBtn";
+import Marquee from "../../components/Marquee";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const SocialIcon = ({
+  href,
+  children,
+  className,
+  style,
+}: {
+  href: string;
+  children: React.ReactNode;
+  className: string;
+  style?: React.CSSProperties;
+}) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={`transition-colors duration-300 ${className}`}
+    style={style}
+  >
+    {children}
+  </a>
+);
 
 const Contact: React.FC = () => {
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const topPartRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    company: "",
     phone: "",
-    project: "",
+    inquiry: "",
   });
 
   const [errors, setErrors] = useState({
     name: "",
     email: "",
+    company: "",
     phone: "",
-    project: "",
+    inquiry: "",
     budget: "",
   });
 
+  useEffect(() => {
+    if (!containerRef.current || !topPartRef.current) return;
+
+    // Use a single timeline for pinning and wiping
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: "+=100%",
+        scrub: true,
+        pin: true,
+        pinSpacing: true,
+      },
+    });
+
+    // Wipe the top part upwards to reveal the bottom part underneath
+    // Adjusted to 55% to ensure it clears the footer text completely
+    tl.to(topPartRef.current, {
+      clipPath: "inset(0% 0% 55% 0%)",
+      ease: "none",
+    });
+
+    // Subtle Parallax for the video behind
+    gsap.to(videoRef.current, {
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: true,
+      },
+      y: "15%",
+      ease: "none",
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => {
+        if (t.vars.trigger === containerRef.current) t.kill();
+      });
+    };
+  }, []);
+
   const validate = () => {
     let tempErrors = {
-      name: "", email: "", phone: "", project: "", budget: "",
+      name: "",
+      email: "",
+      company: "",
+      phone: "",
+      inquiry: "",
+      budget: "",
     };
     let isValid = true;
 
-    if (!formData.name) { isValid = false; tempErrors.name = "Name is required."; }
-    if (!formData.email) { isValid = false; tempErrors.email = "Email is required."; }
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) { isValid = false; tempErrors.email = "Email is not valid."; }
-    if (!formData.phone) { isValid = false; tempErrors.phone = "Phone number is required."; }
-    if (!formData.project) { isValid = false; tempErrors.project = "Please tell us about your project."; }
-    if (!selectedBudget) { isValid = false; tempErrors.budget = "Please select a project budget."; }
+    if (!formData.name) {
+      isValid = false;
+      tempErrors.name = "Name is required.";
+    }
+    if (!formData.email) {
+      isValid = false;
+      tempErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      isValid = false;
+      tempErrors.email = "Email is not valid.";
+    }
+    if (!formData.inquiry) {
+      isValid = false;
+      tempErrors.inquiry = "Please tell us about your inquiry.";
+    }
+    if (!selectedBudget) {
+      isValid = false;
+      tempErrors.budget = "Please select a project budget.";
+    }
 
     setErrors(tempErrors);
     return isValid;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -49,55 +144,137 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <footer
-      id="contact"
-      className="bg-[#e4e3de] text-[#0a0a0a] py-20 lg:py-32 px-8 md:px-16 lg:px-24 w-full flex flex-col items-start overflow-hidden relative z-20"
+    <div
+      ref={containerRef}
+      className="relative w-full h-[100vh] overflow-hidden bg-[#0a0a0a]"
     >
-      <div className="max-w-[1600px] w-full mx-auto flex flex-col items-start">
-        {/* Heading - Left Aligned */}
-        <div className="w-full text-left mb-16">
-          <h2 className="text-6xl md:text-8xl lg:text-9xl font-granary uppercase leading-[0.85] tracking-tighter text-[#0a0a0a]">
-            Let’s Work <br /> <span className="font-apparel italic">Together</span>
-          </h2>
-          
-          <div className="flex justify-start space-x-8 mt-10">
-            {["Facebook", "LinkedIn", "Email"].map((platform) => (
-              <a
-                key={platform}
-                href={`#${platform.toLowerCase()}`}
-                className="inline-flex text-base md:text-lg items-center group relative overflow-hidden text-[#0a0a0a]"
-              >
-                <span>{platform}</span>
-                <span className="relative w-5 h-5 ml-1 inline-flex items-center justify-center">
-                  <ArrowIcon className="absolute w-3.5 h-3.5 rotate-[-45deg] transition-all duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:opacity-0" />
-                  <ArrowIcon className="absolute w-3.5 h-3.5 rotate-[-45deg] translate-x-[-8px] translate-y-[8px] opacity-0 transition-all duration-700 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100" />
-                </span>
-              </a>
-            ))}
-          </div>
+      {/* Bottom Part: Video/Footer Section (Revealed behind) */}
+      <div className="absolute inset-0 z-[1] w-full h-full flex flex-col justify-end">
+        {/* Video Background */}
+        <div className="absolute inset-0 z-[1] pointer-events-none">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-cover transform-gpu opacity-40"
+          >
+            <source
+              src="/projectVideos/herovideo/wave-optimized.webm"
+              type="video/webm"
+            />
+            <source
+              src="/projectVideos/herovideo/wave-optimized.mp4"
+              type="video/mp4"
+            />
+          </video>
         </div>
 
-        {/* Form Content - Left Aligned */}
-        <div className="w-full">
-          <p className="text-[#0a0a0a] text-xl md:text-2xl mb-12 text-left opacity-80 leading-relaxed max-w-2xl">
-            Before we start, we would like to better understand your needs.
-            We'll review your application and schedule a free estimation call.
-          </p>
+        <div className="absolute inset-0 z-[2] bg-black/60 pointer-events-none" />
 
-          <form onSubmit={handleSubmit} className="w-full space-y-10">
-            <div className="w-full">
-              <input
-                type="text"
-                name="name"
-                placeholder="Your name"
-                value={formData.name}
-                onChange={handleChange}
-                className="bg-transparent border-b border-[#0a0a0a] focus:outline-none py-3 w-full text-xl md:text-2xl text-[#0a0a0a] placeholder:text-[#0a0a0a]/30"
-              />
-              {errors.name && <p className="text-red-500 text-sm mt-2">{errors.name}</p>}
+        {/* Info Area (Bottom content) */}
+        <div className="relative z-[10] w-full min-h-[40vh] flex flex-col justify-end">
+          <div className="w-full px-8 md:px-12 lg:px-24 py-8 md:py-12 lg:py-16 flex flex-col md:flex-row justify-between items-start gap-8 text-[#e4e3de]">
+            <div className="flex flex-col items-start text-left">
+              <h3 className="text-2xl md:text-3xl lg:text-5xl font-semibold font-granary uppercase leading-tight mb-8 max-w-xl">
+                Available for <br /> select projects
+              </h3>
+              <div className="flex items-start gap-12">
+                <p className="text-[10px] uppercase tracking-[0.2em] opacity-40">
+                  © 2026 Frisdahl Studio
+                </p>
+                <p className="text-[10px] uppercase tracking-widest opacity-40">
+                  Denmark — Copenhagen
+                </p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="flex gap-16 lg:gap-24 mb-2">
+              <div className="flex flex-col items-start text-left">
+                <p className="text-xs uppercase tracking-[0.3em] opacity-40 mb-6">
+                  Menu
+                </p>
+                <nav className="flex flex-col space-y-3">
+                  {["Works", "About", "Contact"].map((item) => (
+                    <Link
+                      key={item}
+                      to={item === "Works" ? "/" : `/${item.toLowerCase()}`}
+                      className="text-sm uppercase tracking-widest hover:opacity-60 transition-opacity"
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+
+              <div className="flex flex-col items-start text-left">
+                <p className="text-xs uppercase tracking-[0.3em] opacity-40 mb-6">
+                  Socials
+                </p>
+                <div className="flex flex-col space-y-3">
+                  {["Instagram", "Facebook", "LinkedIn"].map((platform) => (
+                    <SocialIcon
+                      key={platform}
+                      href="#"
+                      className="text-sm uppercase tracking-widest hover:opacity-60 transition-opacity"
+                    >
+                      {platform}
+                    </SocialIcon>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full pb-6">
+            <div className="w-full px-8 md:px-12 lg:px-24 mb-8">
+              <hr
+                className="w-full h-px border-0 opacity-10"
+                style={{ backgroundColor: "var(--divider)" }}
+              />
+            </div>
+            <Marquee
+              text="Frisdahl Studio°"
+              className="pt-4"
+              itemClassName="text-5xl md:text-7xl lg:text-[7vw] font-granary font-semibold uppercase tracking-wide pr-16 text-[#e4e3de] opacity-[0.05] leading-none"
+              speed={1}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Top Part: White Form Section (Wipes away) */}
+      <div
+        ref={topPartRef}
+        className="absolute inset-0 z-[2] w-full h-full bg-[#ffffff] rounded-t-[40px] flex flex-col items-center justify-start pt-32 will-change-[clip-path]"
+        style={{ clipPath: "inset(0% 0% 0% 0%)" }}
+      >
+        <div className="w-full px-8 md:px-12 lg:px-24 flex flex-col items-start text-left">
+          {/* Heading */}
+          <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-granary font-semibold uppercase tracking-wide text-[#0a0a0a] leading-[0.9] mb-16">
+            Let’s Work <br />{" "}
+            <span className="font-apparel italic">Together</span>
+          </h2>
+
+          {/* Form - Now under heading, full width */}
+          <form onSubmit={handleSubmit} className="w-full space-y-12">
+            {/* Row 1: Name & Email */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <div className="w-full">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="bg-transparent border-b border-[#0a0a0a] focus:outline-none py-3 w-full text-xl md:text-2xl text-[#0a0a0a] placeholder:text-[#0a0a0a]/30"
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-2">{errors.name}</p>
+                )}
+              </div>
               <div className="w-full">
                 <input
                   type="email"
@@ -107,66 +284,97 @@ const Contact: React.FC = () => {
                   onChange={handleChange}
                   className="bg-transparent border-b border-[#0a0a0a] focus:outline-none py-3 w-full text-xl md:text-2xl text-[#0a0a0a] placeholder:text-[#0a0a0a]/30"
                 />
-                {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-2">{errors.email}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Row 2: Company & Phone */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <div className="w-full">
+                <input
+                  type="text"
+                  name="company"
+                  placeholder="Company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  className="bg-transparent border-b border-[#0a0a0a] focus:outline-none py-3 w-full text-xl md:text-2xl text-[#0a0a0a] placeholder:text-[#0a0a0a]/30"
+                />
               </div>
               <div className="w-full">
                 <input
                   type="text"
                   name="phone"
-                  placeholder="Phone number"
+                  placeholder="Phone"
                   value={formData.phone}
                   onChange={handleChange}
                   className="bg-transparent border-b border-[#0a0a0a] focus:outline-none py-3 w-full text-xl md:text-2xl text-[#0a0a0a] placeholder:text-[#0a0a0a]/30"
                 />
-                {errors.phone && <p className="text-red-500 text-sm mt-2">{errors.phone}</p>}
               </div>
             </div>
 
+            {/* Row 3: Inquiry */}
             <div className="w-full">
-              <textarea
-                name="project"
-                placeholder="Tell us about your project"
-                value={formData.project}
+              <input
+                type="text"
+                name="inquiry"
+                placeholder="Inquiry*"
+                value={formData.inquiry}
                 onChange={handleChange}
-                className="bg-transparent border-b border-[#0a0a0a] focus:outline-none p-0 pb-3 w-full text-xl md:text-2xl text-[#0a0a0a] resize-none placeholder:text-[#0a0a0a]/30"
-                rows={1}
-                onInput={(e) => {
-                  e.currentTarget.style.height = "auto";
-                  e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
-                }}
+                className="bg-transparent border-b border-[#0a0a0a] focus:outline-none py-3 w-full text-xl md:text-2xl text-[#0a0a0a] placeholder:text-[#0a0a0a]/30"
               />
-              {errors.project && <p className="text-red-500 text-sm mt-2">{errors.project}</p>}
+              {errors.inquiry && (
+                <p className="text-red-500 text-xs mt-2">{errors.inquiry}</p>
+              )}
             </div>
 
-            <div className="w-full text-left">
-              <p className="text-[#0a0a0a] mb-6 text-lg font-medium uppercase tracking-wider opacity-60">Project budget</p>
-              <div className="flex flex-wrap gap-4 justify-start">
-                {["5-15k", "15-25k", "25-50k", ">50k"].map((budget) => (
-                  <ValueBtn
-                    key={budget}
-                    text={budget}
-                    isActive={selectedBudget === budget}
-                    onClick={() => setSelectedBudget(budget)}
-                  />
-                ))}
+            {/* Final Row: Budget (Left) and Send (Right) */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 pt-4">
+              <div className="flex flex-col items-start">
+                <p className="text-[#0a0a0a] mb-6 text-[10px] font-medium uppercase tracking-[0.2em] opacity-40">
+                  Project budget
+                </p>
+                <div className="flex flex-wrap gap-3 justify-start">
+                  {["5-15k", "15-25k", "25-50k", ">50k"].map((budget) => (
+                    <ValueBtn
+                      key={budget}
+                      text={budget}
+                      isActive={selectedBudget === budget}
+                      onClick={() => setSelectedBudget(budget)}
+                      baseBgColor="bg-transparent"
+                      baseTextColor="text-[#0a0a0a]"
+                      borderColor="border-[#0a0a0a]"
+                      activeBgColor="bg-[#0a0a0a]"
+                      activeTextColor="text-[#ffffff]"
+                      hoverBgColor="bg-[#0a0a0a]"
+                      hoverTextColor="group-hover:text-[#ffffff]"
+                    />
+                  ))}
+                </div>
+                {errors.budget && (
+                  <p className="text-red-500 text-xs mt-4">{errors.budget}</p>
+                )}
               </div>
-            </div>
 
-            <div className="w-full flex justify-start pt-8 pb-12">
-              <AnimatedButton
-                text="Send request"
-                padding="px-12 py-6"
-                baseBgColor="bg-[#0a0a0a]"
-                baseTextColor="text-[#e4e3de]"
-                hoverTextColor="group-hover:text-[#0a0a0a]"
-                hoverBgColor="bg-[#e4e3de]"
-                hoverBorderColor="border-[#0a0a0a]"
-              />
+              <div className="w-full md:w-auto">
+                <AnimatedButton
+                  text="Send request"
+                  padding="px-16 py-8"
+                  baseBorderColor="border-[#0a0a0a]"
+                  baseBgColor="bg-[#0a0a0a]"
+                  baseTextColor="text-[#ffffff]"
+                  hoverTextColor="group-hover:text-[#0a0a0a]"
+                  hoverBgColor="bg-[#ffffff]"
+                  hoverBorderColor="border-[#0a0a0a]"
+                  fontSize="text-xl"
+                />
+              </div>
             </div>
           </form>
         </div>
       </div>
-    </footer>
+    </div>
   );
 };
 
