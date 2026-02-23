@@ -44,9 +44,9 @@ const MobileMenuOverlay: React.FC<{
     >
       {/* The actual menu panel that slides in/out */}
       <div
-        className={`fixed top-0 right-0 w-full sm:w-[500px] h-full sm:h-auto sm:max-h-[calc(100vh-2rem)] sm:top-4 sm:right-4 bg-[#e4e2dd] transform transition-transform duration-700 ease-in-out ${
+        className={`fixed top-0 right-0 w-full sm:w-[500px] h-full sm:h-auto sm:max-h-screen bg-[#e4e2dd] transform transition-transform duration-700 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-[110%]"
-        } overflow-y-auto px-6 sm:px-12 pt-24 sm:pt-16 pb-12 text-left text-[#0a0a0a] shadow-2xl sm:rounded-2xl`}
+        } overflow-y-auto px-6 sm:px-12 pt-24 sm:pt-16 pb-12 text-left text-[#0a0a0a] shadow-2xl sm:rounded-tl-2xl sm:rounded-bl-2xl sm:rounded-br-2xl`}
         onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing the menu
       >
         {/* Main Nav */}

@@ -4,30 +4,35 @@ interface BurgerMenuButtonProps {
   toggleMenu: () => void;
   isOpen: boolean;
   isInverted: boolean;
+  isDark?: boolean;
+  isInsideHeader?: boolean;
 }
 
 const BurgerMenuButton: React.FC<BurgerMenuButtonProps> = ({
   toggleMenu,
   isOpen,
-  isInverted,
+  isDark,
+  isInsideHeader,
 }) => {
-  // Logic for when menu is open:
-  // Default: Dark bars (#0a0a0a), No circle
-  // Hover: White bars (#f2f2f2), Dark circle (#0a0a0a)
-  
-  // Logic for when menu is closed:
-  // Use dynamic theme variables
-  
-  const barColor = isOpen 
-    ? 'bg-[#0a0a0a] group-hover:bg-[#e4e2dd]' 
-    : 'bg-[var(--foreground)] group-hover:bg-[var(--background)]';
-  
-  const circleColor = isOpen
-    ? 'bg-[#0a0a0a]'
-    : 'bg-[var(--foreground)]';
+  const isHeaderDark = Boolean(isDark);
+  const barBaseColor = isOpen || isHeaderDark ? "bg-[#0a0a0a]" : "bg-white";
+  const barHoverColor = isOpen
+    ? "group-hover:bg-white"
+    : isHeaderDark
+      ? "group-hover:bg-white"
+      : "group-hover:bg-[#0a0a0a]";
+  const hoverCircleColor = isOpen
+    ? "bg-[#0a0a0a]"
+    : isHeaderDark
+      ? "bg-[#0a0a0a]"
+      : "bg-white";
+
+  const wrapperClass = isInsideHeader
+    ? "relative pointer-events-auto flex items-center h-12"
+    : "fixed top-0 right-8 py-10 z-[200] pointer-events-none transition-all duration-500";
 
   return (
-    <div className="fixed top-4 right-8 py-6 z-[200] pointer-events-none">
+    <div className={wrapperClass}>
       <button
         onClick={toggleMenu}
         aria-label="Toggle menu"
@@ -35,19 +40,19 @@ const BurgerMenuButton: React.FC<BurgerMenuButtonProps> = ({
       >
         <div className="relative w-6 h-2 flex flex-col justify-between z-10">
           <span
-            className={`block h-0.5 w-full ${barColor} transition-all duration-500 ease-out ${
+            className={`block h-0.5 w-full ${barBaseColor} ${barHoverColor} transition-all duration-500 ease-out ${
               isOpen ? "rotate-45 translate-y-[3px]" : ""
             }`}
           ></span>
           <span
-            className={`block h-0.5 w-full ${barColor} transition-all duration-500 ease-out ${
+            className={`block h-0.5 w-full ${barBaseColor} ${barHoverColor} transition-all duration-500 ease-out ${
               isOpen ? "-rotate-45 -translate-y-[3px]" : ""
             }`}
           ></span>
         </div>
         {/* Expanding circle background */}
         <div
-          className={`absolute inset-0 rounded-full transition-all duration-500 ease-out ${circleColor} z-0 scale-0 group-hover:scale-100`}
+          className={`absolute inset-0 rounded-full transition-all duration-500 ease-out ${hoverCircleColor} z-0 scale-0 group-hover:scale-100`}
         ></div>
       </button>
     </div>

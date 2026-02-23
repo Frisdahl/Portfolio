@@ -6,11 +6,21 @@ import { scrollTo } from "../utils/smoothScroll";
 
 gsap.registerPlugin(ScrollToPlugin);
 
+import BurgerMenuButton from "./BurgerMenuButton";
+
 interface HeaderProps {
   isInverted: boolean;
+  isDark?: boolean;
+  isMobileMenuOpen: boolean;
+  toggleMenu: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ isInverted }) => {
+const Header: React.FC<HeaderProps> = ({
+  isInverted,
+  isDark,
+  isMobileMenuOpen,
+  toggleMenu,
+}) => {
   const location = useLocation();
 
   const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -21,19 +31,31 @@ const Header: React.FC<HeaderProps> = ({ isInverted }) => {
   };
 
   return (
-    <header className="fixed top-4 left-0 right-0 z-50 flex justify-between items-center py-6 px-8 rounded-full transition-colors duration-300 bg-transparent pointer-events-none">
+    <header
+      className={`fixed top-0 left-0 right-0 flex justify-between items-center py-10 px-8 transition-all duration-500 pointer-events-none ${
+        isMobileMenuOpen ? "z-[220]" : "z-50"
+      }`}
+    >
       <div className="z-50 pointer-events-auto">
         <Link to="/" onClick={handleLogoClick}>
           <img
             src="/images/Portfolio-logo.svg"
             alt="Portfolio Logo"
-            className={`h-12 transition-all duration-500 ${isInverted ? "filter invert" : ""}`}
+            className={`h-12 transition-all duration-500 ${
+              isInverted && !isDark ? "filter invert" : ""
+            }`}
           />
         </Link>
       </div>
 
-      <div className="flex items-center gap-8">
-        {/* Navigation links moved to burger menu */}
+      <div className="flex items-center pointer-events-auto">
+        <BurgerMenuButton
+          isOpen={isMobileMenuOpen}
+          toggleMenu={toggleMenu}
+          isInverted={isInverted}
+          isDark={isDark}
+          isInsideHeader={true}
+        />
       </div>
     </header>
   );

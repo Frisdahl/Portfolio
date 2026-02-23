@@ -88,6 +88,9 @@ const Contact: React.FC = () => {
       ease: "none",
     });
 
+    // Refresh all triggers after setting up this one (which pins and shifts layout)
+    ScrollTrigger.refresh();
+
     return () => {
       ScrollTrigger.getAll().forEach((t) => {
         if (t.vars.trigger === containerRef.current) t.kill();
@@ -146,6 +149,7 @@ const Contact: React.FC = () => {
   return (
     <div
       ref={containerRef}
+      id="contact"
       className="relative w-full h-[100vh] overflow-hidden bg-[#0a0a0a]"
     >
       {/* Bottom Part: Video/Footer Section (Revealed behind) */}

@@ -15,6 +15,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isHeaderDark, setIsHeaderDark] = useState(false);
   const layoutRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -33,23 +34,62 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         backgroundColor: "#0a0a0a",
       });
 
-      // PROGRESSIVE REFRESH STRATEGY
-      // 1. Immediate
-      ScrollTrigger.refresh();
+      let headerTrigger: ScrollTrigger | null = null;
+      let refreshTimeouts: number[] = [];
+      let mountRetryTimeouts: number[] = [];
 
-      // 2. Short delay (DOM ready)
-      const t1 = setTimeout(() => ScrollTrigger.refresh(), 200);
+      const clearRefreshTimeouts = () => {
+        refreshTimeouts.forEach((id) => window.clearTimeout(id));
+        refreshTimeouts = [];
+      };
 
-      // 3. Medium delay (Images/Videos likely rendered)
-      const t2 = setTimeout(() => ScrollTrigger.refresh(), 1000);
+      const setupHeaderTrigger = () => {
+        const contactSection = document.getElementById("contact");
+        if (!contactSection) return false;
 
-      // 4. Long delay (Safety fallback for slower hardware)
-      const t3 = setTimeout(() => ScrollTrigger.refresh(), 3000);
+        headerTrigger?.kill();
+
+        headerTrigger = ScrollTrigger.create({
+          trigger: contactSection,
+          start: "top top",
+          end: "bottom top",
+          onEnter: () => setIsHeaderDark(true),
+          onEnterBack: () => setIsHeaderDark(true),
+          onLeave: () => setIsHeaderDark(false),
+          onLeaveBack: () => setIsHeaderDark(false),
+          onRefresh: (self) => {
+            setIsHeaderDark(self.isActive);
+          },
+        });
+
+        clearRefreshTimeouts();
+        refreshTimeouts.push(
+          window.setTimeout(() => ScrollTrigger.refresh(), 0),
+          window.setTimeout(() => ScrollTrigger.refresh(), 200),
+          window.setTimeout(() => ScrollTrigger.refresh(), 1000),
+          window.setTimeout(() => ScrollTrigger.refresh(), 3000),
+        );
+
+        return true;
+      };
+
+      if (!setupHeaderTrigger()) {
+        [100, 300, 700, 1500].forEach((delay) => {
+          const timeoutId = window.setTimeout(() => {
+            if (setupHeaderTrigger()) {
+              mountRetryTimeouts.forEach((id) => window.clearTimeout(id));
+              mountRetryTimeouts = [];
+            }
+          }, delay);
+          mountRetryTimeouts.push(timeoutId);
+        });
+      }
 
       return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-        clearTimeout(t3);
+        mountRetryTimeouts.forEach((id) => window.clearTimeout(id));
+        clearRefreshTimeouts();
+        headerTrigger?.kill();
+        setIsHeaderDark(false);
       };
     }, layoutRef);
 
@@ -60,11 +100,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div ref={layoutRef} className="flex flex-col min-h-screen dark">
-      <Header isInverted={true} />
-      <BurgerMenuButton
-        isOpen={isMobileMenuOpen}
-        toggleMenu={toggleMenu}
+      <Header
         isInverted={true}
+        isDark={isHeaderDark}
+        isMobileMenuOpen={isMobileMenuOpen}
+        toggleMenu={toggleMenu}
       />
       <MobileMenuOverlay isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
 
