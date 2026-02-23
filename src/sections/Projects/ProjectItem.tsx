@@ -234,7 +234,6 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                 hoverBgColor="bg-[var(--background)]"
                 hoverTextColor="group-hover:text-[var(--foreground)]"
                 hoverBorderColor="border-[var(--foreground)]"
-                fontSize="text-[10px]"
               />
             </a>
             <a href={`/projects/${project.id}`} className="block">
@@ -246,7 +245,6 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                 hoverBgColor="bg-[var(--foreground)]"
                 hoverTextColor="group-hover:text-[var(--background)]"
                 hoverBorderColor="border-[var(--foreground)]"
-                fontSize="text-[10px]"
                 showBorder={true}
               />
             </a>

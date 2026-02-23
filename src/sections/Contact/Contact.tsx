@@ -361,7 +361,7 @@ const Contact: React.FC = () => {
             {/* Final Row: Budget (Left) and Send (Right) */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 pt-4">
               <div className="flex flex-col items-start">
-                <p className="text-[#0a0a0a] mb-6 text-[10px] font-medium uppercase tracking-[0.2em] opacity-40">
+                <p className="text-[#0a0a0a] mb-6 text-sm font-medium uppercase tracking-[0.2em] opacity-40">
                   Project budget
                 </p>
                 <div className="flex flex-wrap gap-3 justify-start">

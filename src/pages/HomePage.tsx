@@ -11,8 +11,8 @@ function HomePage() {
     <div className="HomePage">
       <Hero />
       <VideoShowcase />
-      <Projects />
       <Services />
+      <Projects />
       {/* <Expectations />
       <Collaboration /> */}
     </div>

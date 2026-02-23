@@ -159,10 +159,10 @@ const Hero: React.FC = () => {
           <div className="flex flex-col items-start text-left gap-8 md:gap-10">
             <h1
               ref={headlineRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-granary text-[#fff] font-semibold uppercase leading-[1] tracking-tighter"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-apparel text-[#fff]  leading-[1] tracking-tighter"
             >
-              Freelance web developer <br />&
-              <span className="font-apparel italic"> creative designer.</span>
+              Immersive websites, <br />
+              designed with clarity.
             </h1>
           </div>
         </div>
@@ -213,7 +213,7 @@ const Hero: React.FC = () => {
             <Marquee
               text="Frisdahl Studio°"
               className="pt-8"
-              itemClassName="text-5xl md:text-7xl lg:text-[7vw] font-granary font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] opacity-[0.05] leading-none"
+              itemClassName="text-5xl md:text-7xl lg:text-[5vw] font-granary font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] opacity-[0.05] leading-none"
               speed={1}
             />
           </div>
