@@ -80,13 +80,13 @@ const Services: React.FC = () => {
         {
           opacity: 1,
           yPercent: 0,
-          stagger: 0.1, // Increased stagger for "reading" feel
-          ease: "power2.out", // Simpler ease for clearer word-by-word motion
+          stagger: 0.05,
+          duration: 1.2,
+          ease: "power4.out", // Very smooth, premium ease
           scrollTrigger: {
             trigger: headingRef.current,
             start: "top 85%",
-            end: "bottom 30%", // Extended end to give more scroll space
-            scrub: 2, // Even smoother and slower response
+            once: true, // Only plays once, stays visible
           },
         },
       );
@@ -153,7 +153,7 @@ const Services: React.FC = () => {
       className="w-full mb-64 text-[#fff] text-left font-switzer px-8 md:px-12 lg:px-24"
     >
       {/* Heading - Full width across the padded container */}
-      <div className="w-full mb-48">
+      <div className="w-full mb-24">
         <h2
           ref={headingRef}
           className="text-4xl md:text-5xl lg:text-6xl text-[#fff] font-newroman leading-[1.18] tracking-[.65px] text-left w-full"
@@ -163,7 +163,10 @@ const Services: React.FC = () => {
             we use a wrapper that adds an invisible inline block at the start.
           */}
           <div ref={headingTextRef} className="w-full">
-            <span className="inline-block lg:w-[20%] h-1" aria-hidden="true"></span>
+            <span
+              className="inline-block lg:w-[25%] h-1"
+              aria-hidden="true"
+            ></span>
             Frisdahl Studio is a creative digital studio crafting immersive
             websites for modern brands — balancing visual ambition with clarity
             to create refined digital experiences that serve real-world goals.

@@ -89,11 +89,11 @@ const MobileMenuOverlay: React.FC<{
               baseBgColor="bg-[#0a0a0a]"
               baseTextColor="text-[#e4e2dd]"
               baseBorderColor="border-[#0a0a0a]"
-              hoverTextColor="group-hover:text-[#0a0a0a]"
+              hoverTextColor="group-hover/btn:text-[#0a0a0a]"
               hoverBgColor="bg-[#fff]"
+              hoverBorderColor="border-[#0a0a0a]"
               onClick={handleGetInTouchClick}
-              padding=""
-              className="w-full sm:w-auto text-base py-4 px-10"
+              padding="py-4 px-8"
             />
           </div>
         </div>

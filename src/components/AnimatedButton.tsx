@@ -11,6 +11,7 @@ interface AnimatedButtonProps {
   hoverBgColor?: string; // New prop for custom hover background color
   baseBorderColor?: string; // New prop for base border color
   hoverBorderColor?: string; // New prop for hover border color
+  showBorder?: boolean;
   className?: string; // Additional classes for the main button element
   fontSize?: string; // e.g., 'text-xs'
 }
@@ -22,10 +23,11 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   padding = "px-6 py-6",
   baseBgColor = "bg-[var(--foreground)]",
   baseTextColor = "text-[var(--background)]",
-  hoverTextColor = "group-hover:text-[var(--foreground)]",
+  hoverTextColor = "hover:text-[var(--foreground)]",
   hoverBgColor = "bg-[var(--background)]", // Default to bg-white if not provided
   baseBorderColor = "border-[var(--foreground)]", // Default to border-black
-  hoverBorderColor = "group-hover:border-[var(--foreground)]", // Default to border-black on hover
+  hoverBorderColor = "hover:border-[var(--foreground)]", // Default to border-black on hover
+  showBorder = true,
   className = "",
   fontSize = "text-base",
 }) => {
@@ -35,23 +37,23 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     <ButtonComponent
       href={link}
       onClick={onClick}
-      className={`relative overflow-hidden inline-flex items-center justify-center ${padding} w-fit group cursor-pointer rounded-full border-2 ${baseBorderColor} ${hoverBorderColor} ${baseBgColor} ${baseTextColor} transition-all duration-500 ease-out group-hover:scale-x-105 ${className}`}
+      className={`group/btn relative overflow-hidden inline-flex items-center justify-center ${padding} w-fit cursor-pointer rounded-full ${showBorder ? "border-2" : "border-0"} ${baseBorderColor} ${hoverBorderColor} ${baseBgColor} ${baseTextColor} transition-all duration-500 ease-out hover:scale-x-105 ${className}`}
     >
       {/* Sliding background */}
       <span
-        className={`absolute inset-0 z-1 block h-full w-full rounded-[48px] ${hoverBgColor} transform translate-y-[-101%] group-hover:translate-y-0 group-hover:rounded-[0] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)],border-radius duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)]`}
+        className={`absolute inset-0 z-[1] block h-full w-full rounded-[48px] ${hoverBgColor} transform translate-y-[-101%] group-hover/btn:translate-y-0 group-hover/btn:rounded-[0] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)],border-radius duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)]`}
       ></span>
       {/* Original text, slides down */}
       <span className="relative z-10 block overflow-hidden">
         <span
-          className={`block font-semibold whitespace-nowrap ${baseTextColor} ${fontSize} transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)] group-hover:translate-y-[101%]`}
+          className={`block font-semibold whitespace-nowrap ${baseTextColor} ${fontSize} transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)] group-hover/btn:translate-y-[101%]`}
         >
           {text}
         </span>
       </span>
       {/* Sliding text */}
       <span
-        className={`absolute inset-0 z-20 inline-flex items-center justify-center whitespace-nowrap ${hoverTextColor} ${fontSize} font-semibold transform translate-y-[-101%] group-hover:translate-y-0 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)]`}
+        className={`absolute inset-0 z-20 inline-flex items-center justify-center whitespace-nowrap ${hoverTextColor.replace('hover:', 'group-hover/btn:')} ${fontSize} font-semibold transform translate-y-[-101%] group-hover/btn:translate-y-0 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)]`}
       >
         {text}
       </span>

@@ -1,9 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import AnimatedButton from "../../components/AnimatedButton";
-import {
-  initProjectParallax,
-  initProjectItemAnimations,
-} from "./Projects.anim";
+import { initProjectReveal } from "./Projects.anim";
+import { gsap } from "gsap";
 
 interface Project {
   id: number;
@@ -18,41 +16,29 @@ interface Project {
 interface ProjectItemProps {
   project: Project;
   index: number;
-  speed?: number;
+  speed?: number; // Kept for prop compatibility but unused
   aspectClassName?: string;
 }
+
+const TEXT_HIDDEN_Y_PERCENT = 120;
 
 const ProjectItem: React.FC<ProjectItemProps> = ({
   project,
   index,
-  speed = 1,
   aspectClassName = "aspect-square",
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isHoverPlaying, setIsHoverPlaying] = useState(false);
-  const [isPreviewToggled, setIsPreviewToggled] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isInView, setIsInView] = useState(false);
 
   const itemRef = useRef<HTMLDivElement>(null);
-  const parallaxRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-
   const titleTextRef = useRef<HTMLHeadingElement>(null);
   const categoriesTextRef = useRef<HTMLParagraphElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
-
-  // Cache split instances to avoid expensive re-creation
-  const splitCacheRef = useRef<{ title: any; categories: any }>({
-    title: null,
-    categories: null,
-  });
 
   const videoSrc = project.video?.startsWith("/")
     ? project.video
     : `/${project.video}`;
 
-  // Pause video when not visible for better performance
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -63,52 +49,66 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           setIsInView(entry.isIntersecting);
         });
       },
-      { threshold: 0.1 }, // Trigger when 10% visible
+      { threshold: 0.1 },
     );
 
     observer.observe(video);
-
     return () => observer.disconnect();
   }, []);
 
-  // 1. Master playback control
+  // Video logic: autoplay and loop at all times
   useEffect(() => {
-    setIsPlaying(isPreviewToggled || isHoverPlaying);
-  }, [isPreviewToggled, isHoverPlaying]);
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    setIsHoverPlaying(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  const handleVideoEnded = () => {
-    if (isPreviewToggled && videoRef.current) {
+    if (videoRef.current && isInView) {
       videoRef.current.play().catch(() => undefined);
-    } else {
-      if (isHovered && videoRef.current) {
-        videoRef.current.play().catch(() => undefined);
-      } else {
-        setIsHoverPlaying(false);
-      }
+    } else if (videoRef.current && !isInView) {
+      videoRef.current.pause();
     }
+  }, [isInView]);
+
+  // Reveal animation & Initial state for actions
+  useLayoutEffect(() => {
+    if (!itemRef.current || !actionsRef.current) return;
+
+    // Reveal item
+    const ctx = initProjectReveal(itemRef.current);
+
+    // Initial state for actions overlay
+    gsap.set(actionsRef.current, {
+      opacity: 0,
+    });
+
+    // Initial state for text/buttons (to be animated by the other effect)
+    const buttons = actionsRef.current.querySelectorAll("button, a");
+    gsap.set(buttons, {
+      opacity: 0,
+      y: 30,
+    });
+    gsap.set([titleTextRef.current, categoriesTextRef.current], {
+      yPercent: TEXT_HIDDEN_Y_PERCENT,
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const outroTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isPointerInsideRef = useRef(false);
+  const leaveQueuedRef = useRef(false);
+
+  const scheduleOutro = () => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+
+    leaveTimeoutRef.current = setTimeout(() => {
+      if (isPointerInsideRef.current) return;
+      outroTimelineRef.current?.restart(true);
+    }, 400);
   };
 
-  // 2. Parallax
-  useEffect(() => {
-    if (!itemRef.current || !parallaxRef.current) return;
-    const ctx = initProjectParallax(
-      itemRef.current,
-      parallaxRef.current,
-      speed,
-    );
-    return () => ctx.revert();
-  }, [speed]);
-
-  // 3. Consolidated Animation Controller
+  // Build intro and outro timelines once
   useEffect(() => {
     if (
       !titleTextRef.current ||
@@ -117,137 +117,216 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     )
       return;
 
-    // Only play if both in view and should be playing
-    const shouldPlay = isPlaying && isInView;
+    const buttons = actionsRef.current.querySelectorAll("button, a");
 
-    const result = initProjectItemAnimations(
-      shouldPlay,
-      {
-        video: videoRef.current,
-        titleText: titleTextRef.current,
-        categoriesText: categoriesTextRef.current,
-        actions: actionsRef.current,
-      },
-      splitCacheRef.current,
-    );
+    const ctx = gsap.context(() => {
+      const introTl = gsap.timeline({
+        paused: true,
+        defaults: { ease: "power3.out", duration: 0.6 },
+      });
 
-    // Update cache with split instances
-    if (result.splitTitle) splitCacheRef.current.title = result.splitTitle;
-    if (result.splitCategories)
-      splitCacheRef.current.categories = result.splitCategories;
+      introTl
+        .to(
+          actionsRef.current,
+          {
+            opacity: 1,
+            duration: 0.25,
+            ease: "power2.out",
+          },
+          0,
+        )
+        .to(
+          titleTextRef.current,
+          {
+            yPercent: 0,
+          },
+          0.1,
+        )
+        .to(
+          categoriesTextRef.current,
+          {
+            yPercent: 0,
+          },
+          0.2,
+        )
+        .to(
+          buttons,
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.1,
+          },
+          0.25,
+        )
+        .eventCallback("onComplete", () => {
+          if (leaveQueuedRef.current && !isPointerInsideRef.current) {
+            leaveQueuedRef.current = false;
+            scheduleOutro();
+          }
+        });
+
+      const outroTl = gsap.timeline({ paused: true });
+
+      outroTl
+        .to(buttons, {
+          opacity: 0,
+          duration: 0.4,
+          stagger: { each: 0.05, from: "end" },
+          ease: "power3.in",
+        })
+        .to(
+          titleTextRef.current,
+          {
+            yPercent: TEXT_HIDDEN_Y_PERCENT,
+            duration: 0.45,
+            ease: "power3.in",
+          },
+          ">",
+        )
+        .to(
+          categoriesTextRef.current,
+          {
+            yPercent: TEXT_HIDDEN_Y_PERCENT,
+            duration: 0.45,
+            ease: "power3.in",
+          },
+          "<+0.04",
+        )
+        .to(
+          actionsRef.current,
+          {
+            opacity: 0,
+            duration: 0.2,
+            ease: "power2.in",
+          },
+          ">-0.05",
+        );
+
+      introTimelineRef.current = introTl;
+      outroTimelineRef.current = outroTl;
+    });
 
     return () => {
-      result.ctx.revert();
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+        leaveTimeoutRef.current = null;
+      }
+      ctx.revert();
     };
-  }, [isPlaying, isInView]);
+  }, []);
 
-  const projectNumber = `00-${index + 1}`;
+  const handleMouseEnter = () => {
+    isPointerInsideRef.current = true;
+    leaveQueuedRef.current = false;
+
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+
+    if (!isInView || !introTimelineRef.current || !outroTimelineRef.current)
+      return;
+
+    outroTimelineRef.current.pause(0);
+    introTimelineRef.current.restart(true);
+  };
+
+  const handleMouseLeave = () => {
+    isPointerInsideRef.current = false;
+
+    if (!isInView || !introTimelineRef.current) return;
+
+    if (
+      introTimelineRef.current.isActive() ||
+      introTimelineRef.current.progress() < 1
+    ) {
+      leaveQueuedRef.current = true;
+      return;
+    }
+
+    scheduleOutro();
+  };
+
+  // If the card leaves viewport, reset sequence to base state
+  useEffect(() => {
+    if (isInView || !actionsRef.current) return;
+
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+
+    const buttons = actionsRef.current.querySelectorAll("button, a");
+    introTimelineRef.current?.pause(0);
+    outroTimelineRef.current?.pause(0);
+    gsap.set(actionsRef.current, { opacity: 0 });
+    gsap.set(buttons, {
+      opacity: 0,
+      y: 30,
+    });
+    gsap.set([titleTextRef.current, categoriesTextRef.current], {
+      yPercent: TEXT_HIDDEN_Y_PERCENT,
+    });
+  }, [isInView]);
 
   return (
     <div ref={itemRef} className="w-full">
-      <div ref={parallaxRef} className="w-full will-change-transform">
+      <div className="w-full">
         <div
-          className="flex justify-between items-center mb-6 font-switzer uppercase tracking-wider text-base"
-          style={{ color: "var(--foreground)" }}
-        >
-          <div style={{ color: "var(--foreground-muted)" }}>
-            {projectNumber}
-          </div>
-          <button
-            className="flex items-center gap-4 cursor-pointer group focus:outline-none z-30 relative"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const newState = !isPreviewToggled;
-              setIsPreviewToggled(newState);
-              if (!newState) setIsHoverPlaying(false);
-            }}
-          >
-            <span
-              className={`transition-all duration-300 ${isPlaying ? "opacity-100 font-medium" : "opacity-60 group-hover:opacity-100"}`}
-            >
-              PREVIEW
-            </span>
-            <div
-              className="w-10 h-5 rounded-full border relative flex items-center px-0.5 transition-all duration-300"
-              style={{
-                borderColor: isPlaying ? "var(--foreground)" : "var(--divider)",
-                backgroundColor: isPlaying
-                  ? "var(--foreground)"
-                  : "transparent",
-              }}
-            >
-              <div
-                className={`w-3.5 h-3.5 rounded-full transition-all duration-500 ease-in-out transform ${isPlaying ? "translate-x-5" : "translate-x-0"}`}
-                style={{
-                  backgroundColor: isPlaying
-                    ? "var(--background)"
-                    : "var(--foreground)",
-                  opacity: isPlaying ? 1 : 0.4,
-                }}
-              />
-            </div>
-          </button>
-        </div>
-
-        <div
-          className={`relative w-full ${aspectClassName} overflow-hidden flex items-center justify-center text-gray-500 text-lg font-bold rounded-xl`}
+          className={`relative w-full ${aspectClassName} overflow-hidden flex items-center justify-center bg-neutral-900 rounded-xl cursor-default group`}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           {project.video ? (
             <video
               ref={videoRef}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
               src={videoSrc}
               muted
               playsInline
-              loop={false}
-              onEnded={handleVideoEnded}
+              loop={true}
+              autoPlay
               preload="metadata"
             />
           ) : (
             <img
               src={project.image}
               alt={project.title}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
               loading="lazy"
             />
           )}
 
+          {/* Action Overlay */}
           <div
             ref={actionsRef}
-            className="absolute bottom-6 left-6 flex gap-3 z-20 pointer-events-auto"
-            style={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/10 flex items-end justify-start p-8 z-20 pointer-events-none"
           >
-            <a
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <AnimatedButton
-                text="See Live"
-                padding="px-4 py-2"
-                baseBgColor="bg-[var(--foreground)]"
-                baseTextColor="text-[var(--background)]"
-                hoverBgColor="bg-[var(--background)]"
-                hoverTextColor="group-hover:text-[var(--foreground)]"
-                hoverBorderColor="border-[var(--foreground)]"
-              />
-            </a>
-            <a href={`/projects/${project.id}`} className="block">
-              <AnimatedButton
-                text="See Project"
-                padding="px-4 py-2"
-                baseBgColor="bg-transparent"
-                baseTextColor="text-[var(--foreground)]"
-                hoverBgColor="bg-[var(--foreground)]"
-                hoverTextColor="group-hover:text-[var(--background)]"
-                hoverBorderColor="border-[var(--foreground)]"
-                showBorder={true}
-              />
-            </a>
+            <div className="flex gap-3 pointer-events-auto">
+              <a href={project.link} target="_blank" rel="noopener noreferrer">
+                <AnimatedButton
+                  text="See Live"
+                  padding="px-5 py-2.5"
+                  baseBgColor="bg-white"
+                  baseTextColor="text-black"
+                  hoverBgColor="bg-black"
+                  hoverTextColor="group-hover/btn:text-white"
+                  hoverBorderColor="border-white"
+                />
+              </a>
+              <a href={`/projects/${project.id}`}>
+                <AnimatedButton
+                  text="See Project"
+                  padding="px-5 py-2.5"
+                  baseBgColor="bg-transparent"
+                  baseTextColor="text-white"
+                  hoverBgColor="bg-white"
+                  hoverTextColor="group-hover/btn:text-black"
+                  hoverBorderColor="border-white"
+                  showBorder={true}
+                />
+              </a>
+            </div>
           </div>
         </div>
 
@@ -255,7 +334,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           <div className="overflow-hidden">
             <h3
               ref={titleTextRef}
-              className="font-switzer uppercase text-2xl text-[var(--foreground)] leading-tight"
+              className="font-switzer uppercase text-2xl mb-2 text-white leading-tight"
             >
               {project.title}
             </h3>
@@ -263,7 +342,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           <div className="overflow-hidden mt-1">
             <p
               ref={categoriesTextRef}
-              className="font-switzer uppercase text-xs tracking-widest text-[var(--foreground-muted)] opacity-80 leading-tight"
+              className="font-switzer uppercase text-xs tracking-widest text-white/60 leading-tight"
             >
               {project.categories.join(" — ")}
             </p>

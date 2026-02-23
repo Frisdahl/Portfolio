@@ -48,7 +48,7 @@ const Collaboration: React.FC = () => {
                 text="See offer"
                 baseBgColor="bg-[var(--background)]"
                 baseTextColor="text-[var(--foreground)]"
-                hoverTextColor="group-hover:text-[var(--background)]"
+                hoverTextColor="group-hover/btn:text-[var(--background)]"
                 baseBorderColor="border-[var(--background)]"
                 hoverBgColor="bg-[var(--foreground)]"
                 hoverBorderColor="group-hover:border-[var(--background)]"
@@ -78,7 +78,7 @@ const Collaboration: React.FC = () => {
                 text="See offer"
                 baseBgColor="bg-[var(--foreground)]"
                 baseTextColor="text-[var(--background)]"
-                hoverTextColor="group-hover:text-[var(--foreground)]"
+                hoverTextColor="group-hover/btn:text-[var(--foreground)]"
                 hoverBgColor="bg-[var(--background)]"
                 className="w-full !py-3 font-switzer"
               />

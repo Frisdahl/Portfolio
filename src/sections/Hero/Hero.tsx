@@ -159,7 +159,7 @@ const Hero: React.FC = () => {
           <div className="flex flex-col items-start text-left gap-8 md:gap-10">
             <h1
               ref={headlineRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-newroman text-[#fff]  leading-[1] tracking-[.65px]"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-newroman text-[#fff]  leading-[1] tracking-[.65px]"
             >
               Immersive websites, <br />
               designed with clarity.

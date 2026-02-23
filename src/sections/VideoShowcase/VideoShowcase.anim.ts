@@ -13,34 +13,23 @@ export const initVideoShowcaseAnimations = (
   smallText: HTMLElement,
 ) => {
   const ctx = gsap.context(() => {
-    // 1. Split text into lines
-    const splitHeading = new SplitType(heading, {
-      types: "lines",
-      tagName: "span",
-    });
-    const splitLongText = new SplitType(longText, {
-      types: "lines",
-      tagName: "span",
-    });
-    const splitSmallText = new SplitType(smallText, {
-      types: "lines",
-      tagName: "span",
-    });
+    // 1. Split text into lines then words for maximum stability (Matching Services pattern)
+    const splitHeading = new SplitType(heading, { types: "lines", lineClass: "split-line" });
+    const splitHeadingWords = new SplitType(splitHeading.lines!, { types: "words", wordClass: "split-word" });
 
-    // Wrap each line in an overflow-hidden container
-    [splitHeading, splitLongText, splitSmallText].forEach((split) => {
-      split.lines?.forEach((line) => {
-        const wrapper = document.createElement("div");
-        wrapper.style.overflow = "hidden";
-        wrapper.style.paddingTop = "0.1em";
-        wrapper.style.paddingBottom = "0.1em";
-        wrapper.style.marginTop = "-0.1em";
-        line.style.display = "inline-block";
-        line.parentNode?.insertBefore(wrapper, line);
-        wrapper.appendChild(line);
+    const splitLongText = new SplitType(longText, { types: "lines", lineClass: "split-line" });
+    const splitLongTextWords = new SplitType(splitLongText.lines!, { types: "words", wordClass: "split-word" });
 
-        gsap.set(line, { yPercent: 100, opacity: 0 });
-      });
+    const splitSmallText = new SplitType(smallText, { types: "lines", lineClass: "split-line" });
+    const splitSmallTextWords = new SplitType(splitSmallText.lines!, { types: "words", wordClass: "split-word" });
+
+    // Setup initial states
+    [splitHeading, splitLongText, splitSmallText].forEach(s => {
+      gsap.set(s.lines, { overflow: "hidden", display: "block" });
+    });
+    
+    [splitHeadingWords, splitLongTextWords, splitSmallTextWords].forEach(s => {
+      gsap.set(s.words, { yPercent: 100, opacity: 0, display: "inline-block" });
     });
 
     // 2. Create the master timeline
@@ -50,7 +39,7 @@ export const initVideoShowcaseAnimations = (
         start: "top top",
         end: "+=200%",
         pin: true,
-        scrub: 1, // Reduced from 0.8 for better performance on laptops
+        scrub: 1,
         onRefresh: (self) => {
           if (self.pin) self.pin.style.zIndex = "10";
         },
@@ -66,8 +55,8 @@ export const initVideoShowcaseAnimations = (
     })
       .to({}, { duration: 0.2 })
       .to(videoWrapper, {
-        width: "60%", // Wider video
-        xPercent: -35, // Adjust centering for wider video
+        width: "60%",
+        xPercent: -35,
         yPercent: 20,
         borderRadius: "1rem",
         duration: 1,
@@ -79,46 +68,39 @@ export const initVideoShowcaseAnimations = (
         yPercent: -40,
         xPercent: 0,
         right: 0,
-        width: "35%", // Narrower text
-        opacity: 0
+        width: "35%",
+        opacity: 1
       }, "-=0.1")
-      .to(textContainer, {
-        opacity: 1,
-        duration: 0.5
-      })
       .to(
-        splitHeading.lines!,
+        splitHeadingWords.words!,
         {
           yPercent: 0,
           opacity: 1,
           duration: 0.8,
-          stagger: 0.1,
+          stagger: 0.05,
           ease: "power3.out",
-          force3D: true,
         },
         "+=0.1",
       )
       .to(
-        splitLongText.lines!,
+        splitLongTextWords.words!,
         {
           yPercent: 0,
           opacity: 0.8,
           duration: 0.8,
-          stagger: 0.1,
+          stagger: 0.02,
           ease: "power3.out",
-          force3D: true,
         },
         "-=0.4",
       )
       .to(
-        splitSmallText.lines!,
+        splitSmallTextWords.words!,
         {
           yPercent: 0,
           opacity: 0.6,
           duration: 0.8,
-          stagger: 0.1,
+          stagger: 0.02,
           ease: "power3.out",
-          force3D: true,
         },
         "-=0.4",
       )

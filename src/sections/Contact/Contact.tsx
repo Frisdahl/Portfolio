@@ -206,10 +206,10 @@ const Contact: React.FC = () => {
                 Available for <br /> select projects
               </h3>
               <div className="flex items-start gap-12">
-                <p className="text-[10px] uppercase tracking-[0.2em] opacity-40">
+                <p className="text-xs uppercase tracking-[0.2em] opacity-40">
                   © 2026 Frisdahl Studio
                 </p>
-                <p className="text-[10px] uppercase tracking-widest opacity-40">
+                <p className="text-xs uppercase tracking-widest opacity-40">
                   Denmark — Copenhagen
                 </p>
               </div>
@@ -262,7 +262,7 @@ const Contact: React.FC = () => {
             <Marquee
               text="Frisdahl Studio°"
               className="pt-4"
-              itemClassName="text-5xl md:text-7xl lg:text-[7vw] font-switzer font-semibold uppercase tracking-wide pr-16 text-[#e4e3de] opacity-[0.05] leading-none"
+              itemClassName="text-5xl md:text-7xl lg:text-[5vw] font-switzer font-semibold uppercase tracking-wide pr-16 text-[#e4e3de] opacity-[0.05] leading-none"
               speed={1}
             />
           </div>
@@ -282,9 +282,8 @@ const Contact: React.FC = () => {
       >
         <div className="w-full px-8 md:px-12 lg:px-24 flex flex-col items-start text-left">
           {/* Heading */}
-          <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-switzer font-semibold uppercase tracking-wide text-[#0a0a0a] leading-[0.9] mb-16">
-            Let’s Work <br />{" "}
-            <span className="font-newroman italic">Together</span>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-newroman tracking-wide text-[#0a0a0a] leading-[1] mb-16">
+            Let’s work <br></br>together
           </h2>
 
           {/* Form - Now under heading, full width */}
@@ -377,7 +376,7 @@ const Contact: React.FC = () => {
                       activeBgColor="bg-[#0a0a0a]"
                       activeTextColor="text-[#ffffff]"
                       hoverBgColor="bg-[#0a0a0a]"
-                      hoverTextColor="group-hover:text-[#ffffff]"
+                      hoverTextColor="group-hover/btn:text-[#ffffff]"
                     />
                   ))}
                 </div>
@@ -393,7 +392,7 @@ const Contact: React.FC = () => {
                   baseBorderColor="border-[#0a0a0a]"
                   baseBgColor="bg-[#0a0a0a]"
                   baseTextColor="text-[#ffffff]"
-                  hoverTextColor="group-hover:text-[#0a0a0a]"
+                  hoverTextColor="group-hover/btn:text-[#0a0a0a]"
                   hoverBgColor="bg-[#ffffff]"
                   hoverBorderColor="border-[#0a0a0a]"
                   fontSize="text-xl"
