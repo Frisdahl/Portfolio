@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import Marquee from "../../components/Marquee";
+import Links from "../../components/Links";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -165,18 +166,18 @@ const Hero: React.FC = () => {
                     alt="Danish Flag"
                     className="h-6 rounded-full"
                   />
-                  <div className="flex space-x-6">
-                    {["IG", "FB", "LK", "TEL", "MAIL"].map((label) => (
-                      <SocialIcon
-                        key={label}
-                        href="#"
-                        className="hover:opacity-70 transition-opacity font-switzer text-xs uppercase tracking-widest"
-                        style={{ color: "var(--foreground-muted)" }}
-                      >
-                        {label}
-                      </SocialIcon>
-                    ))}
-                  </div>
+                  <Links
+                    links={[
+                      { label: "IG", href: "#" },
+                      { label: "FB", href: "#" },
+                      { label: "LK", href: "#" },
+                      { label: "TEL", href: "#" },
+                      { label: "MAIL", href: "#" },
+                    ]}
+                    className="flex space-x-6"
+                    textColor="text-[#fff]"
+                    underlineColor="bg-[#fff]"
+                  />
                 </div>
 
                 <p

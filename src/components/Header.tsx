@@ -1,8 +1,9 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { scrollTo } from "../utils/smoothScroll";
+import { triggerPageTransition } from "./PageTransition";
 
 gsap.registerPlugin(ScrollToPlugin);
 
@@ -22,11 +23,18 @@ const Header: React.FC<HeaderProps> = ({
   toggleMenu,
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleLogoClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    
+    // Start transition and wait for screen to be covered
+    await triggerPageTransition();
+
     if (location.pathname === "/") {
-      e.preventDefault();
-      scrollTo(0, 3);
+      scrollTo(0, 0); // Jump to top immediately while screen is covered
+    } else {
+      navigate("/");
     }
   };
 

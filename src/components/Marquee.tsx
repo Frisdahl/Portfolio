@@ -165,15 +165,15 @@ const Marquee: React.FC<MarqueeProps> = ({
             speedTween && speedTween.kill();
             speedTween = gsap.timeline()
               .to(loop, {
-                timeScale: targetScale * 3,
-                duration: 0.25,
-                ease: "power2.out"
+                timeScale: targetScale * 1.5, // Reduced boost
+                duration: 0.2,
+                ease: "power1.out"
               })
               .to(loop, {
                 timeScale: targetScale,
-                duration: 1.5,
-                ease: "power2.inOut"
-              }, "+=0.2");
+                duration: 0.8, // Faster recovery
+                ease: "power2.out"
+              }, "+=0.1");
           },
         });
       }

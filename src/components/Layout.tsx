@@ -57,6 +57,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onEnterBack: () => setIsHeaderDark(true),
           onLeave: () => setIsHeaderDark(false),
           onLeaveBack: () => setIsHeaderDark(false),
+          onUpdate: (self) => {
+            if (self.isActive !== isHeaderDark) {
+              setIsHeaderDark(self.isActive);
+            }
+          },
           onRefresh: (self) => {
             setIsHeaderDark(self.isActive);
           },

@@ -1,7 +1,8 @@
-import React, { Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
+import PageTransition from "./components/PageTransition";
 import Contact from "./sections/Contact/Contact";
 import "./App.css";
 
@@ -17,6 +18,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <PageTransition />
       <Layout>
         <Suspense fallback={null}>
           <Routes>

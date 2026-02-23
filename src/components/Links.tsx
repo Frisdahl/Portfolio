@@ -3,92 +3,11 @@ import gsap from "gsap";
 
 interface LinksProps {
   links?: Array<{ label: string; href: string }>;
-}
-
-type MaskedArrowProps = {
-  maskId: string;
-  svgRef?: (el: SVGSVGElement | null) => void;
-  maskPathsRef?: (el: SVGGElement | null) => void;
   className?: string;
-};
-
-/**
- * Filled arrow is revealed by a MASK.
- * The mask uses the SAME paths, but as a white stroke that we dash-animate.
- * Result: looks "drawn" but stays solid (no white interior).
- */
-const MaskedArrow = React.forwardRef<
-  SVGSVGElement,
-  Omit<MaskedArrowProps, "svgRef"> & {
-    svgRef?: (el: SVGSVGElement | null) => void;
-  }
->(({ maskId, svgRef, maskPathsRef, className = "" }, ref) => {
-  return (
-    <svg
-      ref={(el) => {
-        if (typeof ref === "function") ref(el);
-        else if (ref)
-          (ref as React.MutableRefObject<SVGSVGElement | null>).current = el;
-        svgRef?.(el);
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 85.01 85.01"
-      className={className}
-      style={{ display: "block", width: "100%", height: "100%" }}
-      shapeRendering="geometricPrecision"
-    >
-      <defs>
-        <mask
-          id={maskId}
-          maskUnits="userSpaceOnUse"
-          maskContentUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width="85.01"
-          height="85.01"
-        >
-          {/* Black = hidden */}
-          <rect x="0" y="0" width="85.01" height="85.01" fill="black" />
-          {/* White stroke drawing = revealed */}
-          <g ref={maskPathsRef}>
-            <path
-              d="M6.62,0c-1.48,0-2.68,1.19-2.69,2.67l-.08,8.93c0,1.5,1.2,2.71,2.69,2.71h47.52c2.4,0,3.6,2.9,1.9,4.59L74.87,0H6.62Z"
-              fill="none"
-              stroke="white"
-            />
-            <path
-              d="M85,2.69c0-1.49-1.2-2.69-2.69-2.69h-7.44l-18.9,18.9-4.1,4.1L.79,74.08c-1.05,1.05-1.05,2.75,0,3.81l6.33,6.33c1.05,1.05,2.75,1.05,3.81,0l55.18-55.18,18.9-18.9V2.69h-.01Z"
-              fill="none"
-              stroke="white"
-            />
-            <path
-              d="M66.1,29.04c1.7-1.7,4.59-.49,4.59,1.9v47.52c0,1.5,1.22,2.7,2.71,2.69l8.93-.08c1.48-.01,2.67-1.21,2.67-2.69V10.13l-18.9,18.9h0Z"
-              fill="none"
-              stroke="white"
-            />
-          </g>
-        </mask>
-      </defs>
-
-      {/* The filled arrow that will be revealed by the mask */}
-      <g mask={`url(#${maskId})`}>
-        <path
-          d="M6.62,0c-1.48,0-2.68,1.19-2.69,2.67l-.08,8.93c0,1.5,1.2,2.71,2.69,2.71h47.52c2.4,0,3.6,2.9,1.9,4.59L74.87,0H6.62Z"
-          fill="#0a0a0a"
-        />
-        <path
-          d="M85,2.69c0-1.49-1.2-2.69-2.69-2.69h-7.44l-18.9,18.9-4.1,4.1L.79,74.08c-1.05,1.05-1.05,2.75,0,3.81l6.33,6.33c1.05,1.05,2.75,1.05,3.81,0l55.18-55.18,18.9-18.9V2.69h-.01Z"
-          fill="#0a0a0a"
-        />
-        <path
-          d="M66.1,29.04c1.7-1.7,4.59-.49,4.59,1.9v47.52c0,1.5,1.22,2.7,2.71,2.69l8.93-.08c1.48-.01,2.67-1.21,2.67-2.69V10.13l-18.9,18.9h0Z"
-          fill="#0a0a0a"
-        />
-      </g>
-    </svg>
-  );
-});
-MaskedArrow.displayName = "MaskedArrow";
+  linkClassName?: string;
+  textColor?: string;
+  underlineColor?: string;
+}
 
 const Links: React.FC<LinksProps> = ({
   links = [
@@ -96,125 +15,120 @@ const Links: React.FC<LinksProps> = ({
     { label: "LinkedIn", href: "#linkedin" },
     { label: "Instagram", href: "#instagram" },
   ],
+  className = "flex flex-wrap gap-x-12 gap-y-4",
+  linkClassName = "text-xs uppercase font-semibold tracking-[0.1em] py-1",
+  textColor = "text-[#0a0a0a]",
+  underlineColor = "bg-[#0a0a0a]",
 }) => {
-  const leftMaskGroupRefs = useRef<(SVGGElement | null)[]>([]);
-  const rightMaskGroupRefs = useRef<(SVGGElement | null)[]>([]);
-  const textRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const lineRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const textSpanRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const introTimelineRefs = useRef<(gsap.core.Timeline | null)[]>([]);
+  const outroTimelineRefs = useRef<(gsap.core.Timeline | null)[]>([]);
+  const isPointerInsideRefs = useRef<boolean[]>([]);
+  const leaveQueuedRefs = useRef<boolean[]>([]);
 
   useEffect(() => {
     const cleanups: Array<() => void> = [];
 
     links.forEach((_, i) => {
-      const leftMaskGroup = leftMaskGroupRefs.current[i];
-      const rightMaskGroup = rightMaskGroupRefs.current[i];
-      const text = textRefs.current[i];
+      const line = lineRefs.current[i];
       const link = linkRefs.current[i];
-      if (!leftMaskGroup || !rightMaskGroup || !text || !link) return;
+      const textSpan = textSpanRefs.current[i];
+      if (!line || !link || !textSpan) return;
 
-      const leftMaskPaths = Array.from(
-        leftMaskGroup.querySelectorAll("path"),
-      ) as SVGPathElement[];
+      // Measure text width and set the underline width
+      const textWidth = textSpan.offsetWidth;
+      gsap.set(line, { width: textWidth, scaleX: 0, transformOrigin: "left" });
 
-      const rightMaskPaths = Array.from(
-        rightMaskGroup.querySelectorAll("path"),
-      ) as SVGPathElement[];
+      // Initialize state trackers
+      isPointerInsideRefs.current[i] = false;
+      leaveQueuedRefs.current[i] = false;
 
-      // Setup LEFT mask stroke (starts hidden, draws in)
-      leftMaskPaths.forEach((p) => {
-        const len = p.getTotalLength();
-        const dash = len + 2;
-
-        gsap.set(p, {
-          strokeWidth: 12,
-          strokeLinecap: "butt",
-          strokeLinejoin: "round",
-          strokeDasharray: dash,
-          strokeDashoffset: dash, // hidden initially
-        });
-      });
-
-      // Setup RIGHT mask stroke (starts visible, erases out)
-      rightMaskPaths.forEach((p) => {
-        const len = p.getTotalLength();
-        const dash = len + 2;
-
-        gsap.set(p, {
-          strokeWidth: 12,
-          strokeLinecap: "butt",
-          strokeLinejoin: "round",
-          strokeDasharray: dash,
-          strokeDashoffset: 0, // fully visible initially
-        });
-      });
-
-      // Hide left mask group initially
-      gsap.set(leftMaskGroup, { opacity: 0 });
-      // Right mask group stays visible
-      gsap.set(rightMaskGroup, { opacity: 1 });
-
-      // Timeline
-      const tl = gsap.timeline({ paused: true });
-
-      // Erase right arrow by "undrawing" strokes
-      tl.to(
-        rightMaskPaths,
-        {
-          strokeDashoffset: (index) => {
-            const len = rightMaskPaths[index].getTotalLength();
-            return len + 2;
-          },
-          duration: 0.45,
-          stagger: 0.05,
-          ease: "power2.inOut",
+      // Create intro timeline (expand from left)
+      const introTimeline = gsap.timeline({
+        paused: true,
+        onComplete: () => {
+          if (leaveQueuedRefs.current[i]) {
+            leaveQueuedRefs.current[i] = false;
+            scheduleOutro(i);
+          }
         },
-        0,
-      )
-        .to(
-          text,
-          {
-            x: 18,
-            opacity: 0.65,
-            duration: 0.45,
-            ease: "power2.inOut",
-          },
-          0,
-        )
-        // turn left mask on BEFORE drawing
-        .to(
-          leftMaskGroup,
-          {
-            opacity: 1,
-            duration: 0.01,
-          },
-          0.08,
-        )
-        // Draw-reveal left arrow via mask
-        .to(
-          leftMaskPaths,
-          {
-            strokeDashoffset: 0,
-            duration: 0.7,
-            stagger: 0.06,
-            ease: "power2.out",
-          },
-          0.12,
-        )
-        // when reversing back to start, hide left mask group again
-        .eventCallback("onReverseComplete", () => {
-          gsap.set(leftMaskGroup, { opacity: 0 });
-        });
+      });
 
-      const onEnter = () => tl.play();
-      const onLeave = () => tl.reverse();
+      introTimeline.to(line, {
+        scaleX: 1,
+        transformOrigin: "left",
+        duration: 0.5,
+        ease: "power2.out",
+      });
 
-      link.addEventListener("mouseenter", onEnter);
-      link.addEventListener("mouseleave", onLeave);
+      // Create outro timeline (exit to the right)
+      const outroTimeline = gsap.timeline({
+        paused: true,
+      });
+
+      outroTimeline.to(line, {
+        scaleX: 0,
+        transformOrigin: "right",
+        duration: 0.5,
+        ease: "power2.in",
+      });
+
+      introTimelineRefs.current[i] = introTimeline;
+      outroTimelineRefs.current[i] = outroTimeline;
+
+      const scheduleOutro = (index: number) => {
+        const outro = outroTimelineRefs.current[index];
+        if (outro && !outro.isActive()) {
+          outro.restart();
+        }
+      };
+
+      const handleMouseEnter = () => {
+        isPointerInsideRefs.current[i] = true;
+        leaveQueuedRefs.current[i] = false;
+
+        const intro = introTimelineRefs.current[i];
+        const outro = outroTimelineRefs.current[i];
+
+        if (outro?.isActive()) {
+          outro.kill();
+        }
+
+        if (intro && !intro.isActive()) {
+          intro.restart();
+        }
+      };
+
+      const handleMouseLeave = () => {
+        isPointerInsideRefs.current[i] = false;
+        const intro = introTimelineRefs.current[i];
+
+        if (intro?.isActive()) {
+          leaveQueuedRefs.current[i] = true;
+        } else {
+          scheduleOutro(i);
+        }
+      };
+
+      link.addEventListener("mouseenter", handleMouseEnter);
+      link.addEventListener("mouseleave", handleMouseLeave);
+
+      // Handle window resize to re-measure text
+      const handleResize = () => {
+        const newTextWidth = textSpan.offsetWidth;
+        gsap.set(line, { width: newTextWidth });
+      };
+
+      window.addEventListener("resize", handleResize);
 
       cleanups.push(() => {
-        link.removeEventListener("mouseenter", onEnter);
-        link.removeEventListener("mouseleave", onLeave);
-        tl.kill();
+        link.removeEventListener("mouseenter", handleMouseEnter);
+        link.removeEventListener("mouseleave", handleMouseLeave);
+        window.removeEventListener("resize", handleResize);
+        if (introTimelineRefs.current[i]) introTimelineRefs.current[i]?.kill();
+        if (outroTimelineRefs.current[i]) outroTimelineRefs.current[i]?.kill();
       });
     });
 
@@ -222,43 +136,30 @@ const Links: React.FC<LinksProps> = ({
   }, [links]);
 
   return (
-    <div className="flex flex-wrap gap-x-12 gap-y-4">
+    <div className={className}>
       {links.map((link, i) => {
-        const maskId = `arrow-mask-${i}`; // stable for this component
         return (
           <a
-            key={link.label}
+            key={link.label + i}
             ref={(el) => {
               linkRefs.current[i] = el;
             }}
             href={link.href}
-            className="inline-flex items-center text-sm font-semibold tracking-widest uppercase text-[#0a0a0a] py-2"
+            className={`relative inline-block ${linkClassName} ${textColor}`}
           >
-            {/* LEFT incoming arrow (true draw reveal via mask) */}
-            <span className="w-[1em] h-[1em] mr-3 rotate-[45deg]">
-              <MaskedArrow
-                maskId={maskId}
-                maskPathsRef={(el) => (leftMaskGroupRefs.current[i] = el)}
-              />
-            </span>
-
-            {/* Text */}
             <span
               ref={(el) => {
-                textRefs.current[i] = el;
+                textSpanRefs.current[i] = el;
               }}
-              className=""
             >
               {link.label}
             </span>
-
-            {/* RIGHT arrow (masked, gets erased via stroke) */}
-            <span className="w-[1em] h-[1em] ml-3">
-              <MaskedArrow
-                maskId={`${maskId}-right`}
-                maskPathsRef={(el) => (rightMaskGroupRefs.current[i] = el)}
-              />
-            </span>
+            <span
+              ref={(el) => {
+                lineRefs.current[i] = el;
+              }}
+              className={`absolute bottom-0 left-0 h-[1px] ${underlineColor}`}
+            ></span>
           </a>
         );
       })}

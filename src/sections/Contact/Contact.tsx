@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import AnimatedButton from "../../components/AnimatedButton";
 import ValueBtn from "../../components/valueBtn";
 import Marquee from "../../components/Marquee";
+import Links from "../../components/Links";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -220,34 +221,32 @@ const Contact: React.FC = () => {
                 <p className="text-xs uppercase tracking-[0.3em] opacity-40 mb-6">
                   Menu
                 </p>
-                <nav className="flex flex-col space-y-3">
-                  {["Works", "About", "Contact"].map((item) => (
-                    <Link
-                      key={item}
-                      to={item === "Works" ? "/" : `/${item.toLowerCase()}`}
-                      className="text-sm uppercase tracking-widest hover:opacity-60 transition-opacity"
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                </nav>
+                <Links
+                  links={[
+                    { label: "Works", href: "/" },
+                    { label: "About", href: "/about" },
+                    { label: "Contact", href: "#contact" },
+                  ]}
+                  className="flex flex-col space-y-3"
+                  textColor="text-[#e4e3de]"
+                  underlineColor="bg-[#e4e3de]"
+                />
               </div>
 
               <div className="flex flex-col items-start text-left">
                 <p className="text-xs uppercase tracking-[0.3em] opacity-40 mb-6">
                   Socials
                 </p>
-                <div className="flex flex-col space-y-3">
-                  {["Instagram", "Facebook", "LinkedIn"].map((platform) => (
-                    <SocialIcon
-                      key={platform}
-                      href="#"
-                      className="text-sm uppercase tracking-widest hover:opacity-60 transition-opacity"
-                    >
-                      {platform}
-                    </SocialIcon>
-                  ))}
-                </div>
+                <Links
+                  links={[
+                    { label: "Instagram", href: "#" },
+                    { label: "Facebook", href: "#" },
+                    { label: "LinkedIn", href: "#" },
+                  ]}
+                  className="flex flex-col space-y-3"
+                  textColor="text-[#e4e3de]"
+                  underlineColor="bg-[#e4e3de]"
+                />
               </div>
             </div>
           </div>
