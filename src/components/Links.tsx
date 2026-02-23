@@ -38,9 +38,17 @@ const MaskedArrow = React.forwardRef<
       shapeRendering="geometricPrecision"
     >
       <defs>
-        <mask id={maskId} maskUnits="objectBoundingBox">
+        <mask
+          id={maskId}
+          maskUnits="userSpaceOnUse"
+          maskContentUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width="85.01"
+          height="85.01"
+        >
           {/* Black = hidden */}
-          <rect x="0" y="0" width="1" height="1" fill="black" />
+          <rect x="0" y="0" width="85.01" height="85.01" fill="black" />
           {/* White stroke drawing = revealed */}
           <g ref={maskPathsRef}>
             <path
@@ -118,7 +126,7 @@ const Links: React.FC<LinksProps> = ({
         const dash = len + 2;
 
         gsap.set(p, {
-          strokeWidth: 14,
+          strokeWidth: 12,
           strokeLinecap: "butt",
           strokeLinejoin: "round",
           strokeDasharray: dash,
@@ -132,7 +140,7 @@ const Links: React.FC<LinksProps> = ({
         const dash = len + 2;
 
         gsap.set(p, {
-          strokeWidth: 14,
+          strokeWidth: 12,
           strokeLinecap: "butt",
           strokeLinejoin: "round",
           strokeDasharray: dash,
@@ -224,10 +232,10 @@ const Links: React.FC<LinksProps> = ({
               linkRefs.current[i] = el;
             }}
             href={link.href}
-            className="inline-flex items-center text-sm font-normal tracking-widest uppercase text-[#0a0a0a] py-2 relative"
+            className="inline-flex items-center text-sm font-semibold tracking-widest uppercase text-[#0a0a0a] py-2"
           >
             {/* LEFT incoming arrow (true draw reveal via mask) */}
-            <span className="absolute left-0 w-4 h-4 rotate-[45deg]">
+            <span className="w-[1em] h-[1em] mr-3 rotate-[45deg]">
               <MaskedArrow
                 maskId={maskId}
                 maskPathsRef={(el) => (leftMaskGroupRefs.current[i] = el)}
@@ -239,13 +247,13 @@ const Links: React.FC<LinksProps> = ({
               ref={(el) => {
                 textRefs.current[i] = el;
               }}
-              className="ml-5"
+              className=""
             >
               {link.label}
             </span>
 
             {/* RIGHT arrow (masked, gets erased via stroke) */}
-            <span className="w-4 h-4 ml-2">
+            <span className="w-[1em] h-[1em] ml-3">
               <MaskedArrow
                 maskId={`${maskId}-right`}
                 maskPathsRef={(el) => (rightMaskGroupRefs.current[i] = el)}
