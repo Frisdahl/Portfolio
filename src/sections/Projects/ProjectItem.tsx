@@ -147,7 +147,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     <div ref={itemRef} className="w-full">
       <div ref={parallaxRef} className="w-full will-change-transform">
         <div
-          className="flex justify-between items-center mb-6 font-granary uppercase tracking-wider text-base"
+          className="flex justify-between items-center mb-6 font-switzer uppercase tracking-wider text-base"
           style={{ color: "var(--foreground)" }}
         >
           <div style={{ color: "var(--foreground-muted)" }}>
@@ -255,7 +255,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           <div className="overflow-hidden">
             <h3
               ref={titleTextRef}
-              className="font-granary uppercase text-2xl text-[var(--foreground)] leading-tight"
+              className="font-switzer uppercase text-2xl text-[var(--foreground)] leading-tight"
             >
               {project.title}
             </h3>
@@ -263,7 +263,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           <div className="overflow-hidden mt-1">
             <p
               ref={categoriesTextRef}
-              className="font-granary uppercase text-xs tracking-widest text-[var(--foreground-muted)] opacity-80 leading-tight"
+              className="font-switzer uppercase text-xs tracking-widest text-[var(--foreground-muted)] opacity-80 leading-tight"
             >
               {project.categories.join(" — ")}
             </p>

@@ -61,7 +61,7 @@ const VideoShowcase: React.FC = () => {
       ref={containerRef}
       className="relative w-full h-screen bg-transparent mb-64"
     >
-      <div className="h-full w-full flex items-center justify-center px-8 md:px-16 lg:px-24">
+      <div className="h-full w-full flex items-center justify-center px-8 md:px-12 lg:px-24">
         <div className="relative w-full flex items-center justify-center">
           <div
             ref={videoWrapperRef}
@@ -81,21 +81,21 @@ const VideoShowcase: React.FC = () => {
 
           <div
             ref={textContainerRef}
-            className="absolute right-0 w-[50%] text-left pointer-events-none pr-12 flex flex-col gap-8"
+            className="absolute right-0 text-left pointer-events-none pr-12 flex flex-col gap-8"
             style={{ visibility: "hidden" }}
           >
             <h2
               ref={headingRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-apparel text-[#fff]  leading-[1] tracking-tighter"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-newroman text-[#fff] tracking-[.65px] leading-[1]"
             >
-              <span className="font-apparel">I design</span> and
+              <span className="font-newroman">I design</span> and
               <br />
               build websites
             </h2>
 
             <p
               ref={longTextRef}
-              className="font-granary text-xl md:text-2xl tracking-tight text-[var(--foreground)] w-full"
+              className="font-switzer text-xl md:text-2xl tracking-tight text-[var(--foreground)] w-full"
             >
               Focused on creating digital experiences that bridge the gap
               between visual aesthetics and technical excellence.
@@ -103,7 +103,7 @@ const VideoShowcase: React.FC = () => {
 
             <p
               ref={smallTextRef}
-              className="font-granary text-sm uppercase tracking-[0.2em] text-[var(--foreground-muted)]"
+              className="font-switzer text-sm uppercase tracking-[0.2em] text-[var(--foreground-muted)]"
             >
               ( Creative Direction & Web Development )
             </p>

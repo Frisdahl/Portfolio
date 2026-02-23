@@ -58,7 +58,7 @@ export const initVideoShowcaseAnimations = (
     });
 
     tl.to(videoWrapper, {
-      width: "90%",
+      width: "100%",
       borderRadius: "1rem",
       duration: 1,
       ease: "power2.inOut",
@@ -66,15 +66,26 @@ export const initVideoShowcaseAnimations = (
     })
       .to({}, { duration: 0.2 })
       .to(videoWrapper, {
-        width: "42%",
-        xPercent: -60,
-        yPercent: 30,
+        width: "60%", // Wider video
+        xPercent: -35, // Adjust centering for wider video
+        yPercent: 20,
         borderRadius: "1rem",
         duration: 1,
         ease: "power2.inOut",
         force3D: true,
       })
-      .set(textContainer, { visibility: "visible", yPercent: -25 }, "-=0.1")
+      .set(textContainer, { 
+        visibility: "visible", 
+        yPercent: -40,
+        xPercent: 0,
+        right: 0,
+        width: "35%", // Narrower text
+        opacity: 0
+      }, "-=0.1")
+      .to(textContainer, {
+        opacity: 1,
+        duration: 0.5
+      })
       .to(
         splitHeading.lines!,
         {

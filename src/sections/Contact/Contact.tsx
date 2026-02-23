@@ -202,7 +202,7 @@ const Contact: React.FC = () => {
         <div className="relative z-[10] w-full min-h-[40vh] flex flex-col justify-end">
           <div className="w-full px-8 md:px-12 lg:px-24 py-8 md:py-12 lg:py-16 flex flex-col md:flex-row justify-between items-start gap-8 text-[#e4e3de]">
             <div className="flex flex-col items-start text-left">
-              <h3 className="text-2xl md:text-3xl lg:text-5xl font-semibold font-granary uppercase leading-tight mb-8 max-w-xl">
+              <h3 className="text-2xl md:text-3xl lg:text-5xl font-semibold font-switzer uppercase leading-tight mb-8 max-w-xl">
                 Available for <br /> select projects
               </h3>
               <div className="flex items-start gap-12">
@@ -262,7 +262,7 @@ const Contact: React.FC = () => {
             <Marquee
               text="Frisdahl Studio°"
               className="pt-4"
-              itemClassName="text-5xl md:text-7xl lg:text-[7vw] font-granary font-semibold uppercase tracking-wide pr-16 text-[#e4e3de] opacity-[0.05] leading-none"
+              itemClassName="text-5xl md:text-7xl lg:text-[7vw] font-switzer font-semibold uppercase tracking-wide pr-16 text-[#e4e3de] opacity-[0.05] leading-none"
               speed={1}
             />
           </div>
@@ -282,9 +282,9 @@ const Contact: React.FC = () => {
       >
         <div className="w-full px-8 md:px-12 lg:px-24 flex flex-col items-start text-left">
           {/* Heading */}
-          <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-granary font-semibold uppercase tracking-wide text-[#0a0a0a] leading-[0.9] mb-16">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-switzer font-semibold uppercase tracking-wide text-[#0a0a0a] leading-[0.9] mb-16">
             Let’s Work <br />{" "}
-            <span className="font-apparel italic">Together</span>
+            <span className="font-newroman italic">Together</span>
           </h2>
 
           {/* Form - Now under heading, full width */}

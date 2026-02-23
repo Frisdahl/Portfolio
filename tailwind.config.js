@@ -18,9 +18,12 @@
         "fade-in-up": "fade-in-up 0.6s ease-out forwards",
       },
       fontFamily: {
-        sans: ["Granary", "sans-serif"],
-        granary: ["Granary", "sans-serif"],
-        apparel: ["Apparel", "sans-serif"],
+        sans: ["Switzer", "sans-serif"],
+        switzer: ["Switzer", "sans-serif"],
+        newroman: ["NewRoman", "serif"],
+        // Backwards compatibility for existing classes
+        granary: ["Switzer", "sans-serif"],
+        apparel: ["NewRoman", "serif"],
       },
     },
   },

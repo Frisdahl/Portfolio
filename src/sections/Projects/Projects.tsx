@@ -60,7 +60,7 @@ const Projects: React.FC = () => {
         <Marquee
           text="Selected Projects°"
           className="pt-8 "
-          itemClassName="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-granary font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] leading-none"
+          itemClassName="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-switzer font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] leading-none"
           speed={1}
         />
       </div>

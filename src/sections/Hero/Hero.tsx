@@ -159,7 +159,7 @@ const Hero: React.FC = () => {
           <div className="flex flex-col items-start text-left gap-8 md:gap-10">
             <h1
               ref={headlineRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-apparel text-[#fff]  leading-[1] tracking-tighter"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-newroman text-[#fff]  leading-[1] tracking-[.65px]"
             >
               Immersive websites, <br />
               designed with clarity.
@@ -184,7 +184,7 @@ const Hero: React.FC = () => {
                       <SocialIcon
                         key={label}
                         href="#"
-                        className="hover:opacity-70 transition-opacity font-granary text-xs uppercase tracking-widest"
+                        className="hover:opacity-70 transition-opacity font-switzer text-xs uppercase tracking-widest"
                         style={{ color: "var(--foreground-muted)" }}
                       >
                         {label}
@@ -194,7 +194,7 @@ const Hero: React.FC = () => {
                 </div>
 
                 <p
-                  className="text-xs md:text-sm max-w-sm text-left md:text-right leading-relaxed font-granary font-light uppercase tracking-wider"
+                  className="text-xs md:text-sm max-w-sm text-left md:text-right leading-relaxed font-switzer font-light uppercase tracking-wider"
                   style={{ color: "var(--foreground-muted)" }}
                 >
                   I help ambitious brands launch digital experiences and
@@ -213,7 +213,7 @@ const Hero: React.FC = () => {
             <Marquee
               text="Frisdahl Studio°"
               className="pt-8"
-              itemClassName="text-5xl md:text-7xl lg:text-[5vw] font-granary font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] opacity-[0.05] leading-none"
+              itemClassName="text-5xl md:text-7xl lg:text-[5vw] font-switzer font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] opacity-[0.05] leading-none"
               speed={1}
             />
           </div>

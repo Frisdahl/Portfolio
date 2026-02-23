@@ -14,42 +14,77 @@ body {
   color: var(--foreground);
 }
 
+/* Switzer Font (Default) */
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer/Switzer-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer/Switzer-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer/Switzer-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer/Switzer-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer/Switzer-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* NewRoman Font (Headings) */
+@font-face {
+  font-family: "NewRoman";
+  src: url("/fonts/NewRoman/newroman.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Deprecated Granary & Apparel (Keeping declarations for now to avoid breakages during transition) */
 @font-face {
   font-family: "Granary";
   src: url("/fonts/granary/Granary-Light.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
 }
-
 @font-face {
   font-family: "Granary";
   src: url("/fonts/granary/Granary-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
 }
-
 @font-face {
   font-family: "Granary";
   src: url("/fonts/granary/Granary-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
 }
-
 @font-face {
   font-family: "Granary";
   src: url("/fonts/granary/Granary-Semi-Bold.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
 }
-
 @font-face {
   font-family: "Granary";
   src: url("/fonts/granary/Granary-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
 }
-
-/* Apparel Font */
 @font-face {
   font-family: "Apparel";
   src: url("/fonts/Apparel/Fontspring-DEMO-apparel-light.woff2") format("woff2");
@@ -58,8 +93,7 @@ body {
 }
 @font-face {
   font-family: "Apparel";
-  src: url("/fonts/Apparel/Fontspring-DEMO-apparel-regular.woff2")
-    format("woff2");
+  src: url("/fonts/Apparel/Fontspring-DEMO-apparel-regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
 }
@@ -76,16 +110,19 @@ body {
   font-style: normal;
 }
 
-@layer base {
-  /* Fonts are configured in tailwind.config.js */
-}
-
 @layer utilities {
+  .font-newroman {
+    font-family: "NewRoman", serif;
+  }
+  .font-switzer {
+    font-family: "Switzer", sans-serif;
+  }
+  /* Backwards compatibility aliases */
   .font-apparel {
-    font-family: "Apparel", sans-serif;
+    font-family: "NewRoman", serif;
   }
   .font-granary {
-    font-family: "Granary", sans-serif;
+    font-family: "Switzer", sans-serif;
   }
 }
 
@@ -99,18 +136,17 @@ body {
     content: "";
     position: absolute;
     left: 0;
-    bottom: -2px; /* Position below text */
+    bottom: -2px;
     width: 0;
     height: 2px;
-    background-color: currentColor; /* Inherit text color */
-    transition: width 0.3s ease-out; /* Smooth transition */
+    background-color: currentColor;
+    transition: width 0.3s ease-out;
   }
 
   .link-underline-effect:hover::after {
     width: 100%;
   }
 
-  /* Custom Scrollbar for Webkit browsers */
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -128,7 +164,6 @@ body {
     background: var(--foreground-muted);
   }
 
-  /* Custom Scrollbar for Firefox */
   html {
     scrollbar-width: thin;
     scrollbar-color: var(--foreground) var(--background);
@@ -145,7 +180,7 @@ body {
 }
 
 .marquee-rotate-container {
-  animation: rotateCircle 15s linear infinite; /* Adjust duration for speed */
+  animation: rotateCircle 15s linear infinite;
 }
 
 @keyframes fadeInUp {

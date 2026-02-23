@@ -60,7 +60,7 @@ const AboutPage: React.FC = () => {
             ref={headingRef1}
             className="text-8xl font-[granary] text-[var(--foreground)] w-full text-left leading-tight mb-4"
           >
-            As a <span className="font-apparel">creative designer</span>, I help
+            As a <span className="font-newroman">creative designer</span>, I help
             brands and companies connect with their audience,
           </h2>
 
