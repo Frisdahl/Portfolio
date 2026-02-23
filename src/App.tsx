@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 import PageTransition from "./components/PageTransition";
+import ComingSoon from "./components/ComingSoon";
 import Contact from "./sections/Contact/Contact";
 import "./App.css";
 
@@ -19,6 +20,7 @@ function App() {
     <Router>
       <ScrollToTop />
       <PageTransition />
+      <ComingSoon />
       <Layout>
         <Suspense fallback={null}>
           <Routes>
