@@ -42,11 +42,11 @@ const Hero: React.FC = () => {
     // Initial Load Animation
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    // Fade in video
+    // Fade in video (starting from its base 0.4 opacity)
     tl.fromTo(
       videoRef.current,
-      { opacity: 0, scale: 1.1 },
-      { opacity: 0.75, scale: 1.06, duration: 2.5, ease: "power2.inOut" },
+      { scale: 1.1, opacity: 0 },
+      { opacity: 0.4, scale: 1.06, duration: 2.5, ease: "power2.inOut" },
     );
 
     // Split headline for staggered animation
@@ -124,7 +124,7 @@ const Hero: React.FC = () => {
             loop
             playsInline
             preload="metadata"
-            className="w-full h-full object-cover transform-gpu opacity-0"
+            className="w-full h-full object-cover transform-gpu opacity-40"
           >
             <source
               src="/projectVideos/herovideo/wave-optimized.webm"
@@ -137,29 +137,15 @@ const Hero: React.FC = () => {
           </video>
         </div>
 
-        {/* Layer C: Navy/Dark Overlay */}
-        <div
-          className="absolute inset-0 z-[2] pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(5, 10, 20, 0.8) 0%, rgba(5, 5, 5, 0.75) 100%)",
-          }}
-        />
-
-        {/* Layer D: Atmosphere + Grain Overlay */}
-        <div
-          className="absolute inset-0 z-[3] pointer-events-none mix-blend-overlay opacity-[0.08]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          }}
-        />
+        {/* Layer C: Navy/Dark Overlay matching footer */}
+        <div className="absolute inset-0 z-[2] bg-black/60 pointer-events-none" />
 
         {/* Top Content: Headline Wrap */}
         <div className="relative z-[10] px-8">
           <div className="flex flex-col items-start text-left gap-8 md:gap-10">
             <h1
               ref={headlineRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-newroman text-[#fff]  leading-[1] tracking-[.65px]"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-newroman text-[#fff] leading-[1]"
             >
               Immersive websites, <br />
               designed with clarity.

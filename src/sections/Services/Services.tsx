@@ -38,41 +38,34 @@ const services: ServiceItem[] = [
 
 const Services: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [displayIndex, setDisplayIndex] = useState(0);
   const [progress, setProgress] = useState(0);
 
   const timerRef = useRef<number | null>(null);
-  const descriptionRef = useRef<HTMLDivElement>(null);
+  const descriptionTextRef = useRef<HTMLParagraphElement>(null);
+  const smallTitleRef = useRef<HTMLHeadingElement>(null);
+  const rightContentRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const headingTextRef = useRef<HTMLDivElement>(null);
 
   const duration = 10000; // 10 seconds
 
+  // Heading Animation
   useLayoutEffect(() => {
     if (!headingRef.current || !headingTextRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Split ONLY the inner text wrapper (not the entire h2),
-      // so layout/indent stays predictable.
-      const split = new SplitType(headingTextRef.current, {
-        types: "lines, words",
+      new SplitType(headingTextRef.current!, {
+        types: "lines,words",
         lineClass: "split-line",
         wordClass: "split-word",
       });
 
-      const lines = headingTextRef.current.querySelectorAll(".split-line");
-      const words = headingTextRef.current.querySelectorAll(".split-word");
+      const lines = headingTextRef.current!.querySelectorAll(".split-line");
+      const words = headingTextRef.current!.querySelectorAll(".split-word");
 
-      // Each line clips its own words so they never overlap into other lines
-      gsap.set(lines, {
-        display: "block",
-        overflow: "hidden",
-      });
-
-      // Words can transform without breaking spacing
-      gsap.set(words, {
-        display: "inline-block",
-        willChange: "transform, opacity",
-      });
+      gsap.set(lines, { display: "block", overflow: "hidden" });
+      gsap.set(words, { display: "inline-block", translateZ: 0 });
 
       gsap.fromTo(
         words,
@@ -82,70 +75,136 @@ const Services: React.FC = () => {
           yPercent: 0,
           stagger: 0.05,
           duration: 1.2,
-          ease: "power4.out", // Very smooth, premium ease
+          ease: "power4.out",
           scrollTrigger: {
             trigger: headingRef.current,
             start: "top 85%",
-            once: true, // Only plays once, stays visible
+            once: true,
           },
         },
       );
-
-      return () => {
-        split.revert();
-      };
     }, headingRef);
 
-    return () => {
-      ctx.revert(); // kills animations created in this context
-      // Extra safety: kill any triggers attached to this section
-      ScrollTrigger.getAll().forEach((t) => {
-        const triggerEl = t.vars.trigger as Element | undefined;
-        if (
-          triggerEl &&
-          headingRef.current &&
-          headingRef.current.contains(triggerEl)
-        ) {
-          t.kill();
-        }
-      });
-    };
+    return () => ctx.revert();
   }, []);
 
   useEffect(() => {
-    const startTimer = () => {
-      const startTime = Date.now();
+    const startTime = Date.now();
+    const interval = 50; // ms
 
-      timerRef.current = window.setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const currentProgress = (elapsed / duration) * 100;
+    timerRef.current = window.setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const currentProgress = Math.min((elapsed / duration) * 100, 100);
 
-        if (currentProgress >= 100) {
-          setActiveIndex((prev) => (prev + 1) % services.length);
-          if (timerRef.current) window.clearInterval(timerRef.current);
-          setProgress(0);
-        } else {
-          setProgress(currentProgress);
-        }
-      }, 50);
-    };
-
-    startTimer();
+      if (currentProgress >= 100) {
+        setProgress(100);
+        setActiveIndex((prev) => (prev + 1) % services.length);
+      } else {
+        setProgress(currentProgress);
+      }
+    }, interval);
 
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
     };
   }, [activeIndex]);
 
+  // Handle the index transition with exit animation
   useEffect(() => {
-    if (!descriptionRef.current) return;
+    if (activeIndex === displayIndex) return;
 
-    gsap.fromTo(
-      descriptionRef.current,
-      { opacity: 0, x: 20 },
-      { opacity: 1, x: 0, duration: 0.8, ease: "power2.out" },
-    );
-  }, [activeIndex]);
+    const ctx = gsap.context(() => {
+      const words =
+        descriptionTextRef.current?.querySelectorAll(".description-word");
+      const titleWords = smallTitleRef.current?.querySelectorAll(".title-word");
+
+      const elementsToAnimate = [];
+      if (words) elementsToAnimate.push(...Array.from(words));
+      if (titleWords) elementsToAnimate.push(...Array.from(titleWords));
+
+      const tl = gsap.timeline({
+        onComplete: () => setDisplayIndex(activeIndex),
+      });
+
+      if (elementsToAnimate.length > 0) {
+        tl.to(elementsToAnimate, {
+          yPercent: 100,
+          opacity: 0,
+          duration: 0.4,
+          stagger: 0.005,
+          ease: "power2.in",
+        });
+      } else {
+        setDisplayIndex(activeIndex);
+      }
+    });
+
+    return () => ctx.revert();
+  }, [activeIndex, displayIndex]);
+
+  useLayoutEffect(() => {
+    if (
+      !descriptionTextRef.current ||
+      !smallTitleRef.current ||
+      !rightContentRef.current
+    )
+      return;
+
+    const ctx = gsap.context(() => {
+      // 1. Split small title
+      const titleSplit = new SplitType(smallTitleRef.current!, {
+        types: "words",
+        wordClass: "title-word",
+      });
+
+      // 2. Split description
+      const lineSplit = new SplitType(descriptionTextRef.current!, {
+        types: "lines",
+        lineClass: "description-line",
+      });
+
+      const wordSplit = new SplitType(lineSplit.lines!, {
+        types: "words",
+        wordClass: "description-word",
+      });
+
+      // Set initial states
+      gsap.set(lineSplit.lines, { overflow: "hidden", display: "block" });
+      gsap.set([titleSplit.words, wordSplit.words], {
+        yPercent: 100,
+        opacity: 0,
+        display: "inline-block",
+      });
+
+      // Animate in
+      const tl = gsap.timeline();
+      tl.to(titleSplit.words, {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.02,
+        ease: "power3.out",
+      }).to(
+        wordSplit.words,
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.01,
+          ease: "power3.out",
+        },
+        "-=0.4",
+      );
+
+      return () => {
+        titleSplit.revert();
+        wordSplit.revert();
+        lineSplit.revert();
+      };
+    }, rightContentRef);
+
+    return () => ctx.revert();
+  }, [displayIndex]);
 
   return (
     <section
@@ -228,12 +287,15 @@ const Services: React.FC = () => {
 
           {/* Right column */}
           <div className="flex flex-col items-start lg:pl-12">
-            <div ref={descriptionRef} className="w-full">
-              <h4 className="text-3xl mb-6 font-newroman">
-                {services[activeIndex].smallTitle}
+            <div key={displayIndex} ref={rightContentRef} className="w-full">
+              <h4 ref={smallTitleRef} className="text-3xl mb-6 font-newroman">
+                {services[displayIndex].smallTitle}
               </h4>
-              <p className="text-lg md:text-xl font-switzer font-light leading-relaxed text-left opacity-70">
-                {services[activeIndex].description}
+              <p
+                ref={descriptionTextRef}
+                className="text-lg md:text-xl font-switzer font-light leading-relaxed text-left opacity-70"
+              >
+                {services[displayIndex].description}
               </p>
             </div>
           </div>
