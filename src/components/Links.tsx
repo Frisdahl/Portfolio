@@ -92,11 +92,14 @@ const Links: React.FC<LinksProps> = ({
         const intro = introTimelineRefs.current[i];
         const outro = outroTimelineRefs.current[i];
 
+        // If outro is active, wait for it to complete before starting intro
         if (outro?.isActive()) {
-          outro.kill();
-        }
-
-        if (intro && !intro.isActive()) {
+          outro.eventCallback("onComplete", () => {
+            if (isPointerInsideRefs.current[i]) {
+              intro?.restart();
+            }
+          });
+        } else if (intro && !intro.isActive()) {
           intro.restart();
         }
       };
