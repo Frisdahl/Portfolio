@@ -44,7 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       };
 
       const setupHeaderTrigger = () => {
-        const contactSection = document.getElementById("contact");
+        const contactSection = document.getElementById("lets-work-together");
         if (!contactSection) return false;
 
         headerTrigger?.kill();

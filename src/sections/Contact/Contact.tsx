@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import AnimatedButton from "../../components/AnimatedButton";
-import ArrowIcon from "../../components/ArrowIcon";
 import ValueBtn from "../../components/valueBtn";
 import Marquee from "../../components/Marquee";
 
@@ -56,6 +55,27 @@ const Contact: React.FC = () => {
 
   useEffect(() => {
     if (!containerRef.current || !topPartRef.current) return;
+
+    // Scroll-driven border radius animation (smooth out as you scroll in)
+    gsap.to(topPartRef.current, {
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: "+=50%",
+        scrub: true,
+        onUpdate: (self) => {
+          const progress = self.progress;
+          const startRadius = 80;
+          const endRadius = 0;
+          const currentRadius =
+            startRadius - progress * (startRadius - endRadius);
+          if (topPartRef.current) {
+            topPartRef.current.style.borderTopLeftRadius = `${currentRadius}px`;
+            topPartRef.current.style.borderTopRightRadius = `${currentRadius}px`;
+          }
+        },
+      },
+    });
 
     // Use a single timeline for pinning and wiping
     const tl = gsap.timeline({
@@ -252,8 +272,13 @@ const Contact: React.FC = () => {
       {/* Top Part: White Form Section (Wipes away) */}
       <div
         ref={topPartRef}
-        className="absolute inset-0 z-[2] w-full h-full bg-[#ffffff] rounded-t-[40px] flex flex-col items-center justify-start pt-32 will-change-[clip-path]"
-        style={{ clipPath: "inset(0% 0% 0% 0%)" }}
+        id="lets-work-together"
+        className="absolute inset-0 z-[2] w-full h-full bg-[#ffffff] flex flex-col items-center justify-start pt-32 will-change-[clip-path]"
+        style={{
+          clipPath: "inset(0% 0% 0% 0%)",
+          borderTopLeftRadius: "80px",
+          borderTopRightRadius: "80px",
+        }}
       >
         <div className="w-full px-8 md:px-12 lg:px-24 flex flex-col items-start text-left">
           {/* Heading */}
