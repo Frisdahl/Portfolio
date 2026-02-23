@@ -197,6 +197,16 @@ const MobileMenuOverlay: FC<{
     await triggerPageTransition();
 
     if (targetSection) {
+      if (targetSection === "#contact") {
+        // Contact is on every page
+        scrollTo("#contact", 0);
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+          ScrollTrigger.update();
+        }, 50);
+        return;
+      }
+
       if (location.pathname !== "/") {
         navigate("/");
         // Small delay to let navigation happen then scroll

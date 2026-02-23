@@ -109,6 +109,7 @@ const Hero: React.FC = () => {
   return (
     <div
       ref={containerRef}
+      id="hero"
       className="hero-container relative w-full h-[200vh]"
     >
       <section

@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AnimatedButton from "../../components/AnimatedButton";
 import { initProjectReveal } from "./Projects.anim";
 import { gsap } from "gsap";
+import { triggerPageTransition } from "../../components/PageTransition";
 
 interface Project {
   id: number;
@@ -27,6 +29,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   index,
   aspectClassName = "aspect-square",
 }) => {
+  const navigate = useNavigate();
   const [isInView, setIsInView] = useState(false);
 
   const itemRef = useRef<HTMLDivElement>(null);
@@ -34,6 +37,12 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   const titleTextRef = useRef<HTMLHeadingElement>(null);
   const categoriesTextRef = useRef<HTMLParagraphElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
+
+  const handleProjectClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await triggerPageTransition();
+    navigate(`/projects/${project.id}`);
+  };
 
   const videoSrc = project.video?.startsWith("/")
     ? project.video
@@ -314,7 +323,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
                   hoverBorderColor="border-white"
                 />
               </a>
-              <a href={`/projects/${project.id}`}>
+              <a href={`/projects/${project.id}`} onClick={handleProjectClick}>
                 <AnimatedButton
                   text="See Project"
                   padding="px-5 py-2.5"

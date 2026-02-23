@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import AnimatedButton from "../../components/AnimatedButton";
 import ValueBtn from "../../components/valueBtn";
 import Marquee from "../../components/Marquee";
 import Links from "../../components/Links";
+import { triggerPageTransition } from "../../components/PageTransition";
+import { scrollTo } from "../../utils/smoothScroll";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,6 +34,8 @@ const SocialIcon = ({
 );
 
 const Contact: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const topPartRef = useRef<HTMLDivElement>(null);
@@ -91,7 +95,6 @@ const Contact: React.FC = () => {
     });
 
     // Wipe the top part upwards to reveal the bottom part underneath
-    // Adjusted to 55% to ensure it clears the footer text completely
     tl.to(topPartRef.current, {
       clipPath: "inset(0% 0% 55% 0%)",
       ease: "none",
@@ -167,15 +170,53 @@ const Contact: React.FC = () => {
     }
   };
 
+  const handleFooterLinkClick = async (e: React.MouseEvent, to: string, targetSection?: string) => {
+    e.preventDefault();
+    
+    // Start transition
+    await triggerPageTransition();
+
+    if (targetSection) {
+      if (targetSection === "#contact") {
+        // Special case: Contact is on every page, so no need to navigate to "/"
+        scrollTo("#contact", 0);
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+          ScrollTrigger.update();
+        }, 50);
+        return;
+      }
+
+      // Other sections like #projects or #hero only exist on the home page
+      if (location.pathname !== "/") {
+        navigate("/");
+        // Wait for navigation and then scroll
+        setTimeout(() => {
+          scrollTo(targetSection, 0);
+          setTimeout(() => {
+            ScrollTrigger.refresh();
+            ScrollTrigger.update();
+          }, 50);
+        }, 150);
+      } else {
+        scrollTo(targetSection, 0);
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+          ScrollTrigger.update();
+        }, 50);
+      }
+    } else {
+      navigate(to);
+    }
+  };
+
   return (
     <div
       ref={containerRef}
       id="contact"
       className="relative w-full h-[100vh] overflow-hidden bg-[#0a0a0a]"
     >
-      {/* Bottom Part: Video/Footer Section (Revealed behind) */}
       <div className="absolute inset-0 z-[1] w-full h-full flex flex-col justify-end">
-        {/* Video Background */}
         <div className="absolute inset-0 z-[1] pointer-events-none">
           <video
             ref={videoRef}
@@ -199,7 +240,6 @@ const Contact: React.FC = () => {
 
         <div className="absolute inset-0 z-[2] bg-black/60 pointer-events-none" />
 
-        {/* Info Area (Bottom content) */}
         <div className="relative z-[10] w-full min-h-[40vh] flex flex-col justify-end">
           <div className="w-full px-8 md:px-12 lg:px-24 py-8 md:py-12 lg:py-16 flex flex-col md:flex-row justify-between items-start gap-8 text-[#e4e3de]">
             <div className="flex flex-col items-start text-left">
@@ -223,9 +263,9 @@ const Contact: React.FC = () => {
                 </p>
                 <Links
                   links={[
-                    { label: "Works", href: "/" },
-                    { label: "About", href: "/about" },
-                    { label: "Contact", href: "#contact" },
+                    { label: "Works", href: "/", onClick: (e) => handleFooterLinkClick(e, "/", "#projects") },
+                    { label: "About", href: "/about", onClick: (e) => handleFooterLinkClick(e, "/about") },
+                    { label: "Contact", href: "#contact", onClick: (e) => handleFooterLinkClick(e, "", "#contact") },
                   ]}
                   className="flex flex-col space-y-3"
                   textColor="text-[#e4e3de]"
@@ -268,7 +308,6 @@ const Contact: React.FC = () => {
         </div>
       </div>
 
-      {/* Top Part: White Form Section (Wipes away) */}
       <div
         ref={topPartRef}
         id="lets-work-together"
@@ -280,14 +319,11 @@ const Contact: React.FC = () => {
         }}
       >
         <div className="w-full px-8 md:px-12 lg:px-24 flex flex-col items-start text-left">
-          {/* Heading */}
           <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-newroman tracking-wide text-[#0a0a0a] leading-[1] mb-16">
             Let’s work <br></br>together
           </h2>
 
-          {/* Form - Now under heading, full width */}
           <form onSubmit={handleSubmit} className="w-full space-y-12">
-            {/* Row 1: Name & Email */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="w-full">
                 <input
@@ -317,7 +353,6 @@ const Contact: React.FC = () => {
               </div>
             </div>
 
-            {/* Row 2: Company & Phone */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="w-full">
                 <input
@@ -341,7 +376,6 @@ const Contact: React.FC = () => {
               </div>
             </div>
 
-            {/* Row 3: Inquiry */}
             <div className="w-full">
               <input
                 type="text"
@@ -356,7 +390,6 @@ const Contact: React.FC = () => {
               )}
             </div>
 
-            {/* Final Row: Budget (Left) and Send (Right) */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 pt-4">
               <div className="flex flex-col items-start">
                 <p className="text-[#0a0a0a] mb-6 text-sm font-medium uppercase tracking-[0.2em] opacity-40">

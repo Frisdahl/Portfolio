@@ -70,21 +70,21 @@ const PageTransition = () => {
         },
         ease: "power2.inOut",
         force3D: true,
+        onComplete: () => {
+          // Resolve as soon as the screen is covered!
+          resolve();
+        },
       });
 
       // 2. Logo and text appear (WHITE)
       tl.to(
         [logoRef.current, textRef.current],
         {
-          opacity: 1,
+          opacity: 0.4,
           y: 0,
           duration: 0.8,
           ease: "power3.out",
           stagger: 0.1,
-          onComplete: () => {
-            // Screen is fully covered, resolve for caller
-            resolve();
-          },
         },
         "-=0.2",
       );
@@ -118,7 +118,7 @@ const PageTransition = () => {
   useEffect(() => {
     transitionTrigger = animate;
 
-    // Auto-trigger on mount
+    // Auto-trigger on initial load/mount
     animate();
 
     return () => {
@@ -142,8 +142,8 @@ const PageTransition = () => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[99999] pointer-events-none"
-      style={{ display: "none", visibility: "hidden" }}
+      className="fixed inset-0 z-[99999] pointer-events-none invisible"
+      style={{ display: "none" }}
     >
       {/* Background Columns - DARK BACKGROUND */}
       <div className="absolute inset-0 flex w-full h-full z-0 overflow-hidden">
@@ -169,16 +169,20 @@ const PageTransition = () => {
             ref={logoRef}
             src="/images/Portfolio-logo.svg"
             alt="Frisdahl Studio Logo"
-            className="h-20 md:h-28 mb-8 opacity-[40%]"
+            className="h-16 md:h-20 mb-8"
             style={{
               willChange: "opacity, transform",
               filter: "brightness(0) invert(1)", // Force logo white
+              opacity: 0,
             }}
           />
           <h1
             ref={textRef}
-            className="text-4xl md:text-3xl text-[#fff] uppercase opacity-0 text-center opacity-[40%]"
-            style={{ willChange: "opacity, transform" }}
+            className=" text-3xl md:text-5xl text-[#fff] uppercase text-center"
+            style={{
+              willChange: "opacity, transform",
+              opacity: 0,
+            }}
           >
             Frisdahl studio°
           </h1>
