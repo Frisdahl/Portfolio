@@ -26,6 +26,7 @@ interface ProjectItemProps {
 const ProjectItem: React.FC<ProjectItemProps> = ({
   project,
   fillHeight = false,
+  aspectClassName = "aspect-square"
 }) => {
   const navigate = useNavigate();
   const [isInView, setIsInView] = useState(false);
@@ -38,6 +39,16 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   const handleProjectClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    if (project.link && project.link !== "#" && project.link !== "") {
+      if (project.link.startsWith("http")) {
+        window.open(project.link, "_blank", "noopener,noreferrer");
+      } else {
+        navigate(project.link);
+      }
+      return;
+    }
+    
     showComingSoon();
   };
 
@@ -126,18 +137,20 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className={`relative w-full overflow-hidden rounded-2xl bg-neutral-900 ${fillHeight ? "h-full" : "aspect-square"}`}>
+      <div className={`relative w-full overflow-hidden rounded-2xl bg-neutral-900 ${fillHeight ? "h-full" : aspectClassName}`}>
         {project.video ? (
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-            src={videoSrc}
             muted
             playsInline
             loop={true}
             autoPlay
             preload="metadata"
-          />
+          >
+            <source src={videoSrc} type="video/mp4" />
+            <source src={videoSrc.replace(".mp4", ".webm")} type="video/webm" />
+          </video>
         ) : (
           <img
             src={project.image}
