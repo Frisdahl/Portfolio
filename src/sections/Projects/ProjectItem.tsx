@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { initProjectReveal } from "./Projects.anim";
 import { gsap } from "gsap";
 import { triggerPageTransition } from "../../components/PageTransition";
 import { showComingSoon } from "../../components/ComingSoon";
@@ -83,12 +82,11 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   useLayoutEffect(() => {
     if (!itemRef.current) return;
-    const ctx = initProjectReveal(itemRef.current);
     
     gsap.set(contentOverlayRef.current, { opacity: 0 });
     gsap.set([titleContainerRef.current, descContainerRef.current], { y: 30, opacity: 0 });
 
-    return () => ctx.revert();
+    return () => {};
   }, []);
 
   const handleMouseEnter = () => {
