@@ -65,11 +65,11 @@ const VideoShowcase: React.FC = () => {
         <div className="relative w-full flex items-center justify-center">
           <div
             ref={videoWrapperRef}
-            className="relative w-[50vw] aspect-video overflow-hidden rounded-3xl z-10 bg-neutral-900"
+            className="relative w-[65vw] max-w-[1440px] max-h-[85vh] aspect-[1440/810] overflow-hidden rounded-3xl z-10 bg-neutral-900 shadow-2xl"
           >
             <video
               ref={videoRef}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
               autoPlay
               muted
               loop
