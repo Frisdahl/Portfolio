@@ -19,7 +19,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <PageTransition />
+      {/* <PageTransition /> */}
       <ComingSoon />
       <Layout>
         <Suspense fallback={null}>

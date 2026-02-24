@@ -5,6 +5,7 @@ import Services from "../sections/Services/Services";
 import Expectations from "../sections/Expectations/Expectations";
 import Collaboration from "../sections/Collaboration/Collaboration";
 import VideoShowcase from "../sections/VideoShowcase/VideoShowcase";
+import FeaturedIntro from "../sections/FeaturedIntro/FeaturedIntro";
 
 function HomePage() {
   return (
@@ -12,6 +13,7 @@ function HomePage() {
       <Hero />
       <VideoShowcase />
       <Services />
+      <FeaturedIntro />
       <Projects />
       {/* <Expectations />
       <Collaboration /> */}
