@@ -82,7 +82,7 @@ export const initVideoShowcaseAnimations = (
       .to(
         videoWrapper,
         {
-          width: "60%",
+          width: "55%",
           xPercent: -38,
           yPercent: 15,
           borderRadius: "1.5rem",
@@ -101,7 +101,7 @@ export const initVideoShowcaseAnimations = (
           yPercent: -45,
           xPercent: 0,
           right: "5%", // Refined margin from edge
-          width: "30%", // Narrower text column to prevent video overlap
+          width: "35%", // Narrower text column to prevent video overlap
           opacity: 1,
         },
         "-=0.4",
