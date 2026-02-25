@@ -28,10 +28,10 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   aspectClassName = "aspect-square",
 }) => {
   const navigate = useNavigate();
-  const [isInView, setIsInView] = useState(false);
 
   const itemRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const videoOverlayRef = useRef<HTMLDivElement>(null); // New ref for the dark video overlay
   const contentOverlayRef = useRef<HTMLDivElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const descContainerRef = useRef<HTMLDivElement>(null);
@@ -55,31 +55,6 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     ? project.video
     : `/${project.video}`;
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setIsInView(entry.isIntersecting);
-        });
-      },
-      { threshold: 0.1 },
-    );
-
-    observer.observe(video);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (videoRef.current && isInView) {
-      videoRef.current.play().catch(() => undefined);
-    } else if (videoRef.current && !isInView) {
-      videoRef.current.pause();
-    }
-  }, [isInView]);
-
   useLayoutEffect(() => {
     if (!itemRef.current) return;
 
@@ -93,41 +68,71 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   }, []);
 
   const handleMouseEnter = () => {
-    if (!contentOverlayRef.current) return;
+    // Play video
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => undefined);
+    }
 
-    gsap.to(contentOverlayRef.current, {
-      opacity: 1,
-      duration: 0.4,
-      ease: "power2.out",
-    });
+    // Fade out dark video overlay
+    if (videoOverlayRef.current) {
+      gsap.to(videoOverlayRef.current, {
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.inOut",
+      });
+    }
 
-    gsap.to([titleContainerRef.current, descContainerRef.current], {
-      y: 0,
-      opacity: 1,
-      duration: 0.7,
-      stagger: 0.08,
-      ease: "power4.out",
-      delay: 0.05,
-    });
+    // Show content capsules
+    if (contentOverlayRef.current) {
+      gsap.to(contentOverlayRef.current, {
+        opacity: 1,
+        duration: 0.4,
+        ease: "power2.out",
+      });
+
+      gsap.to([titleContainerRef.current, descContainerRef.current], {
+        y: 0,
+        opacity: 1,
+        duration: 0.7,
+        stagger: 0.08,
+        ease: "power4.out",
+        delay: 0.05,
+      });
+    }
   };
 
   const handleMouseLeave = () => {
-    if (!contentOverlayRef.current) return;
+    // Pause video
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
 
-    gsap.to([descContainerRef.current, titleContainerRef.current], {
-      y: 15,
-      opacity: 0,
-      duration: 0.4,
-      stagger: 0.05,
-      ease: "power2.in",
-    });
+    // Fade in dark video overlay
+    if (videoOverlayRef.current) {
+      gsap.to(videoOverlayRef.current, {
+        opacity: 1,
+        duration: 0.6,
+        ease: "power2.inOut",
+      });
+    }
 
-    gsap.to(contentOverlayRef.current, {
-      opacity: 0,
-      duration: 0.4,
-      ease: "power2.in",
-      delay: 0.2,
-    });
+    // Hide content capsules
+    if (contentOverlayRef.current) {
+      gsap.to([descContainerRef.current, titleContainerRef.current], {
+        y: 15,
+        opacity: 0,
+        duration: 0.4,
+        stagger: 0.05,
+        ease: "power2.in",
+      });
+
+      gsap.to(contentOverlayRef.current, {
+        opacity: 0,
+        duration: 0.4,
+        ease: "power2.in",
+        delay: 0.2,
+      });
+    }
   };
 
   return (
@@ -142,31 +147,41 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         className={`relative w-full overflow-hidden rounded-2xl bg-neutral-900 ${fillHeight ? "h-full" : aspectClassName}`}
       >
         {project.video ? (
-          <video
-            ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-            muted
-            playsInline
-            loop={true}
-            autoPlay
-            preload="metadata"
-          >
-            <source src={videoSrc} type="video/mp4" />
-            <source src={videoSrc.replace(".mp4", ".webm")} type="video/webm" />
-          </video>
+          <>
+            <video
+              ref={videoRef}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              muted
+              playsInline
+              loop={true}
+              preload="metadata"
+            >
+              <source src={videoSrc} type="video/mp4" />
+              <source src={videoSrc.replace(".mp4", ".webm")} type="video/webm" />
+            </video>
+            {/* Dark Video Overlay */}
+            <div 
+              ref={videoOverlayRef}
+              className="absolute inset-0 bg-black/60 z-10 pointer-events-none transition-transform duration-1000 group-hover:scale-105"
+            />
+          </>
         ) : (
-          <img
-            src={project.image}
-            alt={project.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-            loading="lazy"
-          />
+          <>
+            <img
+              src={project.image}
+              alt={project.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              loading="lazy"
+            />
+            {/* Dark Image Overlay */}
+            <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none transition-opacity duration-700 group-hover:opacity-0" />
+          </>
         )}
 
         {/* Dual Capsule Overlay */}
         <div
           ref={contentOverlayRef}
-          className="absolute inset-0 bg-black/10 flex items-end justify-start p-6 md:p-8 z-20 pointer-events-none"
+          className="absolute inset-0 flex items-end justify-start p-6 md:p-8 z-20 pointer-events-none"
         >
           <div className="flex flex-wrap items-center gap-3 w-full">
             {/* Title Capsule - Dark Glass */}

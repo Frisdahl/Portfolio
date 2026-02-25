@@ -147,7 +147,7 @@ const BrandsMarquee: React.FC = () => {
   return (
     <section
       ref={containerRef}
-      className="relative py-32 md:py-48 w-full overflow-hidden bg-[#0a0a0a]"
+      className="relative w-full mb-48 overflow-hidden bg-[#0a0a0a]"
       style={{ "--tileSkew": "-12deg" } as React.CSSProperties}
     >
       {/* Visual Polish */}
@@ -160,11 +160,8 @@ const BrandsMarquee: React.FC = () => {
       />
 
       <div className="flex flex-col md:flex-row  px-8 md:px-16 lg:px-24 items-start md:items-end justify-between gap-8 mb-8 overflow-hidden">
-        <div className="max-w-md overflow-hidden">
-          <h2
-            ref={headerRef}
-            className="project-header-text text-2xl md:text-3xl lg:text-5xl text-left font-newroman text-white leading-tight"
-          >
+        <div className="max-w-2xl overflow-hidden">
+          <h2 ref={headerRef} className="project-header-text text-2xl md:text-3xl lg:text-5xl text-left font-newroman text-white leading-tight">
             Brands & creative teams <br className="hidden md:block" />
             I’ve collaborated with
           </h2>
@@ -181,25 +178,39 @@ const BrandsMarquee: React.FC = () => {
       </div>
 
       <div className="relative z-10 flex whitespace-nowrap">
-        <div ref={marqueeRef} className="flex gap-4 md:gap-6">
+        <div ref={marqueeRef} className="flex gap-4 md:gap-6 py-12">
           {duplicatedBrands.map((brand, idx) => (
             <a
               key={`${brand.name}-${idx}`}
               href={brand.href || "#"}
-              className="group relative flex-shrink-0 w-56 h-48 md:w-72 md:h-62 bg-[#F4F3EF] rounded-md flex items-center justify-center transition-transform duration-500 hover:scale-[1.03]"
+              className="group relative flex-shrink-0 w-56 h-48 md:w-72 md:h-62 rounded-2xl flex items-center justify-center transition-all duration-500 hover:scale-[1.04] backdrop-blur-3xl saturate-[1.8] shadow-[0_25px_80px_-15px_rgba(0,0,0,0.7)]"
               style={{
                 transform: `skewX(var(--tileSkew)) translateZ(0)`,
                 willChange: "transform",
+                border: "1px solid rgba(255,255,255,0.06)",
+                background: "linear-gradient(140deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01) 40%, rgba(0,0,0,0.1))"
               }}
             >
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 tile-sheen" />
+              {/* Internal Glass Depth Layer */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent opacity-50 rounded-2xl pointer-events-none" />
+              
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 tile-sheen rounded-2xl" />
+              
               <div
-                className="flex flex-col items-center justify-center transition-all duration-500 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100"
-                style={{ transform: `skewX(calc(var(--tileSkew) * -1))` }}
+                className="relative z-10 flex flex-col items-center justify-center transition-all duration-500 grayscale group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                style={{ 
+                  transform: `skewX(calc(var(--tileSkew) * -1))`,
+                  opacity: 0.7,
+                  filter: "contrast(0.95)"
+                }}
               >
-                <span className="text-2xl md:text-4xl font-switzer font-bold text-[#9A9A9A] group-hover:text-[#111] tracking-tighter transition-colors">
-                  {brand.name}
-                </span>
+                {brand.logo ? (
+                  <img src={brand.logo} alt={brand.name} className="w-24 md:w-40 h-auto object-contain" />
+                ) : (
+                  <span className="text-2xl md:text-4xl font-switzer font-bold text-white/80 group-hover:text-white tracking-tighter drop-shadow-md">
+                    {brand.name}
+                  </span>
+                )}
               </div>
             </a>
           ))}
@@ -210,7 +221,13 @@ const BrandsMarquee: React.FC = () => {
         dangerouslySetInnerHTML={{
           __html: `
         .tile-sheen {
-          background: linear-gradient(25deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
+          background: linear-gradient(
+            25deg,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.10) 45%,
+            rgba(255,255,255,0) 100%
+          );
+          mix-blend-mode: screen;
         }
       `,
         }}

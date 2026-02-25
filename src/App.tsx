@@ -20,7 +20,7 @@ function App() {
     <Router>
       <div className="noise-grain" />
       <ScrollToTop />
-      {/* <PageTransition /> */}
+      <PageTransition />
       <ComingSoon />
       <Layout>
         <Suspense fallback={null}>
