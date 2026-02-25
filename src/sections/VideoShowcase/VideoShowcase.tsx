@@ -63,12 +63,11 @@ const VideoShowcase: React.FC = () => {
     >
       <div className="w-full max-w-[1920px] mx-auto px-6 md:px-12 lg:px-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-12 lg:gap-20">
-          
           {/* Video Column */}
           <div className="lg:col-span-7 flex justify-center lg:justify-start">
             <div
               ref={videoWrapperRef}
-              className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl md:rounded-3xl z-10 bg-neutral-900 shadow-2xl"
+              className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl z-10 bg-neutral-900"
             >
               <video
                 ref={videoRef}
@@ -114,7 +113,6 @@ const VideoShowcase: React.FC = () => {
               ( Creative Direction & Web Development )
             </p>
           </div>
-          
         </div>
       </div>
     </section>

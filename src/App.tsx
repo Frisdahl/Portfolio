@@ -18,6 +18,7 @@ function App() {
 
   return (
     <Router>
+      <div className="noise-grain" />
       <ScrollToTop />
       {/* <PageTransition /> */}
       <ComingSoon />

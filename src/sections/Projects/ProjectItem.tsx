@@ -25,7 +25,7 @@ interface ProjectItemProps {
 const ProjectItem: React.FC<ProjectItemProps> = ({
   project,
   fillHeight = false,
-  aspectClassName = "aspect-square"
+  aspectClassName = "aspect-square",
 }) => {
   const navigate = useNavigate();
   const [isInView, setIsInView] = useState(false);
@@ -38,7 +38,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   const handleProjectClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     if (project.link && project.link !== "#" && project.link !== "") {
       if (project.link.startsWith("http")) {
         window.open(project.link, "_blank", "noopener,noreferrer");
@@ -47,7 +47,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       }
       return;
     }
-    
+
     showComingSoon();
   };
 
@@ -82,29 +82,32 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   useLayoutEffect(() => {
     if (!itemRef.current) return;
-    
+
     gsap.set(contentOverlayRef.current, { opacity: 0 });
-    gsap.set([titleContainerRef.current, descContainerRef.current], { y: 30, opacity: 0 });
+    gsap.set([titleContainerRef.current, descContainerRef.current], {
+      y: 30,
+      opacity: 0,
+    });
 
     return () => {};
   }, []);
 
   const handleMouseEnter = () => {
     if (!contentOverlayRef.current) return;
-    
+
     gsap.to(contentOverlayRef.current, {
       opacity: 1,
       duration: 0.4,
-      ease: "power2.out"
+      ease: "power2.out",
     });
-    
+
     gsap.to([titleContainerRef.current, descContainerRef.current], {
       y: 0,
       opacity: 1,
       duration: 0.7,
       stagger: 0.08,
       ease: "power4.out",
-      delay: 0.05
+      delay: 0.05,
     });
   };
 
@@ -116,26 +119,28 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       opacity: 0,
       duration: 0.4,
       stagger: 0.05,
-      ease: "power2.in"
+      ease: "power2.in",
     });
 
     gsap.to(contentOverlayRef.current, {
       opacity: 0,
       duration: 0.4,
       ease: "power2.in",
-      delay: 0.2
+      delay: 0.2,
     });
   };
 
   return (
-    <div 
-      ref={itemRef} 
+    <div
+      ref={itemRef}
       className={`w-full cursor-pointer group ${fillHeight ? "h-full flex flex-col" : ""}`}
       onClick={handleProjectClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className={`relative w-full overflow-hidden rounded-2xl bg-neutral-900 ${fillHeight ? "h-full" : aspectClassName}`}>
+      <div
+        className={`relative w-full overflow-hidden rounded-2xl bg-neutral-900 ${fillHeight ? "h-full" : aspectClassName}`}
+      >
         {project.video ? (
           <video
             ref={videoRef}
@@ -165,7 +170,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         >
           <div className="flex flex-wrap items-center gap-3 w-full">
             {/* Title Capsule - Dark Glass */}
-            <div 
+            <div
               ref={titleContainerRef}
               className="backdrop-blur-md bg-black/50 border border-white/10 px-5 py-3 rounded-full flex items-center gap-3 shadow-2xl"
             >
@@ -176,7 +181,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             </div>
 
             {/* Description Capsule - White Glass */}
-            <div 
+            <div
               ref={descContainerRef}
               className="backdrop-blur-md bg-white/20 border border-white/30 px-5 py-3 rounded-full shadow-2xl"
             >

@@ -5,6 +5,7 @@ import Services from "../sections/Services/Services";
 import Expectations from "../sections/Expectations/Expectations";
 import Collaboration from "../sections/Collaboration/Collaboration";
 import VideoShowcase from "../sections/VideoShowcase/VideoShowcase";
+import BrandsMarquee from "../sections/Collaboration/BrandsMarquee";
 
 function HomePage() {
   return (
@@ -13,6 +14,7 @@ function HomePage() {
       <VideoShowcase />
       <Services />
       <Projects />
+      <BrandsMarquee />
       {/* <Expectations />
       <Collaboration /> */}
     </div>
