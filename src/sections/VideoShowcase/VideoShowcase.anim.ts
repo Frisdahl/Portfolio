@@ -56,92 +56,105 @@ export const initVideoShowcaseAnimations = (
       },
     );
 
-    // 2. Create the master timeline with a more generous scroll distance to slow things down
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: container,
-        start: "top top",
-        end: "+=160%", // Increased from 130% to slow down the overall rate of change
-        pin: true,
-        scrub: 1,
-        onRefresh: (self) => {
-          if (self.pin) self.pin.style.zIndex = "10";
-        },
+    const mm = gsap.matchMedia();
+
+    mm.add(
+      {
+        isDesktop: "(min-width: 1024px)",
+        isMobile: "(max-width: 1023px)",
       },
-    });
+      (context) => {
+        const { isDesktop } = context.conditions!;
 
-    // Phase 1: Video expands to full-screen
-    tl.to(videoWrapper, {
-      width: "100%",
-      borderRadius: "1.5rem",
-      duration: 1.2,
-      ease: "expo.inOut",
-      force3D: true,
-    })
-      // Phase 2: Video scales down and moves - Slower and more deliberate
-      .to(
-        videoWrapper,
-        {
-          width: "55%",
-          xPercent: -38,
-          yPercent: 15,
-          borderRadius: "1.5rem",
-          duration: 2.5, // Increased from 1.5 to take up more of the scroll "time"
-          ease: "expo.inOut",
-          force3D: true,
-        },
-        "-=0.2",
-      )
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: container,
+            start: "top top",
+            end: "+=150%", // Slightly reduced scroll for more responsive feel
+            pin: true,
+            scrub: 1.2,
+          },
+        });
 
-      // Phase 3: Text reveal with tighter width to avoid overlap
-      .set(
-        textContainer,
-        {
-          visibility: "visible",
-          yPercent: -45,
-          xPercent: 0,
-          right: "5%", // Refined margin from edge
-          width: "35%", // Narrower text column to prevent video overlap
-          opacity: 1,
-        },
-        "-=0.4",
-      )
+        if (isDesktop) {
+          // Desktop Sequence: Full Screen -> Grid Split
+          tl.fromTo(
+            videoWrapper,
+            { 
+              width: "100vw", 
+              height: "100vh", 
+              xPercent: -15, // Centering logic for full screen 
+              borderRadius: "0rem" 
+            },
+            {
+              width: "100%", // Returns to Grid Column width
+              height: "auto",
+              xPercent: 0,
+              borderRadius: "1.5rem",
+              duration: 2,
+              ease: "expo.inOut",
+            }
+          ).set(
+            textContainer,
+            {
+              visibility: "visible",
+              opacity: 1,
+            },
+            "-=0.5"
+          );
+        } else {
+          // Mobile Sequence: Subtle scaling into text
+          tl.from(videoWrapper, {
+            scale: 1.2,
+            borderRadius: "0rem",
+            duration: 1.5,
+            ease: "expo.out",
+          }).set(
+            textContainer,
+            {
+              visibility: "visible",
+              opacity: 1,
+            },
+            "-=0.5"
+          );
+        }
 
-      .to(
-        splitHeadingWords.words!,
-        {
-          yPercent: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.04,
-          ease: "power3.out",
-        },
-        "-=0.2",
-      )
-      .to(
-        splitLongTextWords.words!,
-        {
-          yPercent: 0,
-          opacity: 0.8,
-          duration: 0.8,
-          stagger: 0.015,
-          ease: "power3.out",
-        },
-        "-=0.6",
-      )
-      .to(
-        splitSmallTextWords.words!,
-        {
-          yPercent: 0,
-          opacity: 0.6,
-          duration: 0.8,
-          stagger: 0.015,
-          ease: "power3.out",
-        },
-        "-=0.6",
-      )
-      // Final hold
-      .to({}, { duration: 0.4 });
+        // Shared text stagger animation
+        tl.to(
+          splitHeadingWords.words!,
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.05,
+            ease: "power4.out",
+          },
+          "-=0.8"
+        )
+          .to(
+            splitLongTextWords.words!,
+            {
+              yPercent: 0,
+              opacity: 0.8,
+              duration: 1,
+              stagger: 0.02,
+              ease: "power4.out",
+            },
+            "-=0.9"
+          )
+          .to(
+            splitSmallTextWords.words!,
+            {
+              yPercent: 0,
+              opacity: 0.6,
+              duration: 1,
+              stagger: 0.02,
+              ease: "power4.out",
+            },
+            "-=0.9"
+          );
+      }
+    );
 
     ScrollTrigger.refresh();
   }, container);

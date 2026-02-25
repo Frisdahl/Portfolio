@@ -18,6 +18,28 @@ export const initGridAnimations = (container: HTMLElement) => {
   const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   
   const ctx = gsap.context(() => {
+    // 1. Header Entrance Animation
+    const headerText = container.querySelector(".project-header-text") as HTMLElement;
+    const subText = container.querySelector(".project-header-subtext") as HTMLElement;
+
+    if (headerText && subText) {
+      const splitHeader = new SplitType(headerText, { types: "lines" });
+      const splitSub = new SplitType(subText, { types: "lines" });
+
+      gsap.from([splitHeader.lines, splitSub.lines], {
+        yPercent: 100,
+        opacity: 0,
+        duration: 1.2,
+        stagger: 0.1,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: headerText,
+          start: "top 85%",
+          once: true,
+        },
+      });
+    }
+
     const rows = container.querySelectorAll(".project-row");
 
     rows.forEach((row) => {

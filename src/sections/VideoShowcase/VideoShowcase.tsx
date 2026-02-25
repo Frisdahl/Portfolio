@@ -59,55 +59,62 @@ const VideoShowcase: React.FC = () => {
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-screen bg-transparent mb-64"
+      className="relative w-full h-[100dvh] bg-transparent mb-32 md:mb-64 flex items-center overflow-hidden"
     >
-      <div className="h-full w-full flex items-center justify-center px-8 md:px-12 lg:px-24">
-        <div className="relative w-full flex items-center justify-center">
-          <div
-            ref={videoWrapperRef}
-            className="relative w-[65vw] max-w-[1440px] max-h-[85vh] aspect-[1440/810] overflow-hidden rounded-3xl z-10 bg-neutral-900 shadow-2xl"
-          >
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover object-center"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              src="/projectVideos/videoshowcase/promo_h264.mp4"
-            />
+      <div className="w-full max-w-[1920px] mx-auto px-6 md:px-12 lg:px-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-12 lg:gap-20">
+          
+          {/* Video Column */}
+          <div className="lg:col-span-7 flex justify-center lg:justify-start">
+            <div
+              ref={videoWrapperRef}
+              className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl md:rounded-3xl z-10 bg-neutral-900 shadow-2xl"
+            >
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                src="/projectVideos/videoshowcase/promo_h264.mp4"
+              />
+            </div>
           </div>
 
+          {/* Text Column */}
           <div
             ref={textContainerRef}
-            className="absolute right-0 text-left pointer-events-none pr-12 flex flex-col gap-8"
+            className="lg:col-span-5 flex flex-col gap-6 md:gap-10 text-center lg:text-left"
             style={{ visibility: "hidden" }}
           >
-            <h2
-              ref={headingRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-newroman text-[#fff] tracking-[.65px] leading-[1]"
-            >
-              <span className="font-newroman">I design</span> and
-              <br />
-              build websites
-            </h2>
-
-            <p
-              ref={longTextRef}
-              className="font-switzer text-xl md:text-2xl tracking-tight text-[var(--foreground)] w-full"
-            >
-              Focused on creating digital experiences that bridge the gap
-              between visual aesthetics and technical excellence.
-            </p>
+            <div className="flex flex-col gap-4 md:gap-6">
+              <h2
+                ref={headingRef}
+                className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-newroman text-white tracking-tight leading-[0.9]"
+              >
+                I design and
+                <br />
+                build websites
+              </h2>
+              <p
+                ref={longTextRef}
+                className="font-switzer text-lg md:text-xl lg:text-2xl tracking-tight text-[var(--foreground)] max-w-xl mx-auto lg:mx-0 opacity-80"
+              >
+                Focused on creating digital experiences that bridge the gap
+                between visual aesthetics and technical excellence.
+              </p>
+            </div>
 
             <p
               ref={smallTextRef}
-              className="font-switzer text-sm uppercase tracking-[0.2em] text-[var(--foreground-muted)]"
+              className="font-switzer text-xs md:text-sm uppercase tracking-[0.3em] text-[var(--foreground-muted)]"
             >
               ( Creative Direction & Web Development )
             </p>
           </div>
+          
         </div>
       </div>
     </section>
