@@ -44,9 +44,16 @@ const PageTransition = () => {
 
       // 1. Prepare DOM synchronously before timeline
       if (containerRef.current) {
-        gsap.set(containerRef.current, { autoAlpha: 1, display: "block" });
+        gsap.set(containerRef.current, {
+          autoAlpha: 1,
+          display: "block",
+          pointerEvents: "all", // Enable to block clicks behind it
+        });
         containerRef.current.offsetHeight; // Force reflow
       }
+
+      // Disable scrolling
+      document.body.style.overflow = "hidden";
 
       // Synchronously split and hide characters to prevent flash
       let split: SplitType | null = null;
@@ -66,8 +73,14 @@ const PageTransition = () => {
             isAnimatingRef.current = false;
             if (split) split.revert();
             if (containerRef.current) {
-              gsap.set(containerRef.current, { autoAlpha: 0, display: "none" });
+              gsap.set(containerRef.current, {
+                autoAlpha: 0,
+                display: "none",
+                pointerEvents: "none", // Reset for future use
+              });
             }
+            // Re-enable scrolling
+            document.body.style.overflow = "";
           },
         });
 

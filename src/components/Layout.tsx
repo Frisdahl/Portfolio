@@ -51,7 +51,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         headerTrigger = ScrollTrigger.create({
           trigger: contactSection,
-          start: "top top",
+          start: "top 5px", // Slightly offset from very top to handle sub-pixel jump issues
           end: "bottom top",
           onEnter: () => setIsHeaderDark(true),
           onEnterBack: () => setIsHeaderDark(true),

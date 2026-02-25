@@ -22,11 +22,11 @@ interface Brand {
 }
 
 const brands: Brand[] = [
-  { name: "Nike" },
-  { name: "Apple" },
-  { name: "Stripe" },
-  { name: "Airbnb" },
-  { name: "Figma" },
+  { name: "DemensAi" },
+  { name: "Fonden for Entreprenørskab" },
+  { name: "CryoByBreum" },
+  { name: "Fjong Studio" },
+  { name: "Anette" },
   { name: "Vercel" },
   { name: "Tesla" },
   { name: "Netflix" },
@@ -159,9 +159,12 @@ const BrandsMarquee: React.FC = () => {
         }}
       />
 
-      <div className="flex flex-col md:flex-row  px-8 md:px-16 lg:px-24 items-start md:items-end justify-between gap-8 mb-8 overflow-hidden">
+      <div className="flex flex-col md:flex-row  px-8 md:px-16 lg:px-24 items-start md:items-end justify-between gap-8 overflow-hidden">
         <div className="max-w-2xl overflow-hidden">
-          <h2 ref={headerRef} className="project-header-text text-2xl md:text-3xl lg:text-5xl text-left font-newroman text-white leading-tight">
+          <h2
+            ref={headerRef}
+            className="project-header-text text-2xl md:text-3xl lg:text-5xl text-left font-newroman text-white leading-tight"
+          >
             Brands & creative teams <br className="hidden md:block" />
             I’ve collaborated with
           </h2>
@@ -177,37 +180,33 @@ const BrandsMarquee: React.FC = () => {
         </div>
       </div>
 
-      <div className="relative z-10 flex whitespace-nowrap">
-        <div ref={marqueeRef} className="flex gap-4 md:gap-6 py-12">
+      <div className="relative z-10 flex whitespace-nowrap py-8">
+        <div ref={marqueeRef} className="flex gap-4 md:gap-6">
           {duplicatedBrands.map((brand, idx) => (
             <a
               key={`${brand.name}-${idx}`}
               href={brand.href || "#"}
-              className="group relative flex-shrink-0 w-56 h-48 md:w-72 md:h-62 rounded-2xl flex items-center justify-center transition-all duration-500 hover:scale-[1.04] backdrop-blur-3xl saturate-[1.8] shadow-[0_25px_80px_-15px_rgba(0,0,0,0.7)]"
+              className="group relative flex-shrink-0 w-56 h-48 md:w-72 md:h-62 border rounded-xl border-white/10 flex items-center justify-center transition-all duration-500 hover:scale-[1.03] hover:border-white/30"
               style={{
                 transform: `skewX(var(--tileSkew)) translateZ(0)`,
                 willChange: "transform",
-                border: "1px solid rgba(255,255,255,0.06)",
-                background: "linear-gradient(140deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01) 40%, rgba(0,0,0,0.1))"
               }}
             >
-              {/* Internal Glass Depth Layer */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent opacity-50 rounded-2xl pointer-events-none" />
-              
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 tile-sheen rounded-2xl" />
-              
               <div
-                className="relative z-10 flex flex-col items-center justify-center transition-all duration-500 grayscale group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
-                style={{ 
+                className="relative z-10 flex flex-col items-center justify-center transition-all duration-500 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100"
+                style={{
                   transform: `skewX(calc(var(--tileSkew) * -1))`,
-                  opacity: 0.7,
-                  filter: "contrast(0.95)"
+                  filter: "contrast(0.95)",
                 }}
               >
                 {brand.logo ? (
-                  <img src={brand.logo} alt={brand.name} className="w-24 md:w-40 h-auto object-contain" />
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className="w-24 md:w-40 h-auto object-contain"
+                  />
                 ) : (
-                  <span className="text-2xl md:text-4xl font-switzer font-bold text-white/80 group-hover:text-white tracking-tighter drop-shadow-md">
+                  <span className="text-2xl md:text-4xl font-switzer font-bold text-white/50 group-hover:text-white tracking-tighter transition-colors duration-300">
                     {brand.name}
                   </span>
                 )}

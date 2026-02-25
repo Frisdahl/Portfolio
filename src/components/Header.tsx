@@ -40,9 +40,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 flex justify-between items-center py-10 px-8 transition-all duration-500 pointer-events-none ${
-        isMobileMenuOpen ? "z-[220]" : "z-50"
-      }`}
+      className={`fixed top-0 left-0 right-0 flex justify-between items-center py-10 px-8 transition-all duration-500 pointer-events-none z-[220]`}
     >
       <div className="z-50 pointer-events-auto">
         <Link to="/" onClick={handleLogoClick}>

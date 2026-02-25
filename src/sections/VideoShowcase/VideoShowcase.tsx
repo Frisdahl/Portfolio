@@ -89,15 +89,14 @@ const VideoShowcase: React.FC = () => {
             style={{ visibility: "hidden" }}
           >
             <div className="flex flex-col gap-4 md:gap-6">
-              <h2
-                ref={headingRef}
-                className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-newroman text-white tracking-tight leading-[0.9]"
-              >
-                I design and
-                <br />
-                build websites
-              </h2>
-              <p
+                          <h2
+                            ref={headingRef}
+                            className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-newroman text-white tracking-tight leading-[1.1]"
+                          >
+                            I design and
+                            <br />
+                            build websites
+                          </h2>              <p
                 ref={longTextRef}
                 className="font-switzer text-lg md:text-xl lg:text-2xl tracking-tight text-[var(--foreground)] max-w-xl mx-auto lg:mx-0 opacity-80"
               >

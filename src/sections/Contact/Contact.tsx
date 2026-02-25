@@ -39,6 +39,7 @@ const Contact: React.FC = () => {
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const topPartRef = useRef<HTMLDivElement>(null);
+  const bgContentRef = useRef<HTMLDivElement>(null); // Ref for background video/content
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [formData, setFormData] = useState({
@@ -59,26 +60,59 @@ const Contact: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!containerRef.current || !topPartRef.current) return;
+    if (!containerRef.current || !topPartRef.current || !bgContentRef.current) return;
 
-    // Scroll-driven border radius animation (smooth out as you scroll in)
-    gsap.to(topPartRef.current, {
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top top",
-        end: "+=50%",
-        scrub: true,
-        onUpdate: (self) => {
-          const progress = self.progress;
-          const startRadius = 80;
-          const endRadius = 0;
-          const currentRadius =
-            startRadius - progress * (startRadius - endRadius);
-          if (topPartRef.current) {
-            topPartRef.current.style.borderTopLeftRadius = `${currentRadius}px`;
-            topPartRef.current.style.borderTopRightRadius = `${currentRadius}px`;
-          }
+    // Scroll-driven entrance slide-up for BOTH form and background
+    gsap.fromTo(
+      [topPartRef.current, bgContentRef.current],
+      { yPercent: 100 },
+      {
+        yPercent: 0,
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "top top",
+          scrub: 1.5, // Increased from true for more weight and smoothness
         },
+      },
+    );
+
+    // Scroll-driven background color transition
+    gsap.fromTo(
+      topPartRef.current,
+      {
+        backgroundColor: "#0a0a0a", // Start with dark color
+      },
+      {
+        backgroundColor: "#ffffff", // Transition to white
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "top top",
+          scrub: 1.5, // Sync with the slide-up for a unified feel
+        },
+      },
+    );
+
+    // Scroll-triggered border radius switch
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top top",
+      onEnter: () => {
+        gsap.to(topPartRef.current, {
+          borderTopLeftRadius: "0px",
+          borderTopRightRadius: "0px",
+          duration: 0.6,
+          ease: "power2.inOut",
+        });
+      },
+      onLeaveBack: () => {
+        gsap.to(topPartRef.current, {
+          borderTopLeftRadius: "80px",
+          borderTopRightRadius: "80px",
+          duration: 0.6,
+          ease: "power2.inOut",
+        });
       },
     });
 
@@ -94,11 +128,11 @@ const Contact: React.FC = () => {
       },
     });
 
-    // Wipe the top part upwards to reveal the bottom part underneath
+    // Wipe the top part upwards - delay it within the timeline to let radius settle
     tl.to(topPartRef.current, {
       clipPath: "inset(0% 0% 55% 0%)",
       ease: "none",
-    });
+    }, "+=0.3"); // Start wipe after radius is essentially zero
 
     // Subtle Parallax for the video behind
     gsap.to(videoRef.current, {
@@ -170,9 +204,13 @@ const Contact: React.FC = () => {
     }
   };
 
-  const handleFooterLinkClick = async (e: React.MouseEvent, to: string, targetSection?: string) => {
+  const handleFooterLinkClick = async (
+    e: React.MouseEvent,
+    to: string,
+    targetSection?: string,
+  ) => {
     e.preventDefault();
-    
+
     // Start transition
     await triggerPageTransition();
 
@@ -216,7 +254,10 @@ const Contact: React.FC = () => {
       id="contact"
       className="relative w-full h-[100vh] overflow-hidden bg-[#0a0a0a]"
     >
-      <div className="absolute inset-0 z-[1] w-full h-full flex flex-col justify-end">
+      <div 
+        ref={bgContentRef}
+        className="absolute inset-0 z-[1] w-full h-full flex flex-col justify-end will-change-transform"
+      >
         <div className="absolute inset-0 z-[1] pointer-events-none">
           <video
             ref={videoRef}
@@ -263,9 +304,22 @@ const Contact: React.FC = () => {
                 </p>
                 <Links
                   links={[
-                    { label: "Works", href: "/", onClick: (e) => handleFooterLinkClick(e, "/", "#projects") },
-                    { label: "About", href: "/about", onClick: (e) => handleFooterLinkClick(e, "/about") },
-                    { label: "Contact", href: "#contact", onClick: (e) => handleFooterLinkClick(e, "", "#contact") },
+                    {
+                      label: "Works",
+                      href: "/",
+                      onClick: (e) =>
+                        handleFooterLinkClick(e, "/", "#projects"),
+                    },
+                    {
+                      label: "About",
+                      href: "/about",
+                      onClick: (e) => handleFooterLinkClick(e, "/about"),
+                    },
+                    {
+                      label: "Contact",
+                      href: "#contact",
+                      onClick: (e) => handleFooterLinkClick(e, "", "#contact"),
+                    },
                   ]}
                   className="flex flex-col space-y-3"
                   textColor="text-[#e4e3de]"
@@ -311,7 +365,7 @@ const Contact: React.FC = () => {
       <div
         ref={topPartRef}
         id="lets-work-together"
-        className="absolute inset-0 z-[2] w-full h-full bg-[#ffffff] flex flex-col items-center justify-start pt-32 will-change-[clip-path]"
+        className="absolute inset-0 z-[2] w-full h-full flex flex-col items-center justify-start pt-32 will-change-[clip-path,background-color,transform]"
         style={{
           clipPath: "inset(0% 0% 0% 0%)",
           borderTopLeftRadius: "80px",

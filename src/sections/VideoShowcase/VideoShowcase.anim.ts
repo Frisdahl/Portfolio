@@ -13,48 +13,30 @@ export const initVideoShowcaseAnimations = (
   smallText: HTMLElement,
 ) => {
   const ctx = gsap.context(() => {
-    // 1. Split text for animation
-    const splitHeading = new SplitType(heading, {
-      types: "lines",
-      lineClass: "split-line",
-    });
-    const splitHeadingWords = new SplitType(splitHeading.lines!, {
-      types: "words",
-      wordClass: "split-word",
+    // 1. Split text into lines and words for the standard slide-up effect
+    const splits = [heading, longText, smallText].map((el) => {
+      const s = new SplitType(el, { types: "lines,words" });
+      
+      s.lines?.forEach(line => {
+        gsap.set(line, { overflow: "hidden", display: "block" });
+      });
+
+      s.words?.forEach(word => {
+        gsap.set(word, { display: "inline-block", translateZ: 0 });
+      });
+
+      return s;
     });
 
-    const splitLongText = new SplitType(longText, {
-      types: "lines",
-      lineClass: "split-line",
-    });
-    const splitLongTextWords = new SplitType(splitLongText.lines!, {
-      types: "words",
-      wordClass: "split-word",
-    });
+    const [splitHeading, splitLongText, splitSmallText] = splits;
 
-    const splitSmallText = new SplitType(smallText, {
-      types: "lines",
-      lineClass: "split-line",
+    // Initial state: Hidden below the line
+    splits.forEach((s) => {
+      gsap.set(s.words, { 
+        yPercent: 100, 
+        opacity: 0 
+      });
     });
-    const splitSmallTextWords = new SplitType(splitSmallText.lines!, {
-      types: "words",
-      wordClass: "split-word",
-    });
-
-    // Setup initial states
-    [splitHeading, splitLongText, splitSmallText].forEach((s) => {
-      gsap.set(s.lines, { overflow: "hidden", display: "block" });
-    });
-
-    [splitHeadingWords, splitLongTextWords, splitSmallTextWords].forEach(
-      (s) => {
-        gsap.set(s.words, {
-          yPercent: 100,
-          opacity: 0,
-          display: "inline-block",
-        });
-      },
-    );
 
     const mm = gsap.matchMedia();
 
@@ -70,7 +52,7 @@ export const initVideoShowcaseAnimations = (
           scrollTrigger: {
             trigger: container,
             start: "top top",
-            end: "+=150%", // Slightly reduced scroll for more responsive feel
+            end: "+=150%",
             pin: true,
             scrub: 1.2,
           },
@@ -80,28 +62,21 @@ export const initVideoShowcaseAnimations = (
           // Desktop Sequence: Full Screen -> Grid Split
           tl.fromTo(
             videoWrapper,
-            { 
-              width: "100vw", 
-              height: "100vh", 
-              xPercent: -15, // Centering logic for full screen 
-              borderRadius: "0rem" 
+            {
+              width: "100vw",
+              height: "100vh",
+              xPercent: -15,
+              borderRadius: "0rem",
             },
             {
-              width: "100%", // Returns to Grid Column width
+              width: "100%",
               height: "auto",
               xPercent: 0,
               borderRadius: "1.5rem",
               duration: 2,
               ease: "expo.inOut",
-            }
-          ).set(
-            textContainer,
-            {
-              visibility: "visible",
-              opacity: 1,
             },
-            "-=0.5"
-          );
+          ).set(textContainer, { visibility: "visible" }, "-=1.0");
         } else {
           // Mobile Sequence: Subtle scaling into text
           tl.from(videoWrapper, {
@@ -109,51 +84,44 @@ export const initVideoShowcaseAnimations = (
             borderRadius: "0rem",
             duration: 1.5,
             ease: "expo.out",
-          }).set(
-            textContainer,
-            {
-              visibility: "visible",
-              opacity: 1,
-            },
-            "-=0.5"
-          );
+          }).set(textContainer, { visibility: "visible" }, "-=0.5");
         }
 
-        // Shared text stagger animation
+        // Shared text stagger animation: Words slide up into view
         tl.to(
-          splitHeadingWords.words!,
+          splitHeading.words!,
           {
             yPercent: 0,
             opacity: 1,
-            duration: 1,
+            duration: 1.2,
             stagger: 0.05,
             ease: "power4.out",
           },
-          "-=0.8"
+          "-=0.8",
         )
           .to(
-            splitLongTextWords.words!,
+            splitLongText.words!,
             {
               yPercent: 0,
-              opacity: 0.8,
-              duration: 1,
-              stagger: 0.02,
+              opacity: 1,
+              duration: 1.0,
+              stagger: 0.01,
               ease: "power4.out",
             },
-            "-=0.9"
+            "-=1.0",
           )
           .to(
-            splitSmallTextWords.words!,
+            splitSmallText.words!,
             {
               yPercent: 0,
-              opacity: 0.6,
-              duration: 1,
-              stagger: 0.02,
+              opacity: 1,
+              duration: 1.0,
+              stagger: 0.01,
               ease: "power4.out",
             },
-            "-=0.9"
+            "-=1.0",
           );
-      }
+      },
     );
 
     ScrollTrigger.refresh();
