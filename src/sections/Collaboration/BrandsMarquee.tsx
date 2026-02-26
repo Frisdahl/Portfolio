@@ -147,23 +147,23 @@ const BrandsMarquee: React.FC = () => {
   return (
     <section
       ref={containerRef}
-      className="relative w-full mb-48 overflow-hidden bg-[#0a0a0a]"
+      className="relative w-full pb-48 overflow-hidden bg-[#fefffe]"
       style={{ "--tileSkew": "-12deg" } as React.CSSProperties}
     >
       {/* Visual Polish */}
       <div
         className="absolute inset-0 opacity-[0.02] pointer-events-none"
         style={{
-          backgroundImage: "radial-gradient(#fff 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(#000 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
 
       <div className="flex flex-col md:flex-row  px-8 md:px-16 lg:px-24 items-start md:items-end justify-between gap-8 overflow-hidden">
-        <div className="max-w-2xl overflow-hidden">
+        <div className=" overflow-hidden">
           <h2
             ref={headerRef}
-            className="project-header-text text-2xl md:text-3xl lg:text-5xl text-left font-newroman text-white leading-tight"
+            className="project-header-text text-2xl md:text-3xl lg:text-5xl w-full text-left font-instrumentsans font-semibold text-[#1c1d1e] leading-tight"
           >
             Brands & creative teams <br className="hidden md:block" />
             I’ve collaborated with
@@ -172,7 +172,7 @@ const BrandsMarquee: React.FC = () => {
         <div className="max-w-sm md:text-right overflow-hidden">
           <p
             ref={subtextRef}
-            className="project-header-subtext font-switzer text-base md:text-lg text-[var(--foreground)] opacity-70 leading-relaxed"
+            className="project-header-subtext font-switzer text-base md:text-lg text-[#1c1d1e] opacity-40 leading-relaxed tracking-wider"
           >
             Trusted by brands & <br className="hidden md:block" /> creative
             teams worldwide
@@ -186,7 +186,7 @@ const BrandsMarquee: React.FC = () => {
             <a
               key={`${brand.name}-${idx}`}
               href={brand.href || "#"}
-              className="group relative flex-shrink-0 w-56 h-48 md:w-72 md:h-62 border rounded-xl border-white/10 flex items-center justify-center transition-all duration-500 hover:scale-[1.03] hover:border-white/30"
+              className="group relative flex-shrink-0 w-56 h-48 md:w-72 md:h-62 border rounded-xl border-[#1c1d1e]/10 flex items-center justify-center transition-all duration-500 hover:scale-[1.03] hover:border-[#1c1d1e]/30"
               style={{
                 transform: `skewX(var(--tileSkew)) translateZ(0)`,
                 willChange: "transform",
@@ -206,7 +206,7 @@ const BrandsMarquee: React.FC = () => {
                     className="w-24 md:w-40 h-auto object-contain"
                   />
                 ) : (
-                  <span className="text-2xl md:text-4xl font-switzer font-bold text-white/50 group-hover:text-white tracking-tighter transition-colors duration-300">
+                  <span className="text-xl md:text-2xl font-instrumentsans font-bold text-[#1c1d1e]/20 group-hover:text-[#1c1d1e] uppercase tracking-tight transition-colors duration-300">
                     {brand.name}
                   </span>
                 )}
@@ -222,11 +222,11 @@ const BrandsMarquee: React.FC = () => {
         .tile-sheen {
           background: linear-gradient(
             25deg,
-            rgba(255,255,255,0) 0%,
-            rgba(255,255,255,0.10) 45%,
-            rgba(255,255,255,0) 100%
+            rgba(0,0,0,0) 0%,
+            rgba(0,0,0,0.05) 45%,
+            rgba(0,0,0,0) 100%
           );
-          mix-blend-mode: screen;
+          mix-blend-mode: multiply;
         }
       `,
         }}

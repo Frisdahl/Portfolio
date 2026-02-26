@@ -6,14 +6,14 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 if (typeof window !== "undefined") {
-  window.scrollTo(0, 0);
+  // Use a small timeout to override browser scroll restoration more reliably
+  window.history.scrollRestoration = "manual";
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+  }, 10);
 }
 
 gsap.registerPlugin(ScrollTrigger);
-
-if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
-  window.history.scrollRestoration = "manual";
-}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

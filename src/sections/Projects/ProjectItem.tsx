@@ -157,12 +157,15 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
               preload="metadata"
             >
               <source src={videoSrc} type="video/mp4" />
-              <source src={videoSrc.replace(".mp4", ".webm")} type="video/webm" />
+              <source
+                src={videoSrc.replace(".mp4", ".webm")}
+                type="video/webm"
+              />
             </video>
             {/* Dark Video Overlay */}
-            <div 
+            <div
               ref={videoOverlayRef}
-              className="absolute inset-0 bg-black/60 z-10 pointer-events-none transition-transform duration-1000 group-hover:scale-105"
+              className="absolute inset-0 bg-black/20 z-10 pointer-events-none transition-transform duration-1000 group-hover:scale-105"
             />
           </>
         ) : (

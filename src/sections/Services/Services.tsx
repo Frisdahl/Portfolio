@@ -209,13 +209,13 @@ const Services: React.FC = () => {
   return (
     <section
       id="services"
-      className="w-full mb-64 text-[#fff] text-left font-switzer px-8 md:px-12 lg:px-24"
+      className="w-full mb-64 text-[#1c1d1e] text-left font-switzer px-8 md:px-12 lg:px-24"
     >
       {/* Heading - Full width across the padded container */}
       <div className="w-full mb-24">
         <h2
           ref={headingRef}
-          className="text-4xl md:text-5xl lg:text-6xl text-[#fff] font-newroman leading-[1.18] tracking-[.65px] text-left w-full"
+          className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl text-[#1c1d1e] font-instrumentsans font-bold leading-[1.25] tracking-tight text-left w-full"
         >
           {/* 
             To have ONLY the first line indented and the rest full width, 
@@ -236,10 +236,10 @@ const Services: React.FC = () => {
       {/* Services */}
       <div className="w-full lg:pl-[25%]">
         <div className="flex flex-col mb-12">
-          <p className="text-sm uppercase mb-4 font-switzer font-semibold tracking-[0.2em]">
+          <p className="text-sm uppercase mb-4 font-switzer font-semibold tracking-[0.2em] text-[#1c1d1e]/40">
             Services
           </p>
-          <hr className="w-full h-px border-0 bg-[#e4e2dd]" />
+          <hr className="w-full h-px border-0 bg-[#1c1d1e]/10" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32 pt-12">
@@ -259,7 +259,7 @@ const Services: React.FC = () => {
                     setProgress(0);
                   }}
                 >
-                  <span className="text-5xl font-newroman opacity-60 w-6 shrink-0">
+                  <span className="text-4xl font-instrumentsans font-bold opacity-20 w-12 shrink-0">
                     {service.id}
                   </span>
 
@@ -268,16 +268,16 @@ const Services: React.FC = () => {
                       isActive ? "w-16 md:w-20 lg:w-24" : "w-8 md:w-10 lg:w-12"
                     }`}
                   >
-                    <div className="absolute inset-0 bg-[#e4e2dd] opacity-20" />
+                    <div className="absolute inset-0 bg-[#1c1d1e] opacity-10" />
                     {isActive && (
                       <div
-                        className="absolute top-0 left-0 h-full bg-[#ffffff] z-10"
+                        className="absolute top-0 left-0 h-full bg-[#1c1d1e] z-10"
                         style={{ width: `${progress}%` }}
                       />
                     )}
                   </div>
 
-                  <h3 className="text-5xl font-newroman whitespace-nowrap">
+                  <h3 className="text-4xl font-instrumentsans font-bold whitespace-nowrap">
                     {service.name}
                   </h3>
                 </div>
@@ -288,7 +288,10 @@ const Services: React.FC = () => {
           {/* Right column */}
           <div className="flex flex-col items-start lg:pl-12">
             <div key={displayIndex} ref={rightContentRef} className="w-full">
-              <h4 ref={smallTitleRef} className="text-3xl mb-6 font-newroman">
+              <h4
+                ref={smallTitleRef}
+                className="text-3xl mb-6 font-instrumentsans font-bold"
+              >
                 {services[displayIndex].smallTitle}
               </h4>
               <p

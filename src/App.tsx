@@ -1,10 +1,10 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 import PageTransition from "./components/PageTransition";
 import ComingSoon from "./components/ComingSoon";
-import Contact from "./sections/Contact/Contact";
+import Footer from "./components/Footer";
 import "./App.css";
 
 import useSmoothScroll from "./utils/useSmoothScroll";
@@ -12,9 +12,46 @@ import useSmoothScroll from "./utils/useSmoothScroll";
 // Lazy Load Pages
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
 
 function App() {
   useSmoothScroll();
+
+  useEffect(() => {
+    console.clear();
+
+    console.log(
+      "%cFRISDAHL.STUDIO°",
+      `
+      font-size:32px;
+      font-weight:700;
+      background:linear-gradient(90deg,#ffffff,#888);
+      -webkit-background-clip:text;
+      color:transparent;
+      padding: 10px 0;
+      `,
+    );
+
+    console.log(
+      "%cHey fellow developer 👋",
+      "font-size:16px; color:#fff; font-family: 'Switzer', sans-serif; padding-top: 10px;",
+    );
+
+    console.log(
+      "%cIf you're here, you're probably curious. I like that.",
+      "font-size:14px; color:#888; font-family: 'Switzer', sans-serif;",
+    );
+
+    console.log(
+      "%cWant to build something cool together?",
+      "font-size:14px; color:#ffffff; font-family: 'Switzer', sans-serif; font-weight: bold; padding-top: 10px;",
+    );
+
+    console.log(
+      "%c👉 mail@frisdahl.studio",
+      "font-size:14px; color:#ffffff; font-family: 'Switzer', sans-serif; text-decoration: underline;",
+    );
+  }, []);
 
   return (
     <Router>
@@ -22,13 +59,14 @@ function App() {
       <ScrollToTop />
       {/* <PageTransition /> */}
       <ComingSoon />
+      
       <Layout>
         <Suspense fallback={null}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Routes>
-          <Contact />
         </Suspense>
       </Layout>
     </Router>

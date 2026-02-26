@@ -6,6 +6,7 @@ import Expectations from "../sections/Expectations/Expectations";
 import Collaboration from "../sections/Collaboration/Collaboration";
 import VideoShowcase from "../sections/VideoShowcase/VideoShowcase";
 import BrandsMarquee from "../sections/Collaboration/BrandsMarquee";
+import Footer from "../components/Footer";
 
 function HomePage() {
   return (
@@ -17,6 +18,7 @@ function HomePage() {
       <BrandsMarquee />
       {/* <Expectations />
       <Collaboration /> */}
+      <Footer />
     </div>
   );
 }

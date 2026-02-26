@@ -43,7 +43,7 @@ const Hero: React.FC = () => {
     // Initial Load Animation
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    // Fade in video (starting from its base 0.4 opacity)
+    // Fade in video (starting from its base opacity)
     tl.fromTo(
       videoRef.current,
       { scale: 1.1, opacity: 0 },
@@ -114,7 +114,7 @@ const Hero: React.FC = () => {
     >
       <section
         ref={heroRef}
-        className="relative h-[100vh] w-full bg-[#0a0a0a] overflow-hidden flex flex-col justify-between pt-44 pb-4 md:pb-8 will-change-[clip-path]"
+        className="dark-section relative h-[100vh] w-full bg-[#1c1d1e] overflow-hidden flex flex-col justify-between pt-44 pb-4 md:pb-8 will-change-[clip-path]"
         style={{ clipPath: "inset(0% 0% 0% 0%)" }}
       >
         {/* Layer B: Video Background */}
@@ -139,15 +139,18 @@ const Hero: React.FC = () => {
           </video>
         </div>
 
-        {/* Layer C: Navy/Dark Overlay matching footer */}
-        <div className="absolute inset-0 z-[2] bg-black/60 pointer-events-none" />
+        {/* Layer C: Neutral Dark Overlay */}
+        <div
+          className="absolute inset-0 z-[2] pointer-events-none"
+          style={{ backgroundColor: "rgba(28, 29, 30, 0.1)" }}
+        />
 
         {/* Top Content: Headline Wrap */}
         <div className="relative z-[10] px-8">
           <div className="flex flex-col items-start text-left gap-8 md:gap-10">
             <h1
               ref={headlineRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-newroman text-[#fff] leading-[1]"
+              className="text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-instrumentsans font-semibold text-white uppercase tracking-tight leading-[1]"
             >
               Immersive websites, <br />
               designed with clarity.
@@ -176,34 +179,20 @@ const Hero: React.FC = () => {
                       { label: "MAIL", href: "#" },
                     ]}
                     className="flex space-x-6"
-                    textColor="text-[#fff]"
-                    underlineColor="bg-[#fff]"
+                    textColor="text-white"
+                    underlineColor="bg-white"
                   />
                 </div>
 
-                <p
-                  className="text-xs md:text-sm max-w-sm text-left md:text-right leading-relaxed font-switzer font-light uppercase tracking-wider"
-                  style={{ color: "var(--foreground-muted)" }}
-                >
+                <p className="text-xs md:text-sm max-w-sm text-left md:text-right leading-relaxed font-switzer font-light uppercase tracking-wider text-white opacity-60">
                   I help ambitious brands launch digital experiences and
                   strengthen their identity through strategic, custom design.
                 </p>
               </div>
 
               {/* Divider (Also aligned to sides) */}
-              <hr
-                className="w-full h-px border-0 opacity-10"
-                style={{ backgroundColor: "var(--divider)" }}
-              />
+              <hr className="w-full h-px border-0 bg-white opacity-10" />
             </div>
-
-            {/* Marquee Section (Full screen width) */}
-            <Marquee
-              text="Frisdahl Studio°"
-              className="pt-8"
-              itemClassName="text-5xl md:text-7xl lg:text-[5vw] font-switzer font-semibold uppercase tracking-wide pr-20 text-[var(--foreground)] opacity-[0.05] leading-none"
-              speed={1}
-            />
           </div>
         </div>
 

@@ -21,8 +21,8 @@ const Links: React.FC<LinksProps> = ({
   ],
   className = "flex flex-wrap gap-x-12 gap-y-4",
   linkClassName = "text-xs uppercase font-semibold tracking-[0.3em] py-1",
-  textColor = "text-[#0a0a0a]",
-  underlineColor = "bg-[#0a0a0a]",
+  textColor = "text-[#1c1d1e]",
+  underlineColor = "bg-[#1c1d1e]",
 }) => {
   const lineRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);

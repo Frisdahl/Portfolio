@@ -18,7 +18,8 @@
         "fade-in-up": "fade-in-up 0.6s ease-out forwards",
       },
       fontFamily: {
-        sans: ["Switzer", "sans-serif"],
+        sans: ["'Instrument Sans'", "sans-serif"],
+        instrumentsans: ["'Instrument Sans'", "sans-serif"],
         switzer: ["Switzer", "sans-serif"],
         newroman: ["NewRoman", "serif"],
         // Backwards compatibility for existing classes

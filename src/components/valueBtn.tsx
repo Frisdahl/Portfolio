@@ -20,10 +20,10 @@ const ValueBtn: React.FC<ValueBtnProps> = ({
   baseBgColor = "bg-transparent",
   baseTextColor = "text-[var(--foreground)]",
   activeBgColor = "bg-[var(--foreground)]",
-  activeTextColor = "text-[#0a0a0a]",
+  activeTextColor = "text-[#1c1d1e]",
   borderColor = "border-[var(--foreground)]",
   hoverBgColor = "bg-[var(--foreground)]",
-  hoverTextColor = "group-hover/btn:text-[#0a0a0a]",
+  hoverTextColor = "group-hover/btn:text-[#1c1d1e]",
 }) => {
   return (
     <button

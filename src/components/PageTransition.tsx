@@ -236,7 +236,7 @@ const PageTransition = () => {
             ref={(el) => {
               columnsRef.current[i] = el;
             }}
-            className="h-full bg-[#0a0a0a] flex-grow origin-right"
+            className="h-full bg-[#fefffe] flex-grow origin-right"
             style={{
               transform: "scaleX(1)",
               willChange: "transform",
@@ -263,14 +263,14 @@ const PageTransition = () => {
               width="24"
               height="34"
               rx="12"
-              stroke="white"
+              stroke="#1c1d1e"
               strokeWidth="1.5"
             />
             <path
               ref={logoPathRef}
               d="M16.4513 22.0222L6.91754 22.0445H6.25055C6.25055 22.0445 6.90687 20.7414 6.86092 20.8525L6.25055 22.0445L12.2702 10.2889H12.8216L20.6554 26H18.0365L16.3135 22.4C16.2446 22.2667 16.1986 22.0445 16.4054 22.0445H16.4513V22.0222ZM6.86092 20.8525L15.5554 20.8444L11.3196 12.1453L6.86092 20.8525Z"
-              fill="white"
-              stroke="white"
+              fill="#1c1d1e"
+              stroke="#1c1d1e"
               strokeWidth="0.2"
             />
           </svg>
@@ -278,7 +278,7 @@ const PageTransition = () => {
           <div className="overflow-hidden">
             <h1
               ref={textRef}
-              className="text-3xl md:text-4xl text-[#fff] uppercase text-center font-switzer font-light tracking-tight py-1"
+              className="text-3xl md:text-4xl text-[#1c1d1e] uppercase text-center font-switzer font-light tracking-tight py-1"
             >
               Frisdahl studio°
             </h1>

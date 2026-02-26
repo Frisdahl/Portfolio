@@ -64,7 +64,7 @@ const AnimatedMenuLink = forwardRef<HTMLAnchorElement, AnimatedMenuLinkProps>(
         >
           <div
             ref={circleRef}
-            className="absolute left-0 w-[8px] h-[8px] rounded-full bg-[#0a0a0a] opacity-0"
+            className="absolute left-0 w-[8px] h-[8px] rounded-full bg-[#1c1d1e] opacity-0"
             style={{ transform: "scale(0)" }}
           />
           <span
@@ -76,7 +76,7 @@ const AnimatedMenuLink = forwardRef<HTMLAnchorElement, AnimatedMenuLinkProps>(
         </Link>
       </div>
     );
-  }
+  },
 );
 
 AnimatedMenuLink.displayName = "AnimatedMenuLink";
@@ -87,7 +87,7 @@ const MobileMenuOverlay: FC<{
 }> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const menuLabelRef = useRef<HTMLHeadingElement>(null);
@@ -108,76 +108,108 @@ const MobileMenuOverlay: FC<{
     if (timelineRef.current) timelineRef.current.kill();
 
     const tl = gsap.timeline({
-      defaults: { ease: "expo.out" }
+      defaults: { ease: "expo.out" },
     });
     timelineRef.current = tl;
 
     if (isOpen) {
       // Opening animation - using absolute timestamps for precise control
-      tl.to(overlayRef.current, {
-        autoAlpha: 1,
-        duration: 0.8,
-        ease: "power2.inOut"
-      }, 0)
-      
-      tl.to(panelRef.current, {
-        xPercent: 0,
-        opacity: 1,
-        duration: 1.2,
-        ease: "expo.out"
-      }, 0.2);
+      tl.to(
+        overlayRef.current,
+        {
+          autoAlpha: 1,
+          duration: 0.8,
+          ease: "power2.inOut",
+        },
+        0,
+      );
 
-      tl.to(menuLabelRef.current, {
-        opacity: 0.5,
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out"
-      }, 0.4);
+      tl.to(
+        panelRef.current,
+        {
+          xPercent: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: "expo.out",
+        },
+        0.2,
+      );
+
+      tl.to(
+        menuLabelRef.current,
+        {
+          opacity: 0.5,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+        },
+        0.4,
+      );
 
       // Navigation items slide up with a clearer stagger (top to bottom)
-      tl.to(navLinksRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 1.1,
-        stagger: 0.15, // Increased stagger for more visible sequence
-        ease: "power4.out"
-      }, 0.5);
+      tl.to(
+        navLinksRef.current,
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.1,
+          stagger: 0.15, // Increased stagger for more visible sequence
+          ease: "power4.out",
+        },
+        0.5,
+      );
 
-      tl.to(footerRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power2.out"
-      }, 0.8);
+      tl.to(
+        footerRef.current,
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+        },
+        0.8,
+      );
     } else {
       // Closing animation
       tl.to([menuLabelRef.current, footerRef.current], {
         opacity: 0,
         y: 10,
         duration: 0.4,
-        ease: "power2.in"
+        ease: "power2.in",
       });
 
-      tl.to(navLinksRef.current, {
-        opacity: 0,
-        y: 40,
-        duration: 0.5,
-        stagger: 0.05,
-        ease: "power2.in"
-      }, "-=0.3");
+      tl.to(
+        navLinksRef.current,
+        {
+          opacity: 0,
+          y: 40,
+          duration: 0.5,
+          stagger: 0.05,
+          ease: "power2.in",
+        },
+        "-=0.3",
+      );
 
-      tl.to(panelRef.current, {
-        xPercent: 101,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power3.inOut"
-      }, "-=0.4");
+      tl.to(
+        panelRef.current,
+        {
+          xPercent: 101,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power3.inOut",
+        },
+        "-=0.4",
+      );
 
-      tl.to(overlayRef.current, {
-        autoAlpha: 0,
-        duration: 0.7,
-        ease: "power2.inOut"
-      }, "-=0.6");
+      tl.to(
+        overlayRef.current,
+        {
+          autoAlpha: 0,
+          duration: 0.7,
+          ease: "power2.inOut",
+        },
+        "-=0.6",
+      );
     }
 
     return () => {
@@ -234,24 +266,24 @@ const MobileMenuOverlay: FC<{
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[150] bg-[rgba(0,0,0,0.4)] invisible"
+      className="fixed inset-0 z-[150] bg-[rgba(0,0,0,0.6)] invisible"
       onClick={onClose}
     >
       {/* The actual menu panel */}
       <div
         ref={panelRef}
-        className="fixed top-0 right-0 w-full sm:w-[500px] h-full sm:h-auto sm:max-h-screen bg-[#fff] overflow-y-auto px-8 pt-24 sm:pt-16 pb-12 text-left text-[#0a0a0a] shadow-2xl sm:rounded-tl-2xl sm:rounded-bl-2xl sm:rounded-br-2xl"
+        className="fixed top-0 right-0 w-full sm:w-[500px] h-full sm:h-auto sm:max-h-screen bg-[#fff] overflow-y-auto px-8 pt-24 sm:pt-16 pb-12 text-left text-[#1c1d1e] shadow-2xl sm:rounded-tl-2xl sm:rounded-bl-2xl sm:rounded-br-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Main Nav */}
         <div className="mb-12 sm:mb-16">
           <h3
             ref={menuLabelRef}
-            className="text-[10px] uppercase tracking-[0.3em] text-[#0a0a0a] font-medium mb-10 opacity-0"
+            className="text-[10px] uppercase tracking-[0.3em] text-[#1c1d1e] font-medium mb-10 opacity-0"
           >
             Menu
           </h3>
-          <nav className="text-3xl sm:text-4xl text-[#0a0a0a] font-light flex flex-col space-y-3 sm:space-y-5 mb-12 sm:mb-16">
+          <nav className="text-3xl sm:text-4xl text-[#1c1d1e] font-normal flex flex-col space-y-3 sm:space-y-5 mb-12 sm:mb-16">
             <AnimatedMenuLink
               ref={(el) => (navLinksRef.current[0] = el)}
               to="/"
@@ -270,8 +302,8 @@ const MobileMenuOverlay: FC<{
             </AnimatedMenuLink>
             <AnimatedMenuLink
               ref={(el) => (navLinksRef.current[2] = el)}
-              to="/"
-              onClick={(e) => handleLinkClick(e, "/", "#contact")}
+              to="/contact"
+              onClick={(e) => handleLinkClick(e, "/contact")}
               isOpen={isOpen}
             >
               Contact
@@ -289,8 +321,8 @@ const MobileMenuOverlay: FC<{
                 { label: "Instagram", href: "#instagram" },
               ]}
               linkClassName="text-[10px] uppercase font-medium tracking-[0.4em] py-1"
-              textColor="text-[#0a0a0a] opacity-60"
-              underlineColor="bg-[#0a0a0a] opacity-60"
+              textColor="text-[#1c1d1e] opacity-60"
+              underlineColor="bg-[#1c1d1e] opacity-60"
             />
           </div>
         </div>

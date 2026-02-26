@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import BurgerMenuButton from "./BurgerMenuButton";
 import MobileMenuOverlay from "./MobileMenuOverlay";
+import Footer from "./Footer";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
@@ -15,7 +16,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isHeaderDark, setIsHeaderDark] = useState(false);
+  const [isHeaderDark, setIsHeaderDark] = useState(true);
   const layoutRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -28,83 +29,82 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      // Permanent dark theme background
+    const ctx = gsap.context((self) => {
+      // Permanent light theme background
       gsap.set(layoutRef.current, {
-        backgroundColor: "#0a0a0a",
+        backgroundColor: "#fefffe",
       });
 
-      let headerTrigger: ScrollTrigger | null = null;
-      let refreshTimeouts: number[] = [];
       let mountRetryTimeouts: number[] = [];
+      let activeTriggers: ScrollTrigger[] = [];
 
-      const clearRefreshTimeouts = () => {
-        refreshTimeouts.forEach((id) => window.clearTimeout(id));
-        refreshTimeouts = [];
-      };
+      const setupHeaderTriggers = () => {
+        const darkSections = document.querySelectorAll(".dark-section");
+        
+        activeTriggers.forEach(t => t.kill());
+        activeTriggers = [];
 
-      const setupHeaderTrigger = () => {
-        const contactSection = document.getElementById("contact");
-        if (!contactSection) return false;
+        if (darkSections.length === 0) {
+          setIsHeaderDark(true);
+          return false;
+        }
 
-        headerTrigger?.kill();
+        // Check current position
+        let currentlyOverDark = false;
+        darkSections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          // Use a smaller threshold for the top check
+          if (rect.top <= 60 && rect.bottom >= 60) {
+            currentlyOverDark = true;
+          }
 
-        headerTrigger = ScrollTrigger.create({
-          trigger: contactSection,
-          start: "top 5px", // Slightly offset from very top to handle sub-pixel jump issues
-          end: "bottom top",
-          onEnter: () => setIsHeaderDark(true),
-          onEnterBack: () => setIsHeaderDark(true),
-          onLeave: () => setIsHeaderDark(false),
-          onLeaveBack: () => setIsHeaderDark(false),
-          onUpdate: (self) => {
-            if (self.isActive !== isHeaderDark) {
-              setIsHeaderDark(self.isActive);
+          // Use self.add if we are inside context, but ScrollTrigger.create is usually fine if we kill it manually
+          const trigger = ScrollTrigger.create({
+            trigger: section,
+            start: "top 60px", 
+            end: "bottom 60px",
+            onEnter: () => setIsHeaderDark(false),
+            onEnterBack: () => setIsHeaderDark(false),
+            onLeave: () => setIsHeaderDark(true),
+            onLeaveBack: () => setIsHeaderDark(true),
+            onRefresh: (s) => {
+              if (s.isActive) setIsHeaderDark(false);
             }
-          },
-          onRefresh: (self) => {
-            setIsHeaderDark(self.isActive);
-          },
+          });
+          activeTriggers.push(trigger);
         });
 
-        clearRefreshTimeouts();
-        refreshTimeouts.push(
-          window.setTimeout(() => ScrollTrigger.refresh(), 0),
-          window.setTimeout(() => ScrollTrigger.refresh(), 200),
-          window.setTimeout(() => ScrollTrigger.refresh(), 1000),
-          window.setTimeout(() => ScrollTrigger.refresh(), 3000),
-        );
-
+        setIsHeaderDark(!currentlyOverDark);
         return true;
       };
 
-      if (!setupHeaderTrigger()) {
-        [100, 300, 700, 1500].forEach((delay) => {
-          const timeoutId = window.setTimeout(() => {
-            if (setupHeaderTrigger()) {
-              mountRetryTimeouts.forEach((id) => window.clearTimeout(id));
-              mountRetryTimeouts = [];
-            }
-          }, delay);
-          mountRetryTimeouts.push(timeoutId);
-        });
-      }
+      // Add to context for cleanup
+      self.add("setupHeaderTriggers", setupHeaderTriggers);
 
+      // Initial attempt
+      setupHeaderTriggers();
+
+      // Retry logic for lazy content / transitions
+      [100, 300, 600, 1000, 2000].forEach((delay) => {
+        const id = window.setTimeout(() => {
+          setupHeaderTriggers();
+          ScrollTrigger.refresh();
+        }, delay);
+        mountRetryTimeouts.push(id);
+      });
+
+      // Cleanup
       return () => {
-        mountRetryTimeouts.forEach((id) => window.clearTimeout(id));
-        clearRefreshTimeouts();
-        headerTrigger?.kill();
-        setIsHeaderDark(false);
+        mountRetryTimeouts.forEach(id => window.clearTimeout(id));
+        activeTriggers.forEach(t => t.kill());
       };
     }, layoutRef);
 
-    return () => {
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, [location.pathname]);
 
   return (
-    <div ref={layoutRef} className="flex flex-col min-h-screen dark">
+    <div ref={layoutRef} className="flex flex-col min-h-screen">
       <Header
         isInverted={true}
         isDark={isHeaderDark}
@@ -113,7 +113,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       />
       <MobileMenuOverlay isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
 
-      <main className="flex-grow">{children}</main>
+      <main className="relative z-20 bg-[var(--background)] flex-grow">
+        {children}
+      </main>
     </div>
   );
 };

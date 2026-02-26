@@ -63,14 +63,14 @@ const Projects: React.FC = () => {
       <div className="w-full px-8 md:px-16 lg:px-24 mt-32 md:mt-64">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-8 overflow-hidden">
-          <div className="max-w-md overflow-hidden">
-            <h2 className="project-header-text text-2xl md:text-3xl lg:text-5xl text-left font-newroman text-white leading-tight">
+          <div className=" overflow-hidden">
+            <h2 className="project-header-text text-2xl md:text-3xl lg:text-5xl w-full text-left font-instrumentsans font-semibold text-[#1c1d1e] leading-tight">
               Take a look at some of <br className="hidden md:block" />
               my earlier work
             </h2>
           </div>
           <div className="max-w-sm md:text-right overflow-hidden">
-            <p className="project-header-subtext font-switzer text-base md:text-lg text-[var(--foreground)] opacity-70 leading-relaxed">
+            <p className="project-header-subtext font-switzer text-base md:text-lg text-[#1c1d1e] opacity-40 leading-relaxed tracking-wider">
               Handcrafted Experiences for <br className="hidden md:block" />
               Brands of All Sizes, Worldwide
             </p>
