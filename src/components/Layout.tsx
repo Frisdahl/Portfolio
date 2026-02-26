@@ -7,6 +7,7 @@ import Footer from "./Footer";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import lenis from "../utils/lenis";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
@@ -29,51 +30,47 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   useLayoutEffect(() => {
-    const ctx = gsap.context((self) => {
-      // Permanent light theme background
-      gsap.set(layoutRef.current, {
-        backgroundColor: "#fefffe",
-      });
-
+    const ctx = gsap.context(() => {
       let mountRetryTimeouts: number[] = [];
 
       const updateHeaderTheme = () => {
-        const darkSections = document.querySelectorAll(".dark-section");
+        // Sample the element exactly where the header sits (50px from top, middle of screen)
+        const samplePoint = 50;
+        const elements = document.elementsFromPoint(window.innerWidth / 2, samplePoint);
         
-        if (darkSections.length === 0) {
-          setIsHeaderDark(true);
-          return;
-        }
-
-        let currentlyOverDark = false;
-        // The header's active "sensing" point is around 60px from top
-        const sensingPoint = 60;
-
-        darkSections.forEach((section) => {
-          const rect = section.getBoundingClientRect();
-          if (rect.top <= sensingPoint && rect.bottom >= sensingPoint) {
-            currentlyOverDark = true;
-          }
+        // Find the first element in the stack that isn't the header, noise grain, or menu backdrop
+        const target = elements.find(el => {
+          const isHeader = el.closest('header');
+          const isNoise = el.classList.contains('noise-grain');
+          const isMenuOverlay = el.classList.contains('mobile-menu-overlay');
+          return !isHeader && !isNoise && !isMenuOverlay;
         });
 
-        setIsHeaderDark(!currentlyOverDark);
+        if (target) {
+          // Check if this element or any of its parents are marked as a dark section
+          const isOverDark = !!target.closest('.dark-section');
+          setIsHeaderDark(!isOverDark);
+        }
       };
 
-      // Create a single global ScrollTrigger to monitor theme
-      self.add(() => {
-        ScrollTrigger.create({
-          start: 0,
-          end: "max",
-          onUpdate: updateHeaderTheme,
-          onRefresh: updateHeaderTheme,
-        });
+      // Create a single ScrollTrigger to drive the sampling on every scroll
+      ScrollTrigger.create({
+        start: 0,
+        end: "max",
+        onUpdate: updateHeaderTheme,
+        onRefresh: updateHeaderTheme
       });
+
+      // Direct Lenis listener for ultra-smooth updates
+      if (lenis) {
+        lenis.on("scroll", updateHeaderTheme);
+      }
 
       // Initial run
       updateHeaderTheme();
 
-      // Retry loop to catch lazy-loaded content or transition delays
-      [100, 400, 800, 1500, 2500].forEach((delay) => {
+      // Retry loop to handle lazy-loaded content
+      [100, 500, 1000, 2000].forEach((delay) => {
         const id = window.setTimeout(() => {
           updateHeaderTheme();
           ScrollTrigger.refresh();
@@ -83,6 +80,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       return () => {
         mountRetryTimeouts.forEach(id => window.clearTimeout(id));
+        if (lenis) {
+          lenis.off("scroll", updateHeaderTheme);
+        }
       };
     }, layoutRef);
 

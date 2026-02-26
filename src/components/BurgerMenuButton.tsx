@@ -15,16 +15,16 @@ const BurgerMenuButton: React.FC<BurgerMenuButtonProps> = ({
   isInsideHeader,
 }) => {
   const isHeaderDark = Boolean(isDark);
-  const barBaseColor = isOpen || isHeaderDark ? "bg-[#1c1d1e]" : "bg-white";
+  const barBaseColor = isOpen || isHeaderDark ? "bg-[var(--foreground)]" : "bg-white";
   const barHoverColor = isOpen
     ? "group-hover:bg-white"
     : isHeaderDark
       ? "group-hover:bg-white"
-      : "group-hover:bg-[#1c1d1e]";
+      : "group-hover:bg-[var(--foreground)]";
   const hoverCircleColor = isOpen
-    ? "bg-[#1c1d1e]"
+    ? "bg-[var(--foreground)]"
     : isHeaderDark
-      ? "bg-[#1c1d1e]"
+      ? "bg-[var(--foreground)]"
       : "bg-white";
 
   const wrapperClass = isInsideHeader

@@ -59,7 +59,7 @@ function App() {
       <ScrollToTop />
       {/* <PageTransition /> */}
       <ComingSoon />
-      
+
       <Layout>
         <Suspense fallback={null}>
           <Routes>

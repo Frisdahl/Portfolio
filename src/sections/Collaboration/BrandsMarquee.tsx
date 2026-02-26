@@ -180,7 +180,7 @@ const BrandsMarquee: React.FC = () => {
         </div>
       </div>
 
-      <div className="relative z-10 flex whitespace-nowrap py-8">
+      <div className="relative z-10 flex whitespace-nowrap py-8 overflow-hidden">
         <div ref={marqueeRef} className="flex gap-4 md:gap-6">
           {duplicatedBrands.map((brand, idx) => (
             <a
