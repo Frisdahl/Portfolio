@@ -36,67 +36,53 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       });
 
       let mountRetryTimeouts: number[] = [];
-      let activeTriggers: ScrollTrigger[] = [];
 
-      const setupHeaderTriggers = () => {
+      const updateHeaderTheme = () => {
         const darkSections = document.querySelectorAll(".dark-section");
         
-        activeTriggers.forEach(t => t.kill());
-        activeTriggers = [];
-
         if (darkSections.length === 0) {
           setIsHeaderDark(true);
-          return false;
+          return;
         }
 
-        // Check current position
         let currentlyOverDark = false;
+        // The header's active "sensing" point is around 60px from top
+        const sensingPoint = 60;
+
         darkSections.forEach((section) => {
           const rect = section.getBoundingClientRect();
-          // Use a smaller threshold for the top check
-          if (rect.top <= 60 && rect.bottom >= 60) {
+          if (rect.top <= sensingPoint && rect.bottom >= sensingPoint) {
             currentlyOverDark = true;
           }
-
-          // Use self.add if we are inside context, but ScrollTrigger.create is usually fine if we kill it manually
-          const trigger = ScrollTrigger.create({
-            trigger: section,
-            start: "top 60px", 
-            end: "bottom 60px",
-            onEnter: () => setIsHeaderDark(false),
-            onEnterBack: () => setIsHeaderDark(false),
-            onLeave: () => setIsHeaderDark(true),
-            onLeaveBack: () => setIsHeaderDark(true),
-            onRefresh: (s) => {
-              if (s.isActive) setIsHeaderDark(false);
-            }
-          });
-          activeTriggers.push(trigger);
         });
 
         setIsHeaderDark(!currentlyOverDark);
-        return true;
       };
 
-      // Add to context for cleanup
-      self.add("setupHeaderTriggers", setupHeaderTriggers);
+      // Create a single global ScrollTrigger to monitor theme
+      self.add(() => {
+        ScrollTrigger.create({
+          start: 0,
+          end: "max",
+          onUpdate: updateHeaderTheme,
+          onRefresh: updateHeaderTheme,
+        });
+      });
 
-      // Initial attempt
-      setupHeaderTriggers();
+      // Initial run
+      updateHeaderTheme();
 
-      // Retry logic for lazy content / transitions
-      [100, 300, 600, 1000, 2000].forEach((delay) => {
+      // Retry loop to catch lazy-loaded content or transition delays
+      [100, 400, 800, 1500, 2500].forEach((delay) => {
         const id = window.setTimeout(() => {
-          setupHeaderTriggers();
+          updateHeaderTheme();
           ScrollTrigger.refresh();
         }, delay);
         mountRetryTimeouts.push(id);
       });
 
-      // Cleanup
       return () => {
         mountRetryTimeouts.forEach(id => window.clearTimeout(id));
-        activeTriggers.forEach(t => t.kill());
       };
     }, layoutRef);
 
