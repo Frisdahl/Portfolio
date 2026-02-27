@@ -159,7 +159,7 @@ const BrandsMarquee: React.FC = () => {
         }}
       />
 
-      <div className="flex flex-col md:flex-row  px-8 md:px-16 lg:px-24 items-start md:items-end justify-between gap-8 overflow-hidden">
+      <div className="flex flex-col md:flex-row px-8 items-start md:items-end justify-between gap-8 overflow-hidden">
         <div className=" overflow-hidden">
           <h2
             ref={headerRef}

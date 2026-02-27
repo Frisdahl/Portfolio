@@ -155,7 +155,7 @@ const ContactPage: React.FC = () => {
       id="contact"
       className="relative w-full min-h-screen pt-32 md:pt-48 bg-[#fefffe] flex flex-col"
     >
-      <div className="w-full px-8 md:px-12 lg:px-24 flex flex-col items-start text-left pb-32 md:pb-48 flex-grow">
+      <div className="w-full px-8 flex flex-col items-start text-left pb-32 md:pb-48 flex-grow">
         <h2
           ref={headingRef}
           className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-instrumentsans font-bold tracking-tight text-[#1c1d1e] uppercase leading-[1] mb-16"

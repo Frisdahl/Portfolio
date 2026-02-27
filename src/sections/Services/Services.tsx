@@ -209,7 +209,7 @@ const Services: React.FC = () => {
   return (
     <section
       id="services"
-      className="w-full mb-64 text-[#1c1d1e] text-left font-switzer px-8 md:px-12 lg:px-24"
+      className="w-full mb-64 text-[#1c1d1e] text-left font-switzer px-8"
     >
       {/* Heading - Full width across the padded container */}
       <div className="w-full mb-24">
@@ -223,7 +223,8 @@ const Services: React.FC = () => {
           */}
           <div ref={headingTextRef} className="w-full">
             <span
-              className="inline-block lg:w-[25%] h-1"
+              className="inline-block h-1"
+              style={{ width: "calc(var(--nav-width, 25%) + 3rem)" }}
               aria-hidden="true"
             ></span>
             Frisdahl Studio builds refined digital experiences for modern brands
@@ -233,7 +234,7 @@ const Services: React.FC = () => {
       </div>
 
       {/* Services */}
-      <div className="w-full lg:pl-[25%]">
+      <div className="w-full" style={{ paddingLeft: "calc(var(--nav-width, 25%) + 3rem)" }}>
         <div className="flex flex-col mb-12">
           <p className="text-sm uppercase mb-4 font-switzer font-semibold tracking-[0.2em] text-[#1c1d1e]/40">
             Services

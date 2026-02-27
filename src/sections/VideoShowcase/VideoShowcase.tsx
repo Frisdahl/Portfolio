@@ -62,7 +62,7 @@ const VideoShowcase: React.FC = () => {
       ref={containerRef}
       className="relative w-full bg-transparent pt-48 md:pt-64 pb-32 md:pb-48 flex items-center overflow-hidden"
     >
-      <div className="w-full max-w-[1920px] mx-auto px-6 md:px-12 lg:px-24">
+      <div className="w-full max-w-[1920px] mx-auto px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-12 lg:gap-20">
           {/* Video Column */}
           <div className="lg:col-span-7 flex justify-center lg:justify-start">
@@ -96,7 +96,7 @@ const VideoShowcase: React.FC = () => {
           {/* Text Column */}
           <div
             ref={textContainerRef}
-            className="lg:col-span-5 flex flex-col gap-6 md:gap-10 text-center lg:text-left"
+            className="lg:col-span-5 flex flex-col gap-6 md:gap-10 text-center lg:text-left lg:-translate-y-[25%]"
           >
             <div className="flex flex-col gap-4 md:gap-6">
               <h2

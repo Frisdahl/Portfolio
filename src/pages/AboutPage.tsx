@@ -132,7 +132,7 @@ const AboutPage: React.FC = () => {
     >
       <div className="w-full flex flex-col items-center pb-64">
         {/* Top Section: Hero-ish Centered Single Column */}
-        <div className="w-full flex flex-col items-center text-center gap-16 md:gap-24 mb-48 px-8 md:px-16 lg:px-24">
+        <div className="w-full flex flex-col items-center text-center gap-16 md:gap-24 mb-48 px-8">
           <h1
             ref={headingRef}
             className="text-6xl md:text-8xl lg:text-9xl font-instrumentsans font-bold text-[#1c1d1e] uppercase tracking-tight leading-none"
@@ -180,7 +180,7 @@ const AboutPage: React.FC = () => {
         </div>
 
         {/* Stuff I Do Section: Two Columns (Left Aligned) */}
-        <section className="stuff-i-do-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-24 px-8 md:px-16 lg:px-24">
+        <section className="stuff-i-do-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-24 px-8">
           {/* Left Column: Section Title */}
           <div className="w-full md:w-1/3">
             <h2 className="text-4xl md:text-5xl font-instrumentsans font-bold text-[#1c1d1e] uppercase md:sticky md:top-32">
@@ -208,7 +208,7 @@ const AboutPage: React.FC = () => {
         </section>
 
         {/* Experience & Education Section: Two Columns */}
-        <section className="experience-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-32 px-8 md:px-16 lg:px-24">
+        <section className="experience-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-32 px-8">
           {/* Left Column: Section Title */}
           <div className="w-full md:w-1/3">
             <h2 className="text-4xl md:text-5xl font-instrumentsans font-bold text-[#1c1d1e] uppercase md:sticky md:top-32">
