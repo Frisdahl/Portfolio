@@ -5,7 +5,6 @@ import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 import InitialLoader from "./components/InitialLoader";
 import ComingSoon from "./components/ComingSoon";
-import { SpeedInsights } from "@vercel/speed-insights/react";
 import "./App.css";
 
 import useSmoothScroll from "./utils/useSmoothScroll";
