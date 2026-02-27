@@ -114,7 +114,7 @@ const BrandsMarquee: React.FC = () => {
     Observer.create({
       target: window,
       type: "wheel,touch,pointer",
-      onChange: (self: any) => {
+      onChange: (self: Observer) => {
         const isScrollingDown = self.deltaY > 0;
         const m = motion.current;
 
