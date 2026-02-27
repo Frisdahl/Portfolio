@@ -17,13 +17,14 @@ const Header: React.FC = () => {
   React.useLayoutEffect(() => {
     const updateNavWidth = () => {
       if (navRef.current) {
-        const width = navRef.current.offsetWidth;
+        const isMobile = window.innerWidth < 640;
+        const width = isMobile ? 0 : navRef.current.offsetWidth;
         document.documentElement.style.setProperty("--nav-width", `${width}px`);
       }
     };
 
     updateNavWidth();
-    
+
     const ctx = gsap.context(() => {
       if (location.pathname === "/") {
         ScrollTrigger.create({
@@ -50,12 +51,13 @@ const Header: React.FC = () => {
 
   const handleLogoClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    
+
     if (location.pathname !== "/") {
       sessionStorage.setItem("isNavigating", "true");
       sessionStorage.setItem("isHomeNav", "true");
-      await triggerPageTransition();
-      navigate("/");
+      await triggerPageTransition(() => {
+        navigate("/");
+      });
     } else {
       scrollTo(0, 1.5, 0, false);
     }
@@ -77,22 +79,23 @@ const Header: React.FC = () => {
 
     if (section) {
       if (location.pathname !== "/") {
-        // Set specific nav flags for HomePage reveal logic
+        sessionStorage.setItem("isNavigating", "true");
+        sessionStorage.removeItem("isHomeNav");
         sessionStorage.setItem("targetSection", section);
-        
-        await triggerPageTransition();
-        navigate("/");
+
+        await triggerPageTransition(() => {
+          navigate(`/${section}`);
+        });
       } else {
-        // If already on home page, just smooth scroll with offset
         scrollTo(section, 1.5, -120, false);
       }
       return;
     }
 
     if (location.pathname !== to) {
-      sessionStorage.setItem("isNavigating", "true");
-      await triggerPageTransition();
-      navigate(to);
+      await triggerPageTransition(() => {
+        navigate(to);
+      });
     }
   };
 
@@ -101,8 +104,8 @@ const Header: React.FC = () => {
       <nav
         ref={navRef}
         className={`pointer-events-auto flex items-center border-b sm:border border-[#1c1d1e]/10 px-6 sm:pl-2 sm:pr-3 py-4 sm:py-2 w-full sm:w-auto sm:rounded-lg shadow-sm transition-all duration-1000 ${
-          isPastHero 
-            ? "bg-white/30 backdrop-blur-2xl" 
+          isPastHero
+            ? "bg-white/30 backdrop-blur-2xl"
             : "bg-[#fefffe] backdrop-blur-none"
         }`}
       >
@@ -111,11 +114,11 @@ const Header: React.FC = () => {
           onClick={handleLogoClick}
           className="flex items-center mr-5 shrink-0"
         >
-          <div className="bg-[#1d1d1f] w-10 h-10 sm:w-12 sm:h-12 md:w-15 md:h-15 flex items-center justify-center rounded-lg transition-all duration-300">
+          <div className="bg-[#1d1d1f] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-lg transition-all duration-300">
             <img
               src="/images/Logo-white.svg"
               alt="Portfolio Logo"
-              className="h-5 sm:h-6 md:h-8"
+              className="h-6 md:h-8"
             />
           </div>
         </Link>
@@ -130,7 +133,7 @@ const Header: React.FC = () => {
                 onMouseLeave={() => setHoveredIndex(null)}
                 className={`text-[11px] sm:text-xs md:text-[13px] uppercase font-bold tracking-normal transition-all duration-1000 ease-in-out text-[#1c1d1e] inline-block ${
                   hoveredIndex !== null && hoveredIndex !== index
-                    ? "blur-[2px] opacity-50 scale-[0.99]"
+                    ? "md:blur-[2px] md:opacity-50 scale-[0.99]"
                     : "opacity-100 scale-100"
                 }`}
               >

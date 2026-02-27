@@ -1,4 +1,5 @@
-import { useLayoutEffect, useState } from "react";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Hero from "../sections/Hero/Hero";
 import Projects from "../sections/Projects/Projects";
 import Services from "../sections/Services/Services";
@@ -7,48 +8,72 @@ import BrandsMarquee from "../sections/Collaboration/BrandsMarquee";
 import { scrollTo } from "../utils/smoothScroll";
 
 function HomePage() {
-  const [isVisible, setIsVisible] = useState(() => {
-    // Initial state based on whether we are navigating to specific sections
-    return !sessionStorage.getItem("targetSection") && !sessionStorage.getItem("isHomeNav");
-  });
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  useLayoutEffect(() => {
-    const targetSection = sessionStorage.getItem("targetSection");
+  useEffect(() => {
     const isHomeNav = sessionStorage.getItem("isHomeNav") === "true";
-    
-    if (targetSection || isHomeNav) {
-      const reveal = () => {
-        // 1. Force the scroll jump while invisible
-        if (targetSection) {
-          scrollTo(targetSection, 0, -120, true);
-        } else if (isHomeNav) {
-          scrollTo(0, 0, 0, true);
-        }
-        
-        // 2. Clear flags and show page
+
+    let attempts = 0;
+    const maxAttempts = 40;
+    let retryTimeout: number | null = null;
+
+    const attemptScrollToTarget = () => {
+      const target = location.hash || sessionStorage.getItem("targetSection");
+      if (!target) return;
+
+      const targetElement = document.querySelector(target);
+
+      if (targetElement) {
+        scrollTo(target, 0, -120, true);
+        requestAnimationFrame(() => scrollTo(target, 0, -120, true));
         sessionStorage.removeItem("targetSection");
+        sessionStorage.removeItem("isNavigating");
+
+        if (location.hash) {
+          navigate(location.pathname, { replace: true });
+        }
+        return;
+      }
+
+      attempts += 1;
+      if (attempts < maxAttempts) {
+        retryTimeout = window.setTimeout(attemptScrollToTarget, 80);
+      }
+    };
+
+    const startTargetScroll = () => {
+      attempts = 0;
+      attemptScrollToTarget();
+
+      const hasTargetSection = !!sessionStorage.getItem("targetSection");
+      const hasHashTarget = Boolean(location.hash);
+
+      if (hasTargetSection || hasHashTarget) {
         sessionStorage.removeItem("isHomeNav");
-        
-        // Small delay to ensure browser handled the jump before fading in
-        setTimeout(() => setIsVisible(true), 50);
-      };
+        return;
+      }
 
-      const handleTransitionComplete = () => {
-        reveal();
-      };
+      if (isHomeNav) {
+        scrollTo(0, 0, 0, true);
+        sessionStorage.removeItem("isHomeNav");
+        sessionStorage.removeItem("isNavigating");
+      }
+    };
 
-      window.addEventListener("page-transition-complete", handleTransitionComplete);
-      
-      const safetyTimeout = setTimeout(reveal, 1000);
+    window.addEventListener("page-transition-complete", startTargetScroll);
 
-      return () => {
-        window.removeEventListener("page-transition-complete", handleTransitionComplete);
-        clearTimeout(safetyTimeout);
-      };
-    } else {
-      setIsVisible(true);
-    }
-  }, []);
+    // Fallback in case transition event has already fired.
+    const fallbackStart = window.setTimeout(startTargetScroll, 180);
+
+    return () => {
+      window.removeEventListener("page-transition-complete", startTargetScroll);
+      window.clearTimeout(fallbackStart);
+      if (retryTimeout) {
+        window.clearTimeout(retryTimeout);
+      }
+    };
+  }, [location.hash, location.pathname, navigate]);
 
   return (
     <div className="HomePage">

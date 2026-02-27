@@ -4,7 +4,6 @@ import SplitType from "split-type";
 import AnimatedButton from "../components/AnimatedButton";
 import ServiceItem from "../components/ServiceItem";
 import ExperienceItem from "../components/ExperienceItem";
-import { initAboutItemsAnimation } from "./About.anim";
 
 const AboutPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -15,49 +14,60 @@ const AboutPage: React.FC = () => {
     if (!containerRef.current) return;
 
     // Synchronously hide elements that will be animated in
-    gsap.set([headingRef.current, ".about-item"], { 
-      autoAlpha: 0 
+    gsap.set([headingRef.current, ".about-item"], {
+      autoAlpha: 0,
     });
 
     const ctx = gsap.context(() => {
       // 1. Create the entrance timeline (initially paused)
-      const entranceTl = gsap.timeline({ 
+      const entranceTl = gsap.timeline({
         paused: true,
-        delay: 0.2, // Slight breathing room after transition
+        delay: 0.08,
         onStart: () => {
           animationTriggeredRef.current = true;
           // Ensure elements are visible when animation starts
           gsap.set([headingRef.current, ".about-item"], { autoAlpha: 1 });
-        }
+        },
       });
 
       // Heading animation
       if (headingRef.current) {
-        const split = new SplitType(headingRef.current, { types: "lines,words" });
-        gsap.set(split.lines, { overflow: "hidden" });
-        entranceTl.fromTo(split.words, {
-          yPercent: 100,
-          opacity: 0,
-        }, {
-          yPercent: 0,
-          opacity: 1,
-          duration: 1.2,
-          stagger: 0.03,
-          ease: "power4.out",
+        const split = new SplitType(headingRef.current, {
+          types: "lines,words",
         });
+        gsap.set(split.lines, { overflow: "hidden" });
+        entranceTl.fromTo(
+          split.words,
+          {
+            yPercent: 100,
+            opacity: 0,
+          },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1.2,
+            stagger: 0.03,
+            ease: "power4.out",
+          },
+        );
       }
 
       // Content elements reveal
-      entranceTl.fromTo(".about-item", {
-        y: 30,
-        opacity: 0,
-      }, {
-        y: 0,
-        opacity: 1,
-        duration: 1.0,
-        stagger: 0.1,
-        ease: "power3.out",
-      }, "-=0.8");
+      entranceTl.fromTo(
+        ".about-item",
+        {
+          y: 30,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.0,
+          stagger: 0.1,
+          ease: "power3.out",
+        },
+        "-=0.8",
+      );
 
       const startEntranceAnimation = () => {
         if (animationTriggeredRef.current) return;
@@ -67,11 +77,18 @@ const AboutPage: React.FC = () => {
 
       // 2. Coordination logic
       const handleTransitionComplete = () => startEntranceAnimation();
-      window.addEventListener("initial-loader-complete", handleTransitionComplete);
-      window.addEventListener("page-transition-complete", handleTransitionComplete);
+      window.addEventListener(
+        "initial-loader-complete",
+        handleTransitionComplete,
+      );
+      window.addEventListener(
+        "page-transition-complete",
+        handleTransitionComplete,
+      );
 
-      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
-      const isLoaderActive = !!document.querySelector('.initial-loader-wrap');
+      const isInitialLoaderDone =
+        sessionStorage.getItem("hasSeenInitialLoader") === "true";
+      const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
       const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
       if (!isNavigating && isInitialLoaderDone && !isLoaderActive) {
@@ -83,8 +100,14 @@ const AboutPage: React.FC = () => {
       }, 1500);
 
       return () => {
-        window.removeEventListener("initial-loader-complete", handleTransitionComplete);
-        window.removeEventListener("page-transition-complete", handleTransitionComplete);
+        window.removeEventListener(
+          "initial-loader-complete",
+          handleTransitionComplete,
+        );
+        window.removeEventListener(
+          "page-transition-complete",
+          handleTransitionComplete,
+        );
         clearTimeout(safetyTimeout);
         entranceTl.kill();
       };

@@ -26,6 +26,7 @@ const Hero: React.FC = () => {
     const startEntranceAnimation = () => {
       if (animationTriggered) return;
       animationTriggered = true;
+      sessionStorage.removeItem("isNavigating");
 
       // Show elements for animation
       gsap.set([headlineRef.current, footerRef.current], {
@@ -68,12 +69,14 @@ const Hero: React.FC = () => {
       startEntranceAnimation();
     };
     window.addEventListener("initial-loader-complete", handleLoaderComplete);
+    window.addEventListener("page-transition-complete", handleLoaderComplete);
 
     // Check if we should reveal immediately (e.g. not the first load or loader already finished)
     const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
     const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
+    const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
-    if (hasSeenLoader && !isLoaderActive) {
+    if (hasSeenLoader && !isLoaderActive && !isNavigating) {
       console.log("Hero: Internal navigation detected, revealing immediately");
       startEntranceAnimation();
     }
@@ -92,6 +95,10 @@ const Hero: React.FC = () => {
     return () => {
       window.removeEventListener(
         "initial-loader-complete",
+        handleLoaderComplete,
+      );
+      window.removeEventListener(
+        "page-transition-complete",
         handleLoaderComplete,
       );
       clearTimeout(safetyTimeout);

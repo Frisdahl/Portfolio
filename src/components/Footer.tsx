@@ -35,24 +35,31 @@ const Footer: React.FC = () => {
     targetSection?: string,
   ) => {
     e.preventDefault();
-    await triggerPageTransition();
-
     if (targetSection) {
       if (location.pathname !== "/") {
-        navigate("/");
-        setTimeout(() => {
-          scrollTo(targetSection, 0);
-        }, 150);
+        sessionStorage.setItem("isNavigating", "true");
+        sessionStorage.removeItem("isHomeNav");
+        sessionStorage.setItem("targetSection", targetSection);
+
+        await triggerPageTransition();
+        navigate(`/${targetSection}`);
       } else {
-        scrollTo(targetSection, 0);
+        scrollTo(targetSection, 1.2, -120, false);
       }
     } else {
-      navigate(to);
+      if (location.pathname !== to) {
+        sessionStorage.setItem("isNavigating", "true");
+        await triggerPageTransition();
+        navigate(to);
+      }
     }
   };
 
   return (
-    <footer ref={footerRef} className="dark-section relative w-full bg-[#1c1d1e] text-white pt-24 overflow-hidden">
+    <footer
+      ref={footerRef}
+      className="dark-section relative w-full bg-[#1c1d1e] text-white pt-24 overflow-hidden"
+    >
       {/* Background Video Layer */}
       <div className="absolute inset-0 z-[1] pointer-events-none">
         {isInView && (

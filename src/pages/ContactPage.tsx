@@ -26,38 +26,55 @@ const ContactPage: React.FC = () => {
     if (!containerRef.current) return;
 
     // Initial state: Hidden
-    gsap.set([headingRef.current, ".form-field-row", ".budget-area", ".submit-area"], { 
-      autoAlpha: 0 
-    });
+    gsap.set(
+      [headingRef.current, ".form-field-row", ".budget-area", ".submit-area"],
+      {
+        autoAlpha: 0,
+      },
+    );
 
     const ctx = gsap.context(() => {
       // 1. Create the entrance timeline (initially paused)
-      const entranceTl = gsap.timeline({ 
+      const entranceTl = gsap.timeline({
         paused: true,
-        delay: 0.2, // Slight breathing room after transition
+        delay: 0.08,
         onStart: () => {
           animationTriggeredRef.current = true;
           // Ensure elements are visible when animation starts
-          gsap.set([headingRef.current, ".form-field-row", ".budget-area", ".submit-area"], { 
-            autoAlpha: 1 
-          });
-        }
+          gsap.set(
+            [
+              headingRef.current,
+              ".form-field-row",
+              ".budget-area",
+              ".submit-area",
+            ],
+            {
+              autoAlpha: 1,
+            },
+          );
+        },
       });
 
       // Heading staggered text reveal
       if (headingRef.current) {
-        const split = new SplitType(headingRef.current, { types: "lines,words" });
-        gsap.set(split.lines, { overflow: "hidden" });
-        entranceTl.fromTo(split.words, {
-          yPercent: 100,
-          opacity: 0,
-        }, {
-          opacity: 1,
-          yPercent: 0,
-          duration: 1.2,
-          stagger: 0.05,
-          ease: "power4.out",
+        const split = new SplitType(headingRef.current, {
+          types: "lines,words",
         });
+        gsap.set(split.lines, { overflow: "hidden" });
+        entranceTl.fromTo(
+          split.words,
+          {
+            yPercent: 100,
+            opacity: 0,
+          },
+          {
+            opacity: 1,
+            yPercent: 0,
+            duration: 1.2,
+            stagger: 0.05,
+            ease: "power4.out",
+          },
+        );
       }
 
       // Form fields entrance
@@ -66,34 +83,50 @@ const ContactPage: React.FC = () => {
         const budgetArea = formRef.current.querySelector(".budget-area");
         const submitArea = formRef.current.querySelector(".submit-area");
 
-        entranceTl.fromTo(fields, {
-          y: 30,
-          opacity: 0,
-        }, {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15,
-          ease: "power3.out",
-        }, "-=0.8")
-        .fromTo(budgetArea, {
-          y: 20,
-          opacity: 0,
-        }, {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: "power3.out",
-        }, "-=0.6")
-        .fromTo(submitArea, {
-          y: 20,
-          opacity: 0,
-        }, {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: "power3.out"
-        }, "-=0.4");
+        entranceTl
+          .fromTo(
+            fields,
+            {
+              y: 30,
+              opacity: 0,
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 1,
+              stagger: 0.15,
+              ease: "power3.out",
+            },
+            "-=0.8",
+          )
+          .fromTo(
+            budgetArea,
+            {
+              y: 20,
+              opacity: 0,
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: "power3.out",
+            },
+            "-=0.6",
+          )
+          .fromTo(
+            submitArea,
+            {
+              y: 20,
+              opacity: 0,
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: "power3.out",
+            },
+            "-=0.4",
+          );
       }
 
       const startEntranceAnimation = () => {
@@ -104,11 +137,18 @@ const ContactPage: React.FC = () => {
 
       // 2. Coordination logic
       const handleTransitionComplete = () => startEntranceAnimation();
-      window.addEventListener("initial-loader-complete", handleTransitionComplete);
-      window.addEventListener("page-transition-complete", handleTransitionComplete);
+      window.addEventListener(
+        "initial-loader-complete",
+        handleTransitionComplete,
+      );
+      window.addEventListener(
+        "page-transition-complete",
+        handleTransitionComplete,
+      );
 
-      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
-      const isLoaderActive = !!document.querySelector('.initial-loader-wrap');
+      const isInitialLoaderDone =
+        sessionStorage.getItem("hasSeenInitialLoader") === "true";
+      const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
       const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
       if (!isNavigating && isInitialLoaderDone && !isLoaderActive) {
@@ -120,8 +160,14 @@ const ContactPage: React.FC = () => {
       }, 1500);
 
       return () => {
-        window.removeEventListener("initial-loader-complete", handleTransitionComplete);
-        window.removeEventListener("page-transition-complete", handleTransitionComplete);
+        window.removeEventListener(
+          "initial-loader-complete",
+          handleTransitionComplete,
+        );
+        window.removeEventListener(
+          "page-transition-complete",
+          handleTransitionComplete,
+        );
         clearTimeout(safetyTimeout);
         entranceTl.kill();
       };

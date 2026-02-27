@@ -22,7 +22,7 @@ const PageTransition = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const animate = (isInitial = false) => {
+  const animate = (onCovered?: () => void, isInitial = false) => {
     return new Promise<void>((resolve) => {
       if (isAnimatingRef.current && !isInitial) {
         resolve();
@@ -68,16 +68,19 @@ const PageTransition = () => {
             ease: "expo.inOut",
             force3D: true,
             onComplete: () => {
+              // Execute navigation/jump logic while screen is covered
+              onCovered?.();
               resolve();
             },
           });
         } else {
           tl.set(columnsRef.current, { scaleX: 1 });
           tl.to({}, { duration: 0.1 });
+          onCovered?.();
           resolve();
         }
 
-        // 3. Brief pause
+        // 3. Brief pause while covered
         tl.to({}, { duration: 0.2 });
 
         // 4. Retract Phase
@@ -98,10 +101,7 @@ const PageTransition = () => {
   };
 
   useEffect(() => {
-    _setTransitionTrigger(() => animate());
-    
-    // Initial mount: trigger immediately to hide initial loading jump if needed
-    // But InitialLoader handles the first one, so we just clear first mount flag
+    _setTransitionTrigger((onCovered) => animate(onCovered));
     isFirstMountRef.current = false;
   }, []);
 
