@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import lenis from "../utils/lenis";
 
 const InitialLoader: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -15,14 +16,20 @@ const InitialLoader: React.FC = () => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Prevent scrolling during load
+    // 1. Force absolute scroll prevention immediately
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    if (lenis) lenis.stop();
 
     const tl = gsap.timeline({
       delay: 0.5, // Initial breathing room
       onComplete: () => {
         setIsVisible(false);
+        // 2. Re-enable scrolling
         document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+        if (lenis) lenis.start();
+        
         // Remember that we've seen the loader in this session
         sessionStorage.setItem("hasSeenInitialLoader", "true");
         // Dispatch completion event
@@ -103,6 +110,8 @@ const InitialLoader: React.FC = () => {
 
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      if (lenis) lenis.start();
     };
   }, []);
 
@@ -111,7 +120,7 @@ const InitialLoader: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="initial-loader-wrap fixed inset-0 z-[100000] flex items-center justify-center bg-transparent"
+      className="initial-loader-wrap fixed inset-0 z-[100000] flex items-center justify-center bg-transparent pointer-events-auto"
     >
       {/* 12 Columns Background */}
       <div className="absolute inset-0 flex w-full h-full z-0 overflow-hidden">

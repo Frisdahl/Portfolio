@@ -14,95 +14,102 @@ const Hero: React.FC = () => {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-      if (!heroRef.current || !containerRef.current) return;
-  
-      // Synchronously hide elements that will be animated in
+  useEffect(() => {
+    if (!heroRef.current || !containerRef.current) return;
+
+    // Synchronously hide elements that will be animated in
+    gsap.set([videoRef.current, headlineRef.current, footerRef.current], {
+      autoAlpha: 0,
+    });
+
+    let animationTriggered = false;
+    const startEntranceAnimation = () => {
+      if (animationTriggered) return;
+      animationTriggered = true;
+
+      // Show elements for animation
       gsap.set([videoRef.current, headlineRef.current, footerRef.current], {
-        autoAlpha: 0,
+        autoAlpha: 1,
       });
-  
-      let animationTriggered = false;
-      const startEntranceAnimation = () => {
-        if (animationTriggered) return;
-        animationTriggered = true;
-  
-        // Show elements for animation
-        gsap.set([videoRef.current, headlineRef.current, footerRef.current], {
-          autoAlpha: 1,
+
+      // Initial Load Animation
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      // Fade in video (starting from its base opacity)
+      tl.fromTo(
+        videoRef.current,
+        { scale: 1.1, opacity: 0 },
+        { opacity: 0.4, scale: 1.06, duration: 2.5, ease: "power2.inOut" },
+      );
+
+      // Split headline for staggered animation (Contact Page Style)
+      if (headlineRef.current) {
+        const split = new SplitType(headlineRef.current, {
+          types: "lines,words",
         });
-  
-        // Initial Load Animation
-        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-  
-        // Fade in video (starting from its base opacity)
+        gsap.set(split.lines, { overflow: "hidden" });
         tl.fromTo(
-          videoRef.current,
-          { scale: 1.1, opacity: 0 },
-          { opacity: 0.4, scale: 1.06, duration: 2.5, ease: "power2.inOut" },
+          split.words,
+          { yPercent: 100, opacity: 0 },
+          {
+            opacity: 1,
+            yPercent: 0,
+            duration: 1.2,
+            stagger: 0.05,
+            ease: "power4.out",
+          },
+          "-=1.8",
         );
-  
-        // Split headline for staggered animation (Contact Page Style)
-        if (headlineRef.current) {
-          const split = new SplitType(headlineRef.current, {
-            types: "lines,words",
-          });
-          gsap.set(split.lines, { overflow: "hidden" });
-          tl.fromTo(
-            split.words,
-            { yPercent: 100, opacity: 0 },
-            {
-              opacity: 1,
-              yPercent: 0,
-              duration: 1.2,
-              stagger: 0.05,
-              ease: "power4.out",
-            },
-            "-=1.8",
-          );
+      }
+
+      // Fade in footer area
+      tl.fromTo(
+        footerRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 1.2 },
+        "-=1.2",
+      );
+    };
+
+    // Listen for loader completion
+    const handleLoaderComplete = () => {
+      startEntranceAnimation();
+    };
+    window.addEventListener("initial-loader-complete", handleLoaderComplete);
+
+    // Check if we should reveal immediately (e.g. not the first load or loader already finished)
+    const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
+    const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
+
+    if (hasSeenLoader && !isLoaderActive) {
+      console.log("Hero: Internal navigation detected, revealing immediately");
+      startEntranceAnimation();
+    }
+
+    // Safety timeout - only long on first load
+    const safetyTimeout = setTimeout(
+      () => {
+        if (!animationTriggered) {
+          console.log("Hero: Safety timeout triggered");
+          startEntranceAnimation();
         }
-  
-        // Fade in footer area
-        tl.fromTo(
-          footerRef.current,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 1.2 },
-          "-=1.2",
-        );
-      };
-  
-          // Listen for loader completion
-          const handleLoaderComplete = () => {
-            startEntranceAnimation();
-          };
-          window.addEventListener("initial-loader-complete", handleLoaderComplete);
-      
-          // Check if we should reveal immediately (e.g. not the first load or loader already finished)
-          const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
-          const isLoaderActive = !!document.querySelector('.initial-loader-wrap');
-      
-          if (hasSeenLoader && !isLoaderActive) {
-            console.log("Hero: Internal navigation detected, revealing immediately");
-            startEntranceAnimation();
-          }
-      
-          // Safety timeout - only long on first load
-          const safetyTimeout = setTimeout(() => {
-            if (!animationTriggered) {
-              console.log("Hero: Safety timeout triggered");
-              startEntranceAnimation();
-            }
-          }, isLoaderActive ? 6000 : 100); 
-      
-          return () => {
-            window.removeEventListener("initial-loader-complete", handleLoaderComplete);
-            clearTimeout(safetyTimeout);
-          };    }, []);
-  
-    useEffect(() => {
-      if (!heroRef.current || !containerRef.current) return;
-  
-      // Scroll-driven Wipe Transition
+      },
+      isLoaderActive ? 6000 : 100,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "initial-loader-complete",
+        handleLoaderComplete,
+      );
+      clearTimeout(safetyTimeout);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!heroRef.current || !containerRef.current) return;
+
+    // Scroll-driven Wipe Transition
     gsap.to(heroRef.current, {
       scrollTrigger: {
         trigger: containerRef.current,
@@ -137,7 +144,7 @@ const Hero: React.FC = () => {
     <div
       ref={containerRef}
       id="hero"
-      className="hero-container relative w-full h-[200vh]"
+      className="hero-container relative w-full"
     >
       <section
         ref={heroRef}
