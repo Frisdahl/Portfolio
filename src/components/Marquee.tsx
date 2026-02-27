@@ -106,7 +106,7 @@ function horizontalLoop(items: HTMLElement[], config: LoopConfig): LoopTimeline 
       .add("label" + i, distanceToStart / pixelsPerSecond);
     times[i] = distanceToStart / pixelsPerSecond;
   }
-  function toIndex(index: number, vars: Record<string, unknown>) {
+  function toIndex(index: number, vars?: Record<string, unknown>) {
     const finalVars = vars || {};
     let targetIndex = index;
     if (Math.abs(targetIndex - curIndex) > length / 2) {
@@ -122,10 +122,10 @@ function horizontalLoop(items: HTMLElement[], config: LoopConfig): LoopTimeline 
     finalVars.overwrite = true;
     return tl.tweenTo(time, finalVars);
   }
-  tl.next = (vars: Record<string, unknown>) => toIndex(curIndex + 1, vars);
-  tl.previous = (vars: Record<string, unknown>) => toIndex(curIndex - 1, vars);
+  tl.next = (vars?: Record<string, unknown>) => toIndex(curIndex + 1, vars);
+  tl.previous = (vars?: Record<string, unknown>) => toIndex(curIndex - 1, vars);
   tl.current = () => curIndex;
-  tl.toIndex = (index: number, vars: Record<string, unknown>) => toIndex(index, vars);
+  tl.toIndex = (index: number, vars?: Record<string, unknown>) => toIndex(index, vars);
   tl.times = times;
   tl.progress(1, true).progress(0, true);
   if (finalConfig.reversed) {
@@ -167,7 +167,7 @@ const Marquee: React.FC<MarqueeProps> = ({
     const timeoutId = setTimeout(() => {
       if (!railRef.current || !containerRef.current) return;
       
-      const items = Array.from(railRef.current.querySelectorAll(".marquee-item"));
+      const items = Array.from(railRef.current.querySelectorAll(".marquee-item")) as HTMLElement[];
       if (items.length === 0) return;
 
       loop = horizontalLoop(items, {

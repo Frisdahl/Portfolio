@@ -1,4 +1,5 @@
-import { useRef, useEffect, FC, forwardRef, MouseEvent } from "react";
+import { useRef, useEffect, forwardRef } from "react";
+import type { FC, MouseEvent, ReactNode } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { scrollTo } from "../utils/smoothScroll";
 import Links from "./Links";
@@ -9,8 +10,8 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface AnimatedMenuLinkProps {
   to: string;
-  children: React.ReactNode;
-  onClick: (e: MouseEvent) => void;
+  children: ReactNode;
+  onClick: (e: MouseEvent<HTMLAnchorElement>) => void;
   isOpen: boolean;
 }
 
@@ -226,7 +227,7 @@ const MobileMenuOverlay: FC<{
   }, [isOpen]);
 
   const handleLinkClick = async (
-    e: MouseEvent,
+    e: MouseEvent<HTMLAnchorElement>,
     to: string,
     targetSection?: string,
   ) => {
@@ -307,25 +308,25 @@ const MobileMenuOverlay: FC<{
           </h3>
           <nav className="text-3xl sm:text-4xl text-[var(--foreground)] font-normal flex flex-col space-y-3 sm:space-y-5 mb-12 sm:mb-16">
             <AnimatedMenuLink
-              ref={(el) => (navLinksRef.current[0] = el)}
+              ref={(el: HTMLAnchorElement | null) => { navLinksRef.current[0] = el; }}
               to="/"
-              onClick={(e) => handleLinkClick(e, "/", "#projects")}
+              onClick={(e: MouseEvent<HTMLAnchorElement>) => handleLinkClick(e, "/", "#projects")}
               isOpen={isOpen}
             >
               Works
             </AnimatedMenuLink>
             <AnimatedMenuLink
-              ref={(el) => (navLinksRef.current[1] = el)}
+              ref={(el: HTMLAnchorElement | null) => { navLinksRef.current[1] = el; }}
               to="/about"
-              onClick={(e) => handleLinkClick(e, "/about")}
+              onClick={(e: MouseEvent<HTMLAnchorElement>) => handleLinkClick(e, "/about")}
               isOpen={isOpen}
             >
               About
             </AnimatedMenuLink>
             <AnimatedMenuLink
-              ref={(el) => (navLinksRef.current[2] = el)}
+              ref={(el: HTMLAnchorElement | null) => { navLinksRef.current[2] = el; }}
               to="/contact"
-              onClick={(e) => handleLinkClick(e, "/contact")}
+              onClick={(e: MouseEvent<HTMLAnchorElement>) => handleLinkClick(e, "/contact")}
               isOpen={isOpen}
             >
               Contact

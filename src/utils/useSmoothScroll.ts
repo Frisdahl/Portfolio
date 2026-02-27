@@ -20,7 +20,7 @@ const useSmoothScroll = () => {
     }, 100);
 
     const ticker = (time: number) => {
-      lenis.raf(time * 1000);
+      lenis?.raf(time * 1000);
     };
 
     gsap.ticker.add(ticker);
@@ -33,9 +33,9 @@ const useSmoothScroll = () => {
     return () => {
       // Clean up listeners
       gsap.ticker.remove(ticker);
-      lenis.off("scroll", ScrollTrigger.update);
+      lenis?.off("scroll", ScrollTrigger.update);
       window.removeEventListener("resize", onResize);
-      lenis.stop();
+      lenis?.stop();
     };
   }, []);
 };

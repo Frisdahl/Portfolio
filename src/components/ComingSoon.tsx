@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, FC } from "react";
+import { useState, useEffect, useCallback } from "react";
+import type { FC } from "react";
 import gsap from "gsap";
 
 const ComingSoon: FC = () => {

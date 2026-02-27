@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { Observer } from "gsap/Observer";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Observer } from "gsap/all";
 import SplitType from "split-type";
 
 gsap.registerPlugin(Observer, ScrollTrigger);
@@ -114,7 +114,7 @@ const BrandsMarquee: React.FC = () => {
     Observer.create({
       target: window,
       type: "wheel,touch,pointer",
-      onChange: (self) => {
+      onChange: (self: any) => {
         const isScrollingDown = self.deltaY > 0;
         const m = motion.current;
 

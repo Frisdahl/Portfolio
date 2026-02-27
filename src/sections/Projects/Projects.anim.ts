@@ -76,13 +76,9 @@ export const initGridAnimations = (container: HTMLElement) => {
       // --- 2. Grid Rows with Two Cards ---
       if (cards.length === 2) {
         // Measure widths at runtime to identify layout
-        const rects = cards.map(c => c.getBoundingClientRect());
-        const narrowIdx = rects[0].width < rects[1].width ? 0 : 1;
         
         cards.forEach((card, idx) => {
           const isLeft = idx === 0;
-          const _isNarrow = idx === narrowIdx;
-          console.log(_isNarrow); // Use the variable to satisfy lint
           
           // Determine direction based on width detection and position
           // Goal: "Reveal toward center" (Slide IN from edges)
@@ -163,7 +159,7 @@ export const initProjectReveal = (item: HTMLElement) => {
 };
 
 export const initProjectItemAnimations = (
-  isHovered: boolean,
+  _isHovered: boolean,
   elements: {
     video: HTMLVideoElement | null;
     titleText: HTMLElement;

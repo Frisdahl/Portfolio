@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import Hero from "../sections/Hero/Hero";
 import Projects from "../sections/Projects/Projects";
 import Services from "../sections/Services/Services";

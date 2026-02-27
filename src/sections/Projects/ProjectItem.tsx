@@ -6,7 +6,7 @@ import { showComingSoon } from "../../utils/comingSoon";
 interface Project {
   id: number;
   title: string;
-  description: string;
+  description?: string;
   categories: string[];
   image: string;
   video?: string;

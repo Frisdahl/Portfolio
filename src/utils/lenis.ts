@@ -9,7 +9,6 @@ if (typeof window !== "undefined") {
     smoothWheel: true,
     wheelMultiplier: 0.8,
     touchMultiplier: 1.5,
-    normalizeWheel: true, // Crucial for laptop trackpads
     infinite: false,
     syncTouch: true, // Better touch device experience
   });
