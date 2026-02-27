@@ -2,7 +2,7 @@ import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
-import PageTransition from "./components/PageTransition";
+import InitialLoader from "./components/InitialLoader";
 import ComingSoon from "./components/ComingSoon";
 import Footer from "./components/Footer";
 import "./App.css";
@@ -48,7 +48,7 @@ function App() {
     );
 
     console.log(
-      "%c👉 mail@frisdahl.studio",
+      "%c👉 frisdahlmarketing@gmail.com",
       "font-size:14px; color:#ffffff; font-family: 'Switzer', sans-serif; text-decoration: underline;",
     );
   }, []);
@@ -56,8 +56,8 @@ function App() {
   return (
     <Router>
       <div className="noise-grain" />
+      <InitialLoader />
       <ScrollToTop />
-      {/* <PageTransition /> */}
       <ComingSoon />
 
       <Layout>

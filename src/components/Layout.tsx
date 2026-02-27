@@ -43,13 +43,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           const isHeader = el.closest('header');
           const isNoise = el.classList.contains('noise-grain');
           const isMenuOverlay = el.classList.contains('mobile-menu-overlay');
-          return !isHeader && !isNoise && !isMenuOverlay;
+          const isLoader = el.closest('.initial-loader-wrap'); // Add class to InitialLoader
+          return !isHeader && !isNoise && !isMenuOverlay && !isLoader;
         });
 
         if (target) {
           // Check if this element or any of its parents are marked as a dark section
-          const isOverDark = !!target.closest('.dark-section');
+          // ALSO check if it's the hero container which is dark
+          const isOverDark = !!target.closest('.dark-section') || !!target.closest('#hero');
           setIsHeaderDark(!isOverDark);
+        } else {
+          // Default to light elements (dark theme) for Hero if nothing found
+          setIsHeaderDark(false);
         }
       };
 

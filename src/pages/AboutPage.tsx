@@ -14,31 +14,82 @@ const AboutPage: React.FC = () => {
   useLayoutEffect(() => {
     if (!containerRef.current) return;
 
+    // Synchronously hide elements that will be animated in
+    gsap.set([headingRef.current, ".about-item"], { 
+      autoAlpha: 0 
+    });
+
     const ctx = gsap.context(() => {
+      let animationTriggered = false;
+
+      const startEntranceAnimation = () => {
+        if (animationTriggered) return;
+        animationTriggered = true;
+        console.log("AboutPage: Running entrance animation");
+
+        // Show elements for animation
+        gsap.set([headingRef.current, ".about-item"], { 
+          autoAlpha: 1 
+        });
+
+        // Heading animation (Hero/Contact Style)
+        if (headingRef.current) {
+          const split = new SplitType(headingRef.current, { 
+            types: "lines,words" 
+          });
+          gsap.set(split.lines, { overflow: "hidden" });
+          
+          gsap.fromTo(split.words, {
+            yPercent: 100,
+            opacity: 0,
+          }, {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1.2,
+            stagger: 0.03,
+            ease: "power4.out",
+          });
+        }
+
+        // Content elements staggered reveal (Tightened)
+        gsap.fromTo(".about-item", {
+          y: 30,
+          opacity: 0,
+        }, {
+          y: 0,
+          opacity: 1,
+          duration: 1.0,
+          stagger: 0.1,
+          ease: "power3.out",
+          delay: 0.4,
+        });
+      };
+
       // 1. Line-reveal animations for all service/experience items
       initAboutItemsAnimation(containerRef.current!);
 
-      // Heading animation
-      if (headingRef.current) {
-        const split = new SplitType(headingRef.current, { types: "chars" });
-        gsap.from(split.chars, {
-          y: 50,
-          opacity: 0,
-          duration: 1,
-          stagger: 0.02,
-          ease: "power4.out",
-        });
+      // Listen for transition completion (both initial and page-to-page)
+      const handleTransitionComplete = () => {
+        startEntranceAnimation();
+      };
+      
+      window.addEventListener("initial-loader-complete", handleTransitionComplete);
+      window.addEventListener("page-transition-complete", handleTransitionComplete);
+
+      // Check if we should reveal immediately (if loader is already gone)
+      const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
+      const isLoaderActive = !!document.querySelector('.initial-loader-wrap');
+
+      if (hasSeenLoader && !isLoaderActive) {
+        startEntranceAnimation();
       }
 
-      // Content elements staggered reveal
-      gsap.from(".about-item", {
-        y: 40,
-        opacity: 0,
-        duration: 1.2,
-        stagger: 0.2,
-        ease: "power3.out",
-        delay: 0.4,
-      });
+      // Safety timeout
+      const safetyTimeout = setTimeout(() => {
+        if (!animationTriggered && document.body.style.overflow !== "hidden") {
+          startEntranceAnimation();
+        }
+      }, 1500);
 
       // Stuff I Do section reveal
       gsap.from(".stuff-i-do-section", {
@@ -51,6 +102,12 @@ const AboutPage: React.FC = () => {
           start: "top 80%",
         },
       });
+
+      return () => {
+        window.removeEventListener("initial-loader-complete", handleTransitionComplete);
+        window.removeEventListener("page-transition-complete", handleTransitionComplete);
+        clearTimeout(safetyTimeout);
+      };
     }, containerRef);
 
     return () => ctx.revert();

@@ -69,16 +69,16 @@ const Services: React.FC = () => {
 
       gsap.fromTo(
         words,
-        { opacity: 0, yPercent: 100 },
+        { opacity: 0, y: 50 },
         {
           opacity: 1,
-          yPercent: 0,
-          stagger: 0.05,
-          duration: 1.2,
+          y: 0,
+          stagger: 0.02,
+          duration: 1.5,
           ease: "power4.out",
           scrollTrigger: {
             trigger: headingRef.current,
-            start: "top 85%",
+            start: "top 80%",
             once: true,
           },
         },
@@ -226,9 +226,8 @@ const Services: React.FC = () => {
               className="inline-block lg:w-[25%] h-1"
               aria-hidden="true"
             ></span>
-            Frisdahl Studio is a creative digital studio crafting immersive
-            websites for modern brands — balancing visual ambition with clarity
-            to create refined digital experiences that serve real-world goals.
+            Frisdahl Studio builds refined digital experiences for modern brands
+            — where visual ambition meets clarity.
           </div>
         </h2>
       </div>
@@ -252,14 +251,14 @@ const Services: React.FC = () => {
                 <div
                   key={service.id}
                   className={`flex items-center cursor-pointer transition-all duration-500 w-full group ${
-                    isActive ? "opacity-100" : "opacity-20 hover:opacity-40"
+                    isActive ? "opacity-100" : "opacity-30 hover:opacity-40"
                   }`}
                   onClick={() => {
                     setActiveIndex(index);
                     setProgress(0);
                   }}
                 >
-                  <span className="text-4xl font-instrumentsans font-bold opacity-20 w-12 shrink-0">
+                  <span className="text-4xl font-instrumentsans font-bold w-12 shrink-0">
                     {service.id}
                   </span>
 
@@ -268,7 +267,7 @@ const Services: React.FC = () => {
                       isActive ? "w-16 md:w-20 lg:w-24" : "w-8 md:w-10 lg:w-12"
                     }`}
                   >
-                    <div className="absolute inset-0 bg-[#1c1d1e] opacity-10" />
+                    <div className="absolute inset-0 bg-[#1c1d1e] opacity-30" />
                     {isActive && (
                       <div
                         className="absolute top-0 left-0 h-full bg-[#1c1d1e] z-10"
@@ -308,4 +307,4 @@ const Services: React.FC = () => {
   );
 };
 
-export default Services;
+export { Services as default };

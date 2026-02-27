@@ -104,6 +104,8 @@ const MobileMenuOverlay: FC<{
     gsap.set(footerRef.current, { opacity: 0, y: 10 });
   }, []);
 
+  const isClosingForNavigation = useRef(false);
+
   useEffect(() => {
     if (timelineRef.current) timelineRef.current.kill();
 
@@ -207,6 +209,13 @@ const MobileMenuOverlay: FC<{
           autoAlpha: 0,
           duration: 0.7,
           ease: "power2.inOut",
+          onComplete: () => {
+            if (isClosingForNavigation.current) {
+              isClosingForNavigation.current = false;
+              console.log("Menu: Overlay gone - dispatching transition complete");
+              window.dispatchEvent(new CustomEvent("page-transition-complete"));
+            }
+          }
         },
         "-=0.6",
       );
@@ -223,44 +232,31 @@ const MobileMenuOverlay: FC<{
     targetSection?: string,
   ) => {
     e.preventDefault();
+    
+    // Set flag so onComplete knows to fire the event
+    isClosingForNavigation.current = true;
     onClose();
 
-    // Start transition
-    await triggerPageTransition();
+    // Small delay to let navigation happen while menu closes
+    setTimeout(() => {
+      if (targetSection) {
+        if (targetSection === "#contact") {
+          scrollTo("#contact", 0);
+          return;
+        }
 
-    if (targetSection) {
-      if (targetSection === "#contact") {
-        // Contact is on every page
-        scrollTo("#contact", 0);
-        setTimeout(() => {
-          ScrollTrigger.refresh();
-          ScrollTrigger.update();
-        }, 50);
-        return;
-      }
-
-      if (location.pathname !== "/") {
-        navigate("/");
-        // Small delay to let navigation happen then scroll
-        setTimeout(() => {
-          scrollTo(targetSection, 0);
-          // Force ScrollTrigger to recognize the jump
+        if (location.pathname !== "/") {
+          navigate("/");
           setTimeout(() => {
-            ScrollTrigger.refresh();
-            ScrollTrigger.update();
-          }, 50);
-        }, 150);
+            scrollTo(targetSection, 0);
+          }, 150);
+        } else {
+          scrollTo(targetSection, 0);
+        }
       } else {
-        scrollTo(targetSection, 0);
-        // Force ScrollTrigger to recognize the jump
-        setTimeout(() => {
-          ScrollTrigger.refresh();
-          ScrollTrigger.update();
-        }, 50);
+        navigate(to);
       }
-    } else {
-      navigate(to);
-    }
+    }, 200);
   };
 
   return (
