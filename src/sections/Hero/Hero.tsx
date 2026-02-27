@@ -14,26 +14,26 @@ const Hero: React.FC = () => {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
 
-      useEffect(() => {
-        if (!heroRef.current || !containerRef.current) return;
-    
-        // Synchronously hide elements that will be animated in
-        // DO NOT hide videoRef.current here as we want it visible immediately
-        gsap.set([headlineRef.current, footerRef.current], {
-          autoAlpha: 0,
-        });
+  useEffect(() => {
+    if (!heroRef.current || !containerRef.current) return;
+
+    // Synchronously hide elements that will be animated in
+    // DO NOT hide videoRef.current here as we want it visible immediately
+    gsap.set([headlineRef.current, footerRef.current], {
+      autoAlpha: 0,
+    });
     let animationTriggered = false;
-          const startEntranceAnimation = () => {
-            if (animationTriggered) return;
-            animationTriggered = true;
-      
-            // Show elements for animation
-            gsap.set([headlineRef.current, footerRef.current], {
-              autoAlpha: 1,
-            });
-    
-            // Initial Load Animation
-            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    const startEntranceAnimation = () => {
+      if (animationTriggered) return;
+      animationTriggered = true;
+
+      // Show elements for animation
+      gsap.set([headlineRef.current, footerRef.current], {
+        autoAlpha: 1,
+      });
+
+      // Initial Load Animation
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
       // 1. Heading slide up (Split headline)
       if (headlineRef.current) {
         const split = new SplitType(headlineRef.current, {
@@ -46,11 +46,11 @@ const Hero: React.FC = () => {
           {
             opacity: 1,
             yPercent: 0,
-            duration: 1.2,
+            duration: 1.5,
             stagger: 0.05,
             ease: "power4.out",
           },
-          0.1, // Small initial delay
+          0.6, // Small initial delay
         );
       }
 
