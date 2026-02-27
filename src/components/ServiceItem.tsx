@@ -12,7 +12,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   showDivider = true,
 }) => {
   return (
-    <div className="about-animate-item w-full py-8 md:py-10 first:pt-0">
+    <div className="about-animate-item w-full py-8 md:py-10 first:pt-0 opacity-0">
       <div className="flex items-center gap-4 mb-4">
         <h3 className="text-3xl md:text-3xl font-instrumentsans font-bold text-[#1c1d1e] uppercase">
           {title}

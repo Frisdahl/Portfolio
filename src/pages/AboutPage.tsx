@@ -65,7 +65,12 @@ const AboutPage: React.FC = () => {
       };
 
       // 1. Line-reveal animations for all service/experience items
-      initAboutItemsAnimation(containerRef.current!);
+      // Add a tiny delay to ensure children are rendered
+      const aboutItemsTimeout = setTimeout(() => {
+        if (containerRef.current) {
+          initAboutItemsAnimation(containerRef.current);
+        }
+      }, 100);
 
       // Listen for transition completion (both initial and page-to-page)
       const handleTransitionComplete = () => {
@@ -114,6 +119,7 @@ const AboutPage: React.FC = () => {
         window.removeEventListener("initial-loader-complete", handleTransitionComplete);
         window.removeEventListener("page-transition-complete", handleTransitionComplete);
         clearTimeout(safetyTimeout);
+        clearTimeout(aboutItemsTimeout);
       };
     }, containerRef);
 

@@ -13,6 +13,9 @@ export const initAboutItemsAnimation = (container: HTMLElement) => {
     const items = container.querySelectorAll(".about-animate-item");
 
     items.forEach((item) => {
+      // Ensure item is visible before splitting (removes opacity-0)
+      gsap.set(item, { autoAlpha: 1 });
+
       // Find text elements within the item
       const headings = item.querySelectorAll("h3, p.uppercase, span.whitespace-nowrap");
       const descriptions = item.querySelectorAll("p:not(.uppercase)");
@@ -21,7 +24,7 @@ export const initAboutItemsAnimation = (container: HTMLElement) => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: item,
-          start: "top 90%",
+          start: "top 95%",
           once: true,
         },
       });
@@ -35,6 +38,7 @@ export const initAboutItemsAnimation = (container: HTMLElement) => {
           duration: 1,
           stagger: 0.1,
           ease: "power4.out",
+          onComplete: () => split.revert(),
         }, 0); // Start at 0 relative to timeline
       });
 
@@ -47,6 +51,7 @@ export const initAboutItemsAnimation = (container: HTMLElement) => {
           duration: 1,
           stagger: 0.05,
           ease: "power4.out",
+          onComplete: () => split.revert(),
         }, 0.1); // Slight delay for depth
       });
 
