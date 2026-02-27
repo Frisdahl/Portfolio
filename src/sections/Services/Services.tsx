@@ -55,30 +55,30 @@ const Services: React.FC = () => {
     if (!headingRef.current || !headingTextRef.current) return;
 
     const ctx = gsap.context(() => {
-      new SplitType(headingTextRef.current!, {
+      const split = new SplitType(headingTextRef.current!, {
         types: "lines,words",
         lineClass: "split-line",
         wordClass: "split-word",
       });
 
-      const lines = headingTextRef.current!.querySelectorAll(".split-line");
-      const words = headingTextRef.current!.querySelectorAll(".split-word");
-
-      gsap.set(lines, { display: "block", overflow: "hidden" });
-      gsap.set(words, { display: "inline-block", translateZ: 0 });
+      // Wrap each word in a container that has overflow hidden to make the slide up work
+      // or just ensure lines have overflow hidden. 
+      // The current structure uses lines as the masking container.
+      gsap.set(split.lines, { overflow: "hidden" });
+      gsap.set(split.words, { display: "inline-block" });
 
       gsap.fromTo(
-        words,
-        { opacity: 0, y: 50 },
+        split.words,
+        { yPercent: 100, opacity: 0 },
         {
           opacity: 1,
-          y: 0,
+          yPercent: 0,
           stagger: 0.02,
-          duration: 1.5,
+          duration: 1.2,
           ease: "power4.out",
           scrollTrigger: {
             trigger: headingRef.current,
-            start: "top 80%",
+            start: "top 85%",
             once: true,
           },
         },

@@ -1,5 +1,4 @@
-import React, { useState, useLayoutEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useLayoutEffect, useRef } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import { gsap } from "gsap";
@@ -14,7 +13,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const layoutRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
 
   useLayoutEffect(() => {
     // Sync ScrollTrigger with Lenis

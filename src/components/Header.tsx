@@ -2,11 +2,16 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { scrollTo } from "../utils/smoothScroll";
 import { triggerPageTransition } from "../utils/pageTransition";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null);
+  const [isPastHero, setIsPastHero] = React.useState(false);
   const navRef = React.useRef<HTMLElement>(null);
 
   React.useLayoutEffect(() => {
@@ -18,16 +23,30 @@ const Header: React.FC = () => {
     };
 
     updateNavWidth();
-    window.addEventListener("resize", updateNavWidth);
+    
+    const ctx = gsap.context(() => {
+      if (location.pathname === "/") {
+        ScrollTrigger.create({
+          trigger: "#hero",
+          start: "bottom 100px",
+          onEnter: () => setIsPastHero(true),
+          onLeaveBack: () => setIsPastHero(false),
+          onRefresh: (self) => setIsPastHero(self.progress > 0),
+        });
+      } else {
+        setIsPastHero(true);
+      }
+    });
 
-    // Also update after transition
+    window.addEventListener("resize", updateNavWidth);
     window.addEventListener("page-transition-complete", updateNavWidth);
 
     return () => {
+      ctx.revert();
       window.removeEventListener("resize", updateNavWidth);
       window.removeEventListener("page-transition-complete", updateNavWidth);
     };
-  }, []);
+  }, [location.pathname]);
 
   const handleLogoClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -75,7 +94,11 @@ const Header: React.FC = () => {
     <header className="fixed top-0 left-0 right-0 z-[220] pointer-events-none px-0 sm:px-8 flex items-center py-0 sm:py-8">
       <nav
         ref={navRef}
-        className="pointer-events-auto flex items-center bg-[#fefffe]/70 backdrop-blur-lg border-b sm:border border-[#1c1d1e]/10 px-6 sm:pl-2 sm:pr-3 py-4 sm:py-2 w-full sm:w-auto sm:rounded-lg shadow-sm transition-all duration-500"
+        className={`pointer-events-auto flex items-center border-b sm:border border-[#1c1d1e]/10 px-6 sm:pl-2 sm:pr-3 py-4 sm:py-2 w-full sm:w-auto sm:rounded-lg shadow-sm transition-all duration-1000 ${
+          isPastHero 
+            ? "bg-white/30 backdrop-blur-2xl" 
+            : "bg-[#fefffe] backdrop-blur-none"
+        }`}
       >
         <Link
           to="/"
