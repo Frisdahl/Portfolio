@@ -56,7 +56,7 @@ function App() {
   return (
     <Router>
       <div className="noise-grain" />
-      {/* <InitialLoader /> */}
+      <InitialLoader />
       <SpeedInsights />
       <ScrollToTop />
       <ComingSoon />
@@ -70,7 +70,6 @@ function App() {
           </Routes>
         </Suspense>
       </Layout>
-      <SpeedInsights />
     </Router>
   );
 }
