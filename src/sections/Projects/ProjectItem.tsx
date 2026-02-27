@@ -76,16 +76,34 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   useLayoutEffect(() => {
     if (!itemRef.current) return;
 
-    gsap.set(contentOverlayRef.current, { opacity: 0 });
-    gsap.set([titleContainerRef.current, descContainerRef.current], {
-      y: 30,
-      opacity: 0,
-    });
+    const isMobileOrTablet = window.matchMedia("(max-width: 1024px)").matches;
+
+    if (isMobileOrTablet) {
+      // Always visible on mobile/tablet
+      gsap.set(contentOverlayRef.current, { opacity: 1 });
+      gsap.set([titleContainerRef.current, descContainerRef.current], {
+        y: 0,
+        opacity: 1,
+      });
+      // Also fade out the video overlay a bit more on mobile so video is clearer
+      if (videoOverlayRef.current) {
+        gsap.set(videoOverlayRef.current, { opacity: 0.1 });
+      }
+    } else {
+      // Desktop: Initial hidden state for hover effect
+      gsap.set(contentOverlayRef.current, { opacity: 0 });
+      gsap.set([titleContainerRef.current, descContainerRef.current], {
+        y: 30,
+        opacity: 0,
+      });
+    }
 
     return () => {};
   }, []);
 
   const handleMouseEnter = () => {
+    if (window.matchMedia("(max-width: 1024px)").matches) return;
+
     // Play video
     if (videoRef.current) {
       videoRef.current.play().catch(() => undefined);
@@ -120,6 +138,8 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   };
 
   const handleMouseLeave = () => {
+    if (window.matchMedia("(max-width: 1024px)").matches) return;
+
     // Pause video
     if (videoRef.current) {
       videoRef.current.pause();
@@ -173,6 +193,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
               playsInline
               loop={true}
               preload="metadata"
+              autoPlay={window.matchMedia("(max-width: 1024px)").matches}
             >
               <source src={videoSrc} type="video/mp4" />
               <source
@@ -204,16 +225,16 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         {/* Dual Capsule Overlay */}
         <div
           ref={contentOverlayRef}
-          className="absolute inset-0 flex items-end justify-start p-6 md:p-8 z-20 pointer-events-none"
+          className="absolute inset-0 flex items-end justify-start p-4 md:p-6 lg:p-8 z-20 pointer-events-none"
         >
-          <div className="flex flex-wrap items-center gap-3 w-full">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full">
             {/* Title Capsule - Dark Glass */}
             <div
               ref={titleContainerRef}
-              className="backdrop-blur-md bg-black/50 border border-white/10 px-5 py-3 rounded-full flex items-center gap-3 shadow-2xl"
+              className="backdrop-blur-md bg-black/50 border border-white/10 px-3 py-2 md:px-5 md:py-3 rounded-full flex items-center gap-2 md:gap-3 shadow-2xl"
             >
-              <div className="w-2 h-2 rounded-full bg-white flex-shrink-0 animate-pulse-fast" />
-              <h3 className="font-switzer font-medium uppercase text-sm md:text-base text-white tracking-wider leading-none">
+              <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-white flex-shrink-0 animate-pulse-fast" />
+              <h3 className="font-switzer font-medium uppercase text-[10px] md:text-sm lg:text-base text-white tracking-wider leading-none">
                 {project.title}
               </h3>
             </div>
@@ -221,9 +242,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             {/* Description Capsule - White Glass */}
             <div
               ref={descContainerRef}
-              className="backdrop-blur-md bg-white/20 border border-white/30 px-5 py-3 rounded-full shadow-2xl"
+              className="backdrop-blur-md bg-white/20 border border-white/30 px-3 py-2 md:px-5 md:py-3 rounded-full shadow-2xl"
             >
-              <p className="font-switzer uppercase text-[10px] md:text-[11px] font-medium tracking-[0.15em] text-white/90 leading-none">
+              <p className="font-switzer uppercase text-[8px] md:text-[10px] lg:text-[11px] font-medium tracking-[0.15em] text-white/90 leading-none">
                 {project.categories.join(" — ")}
               </p>
             </div>

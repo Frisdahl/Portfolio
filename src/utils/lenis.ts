@@ -4,13 +4,11 @@ let lenis: Lenis | null = null;
 
 if (typeof window !== "undefined") {
   lenis = new Lenis({
-    duration: 1.5, // Smoother, longer duration
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    smoothWheel: true,
-    wheelMultiplier: 0.8,
-    touchMultiplier: 1.5,
+    lerp: 0.1, // More consistent smoothness
+    wheelMultiplier: 1,
+    touchMultiplier: 1, // Reduced for natural mobile feel
     infinite: false,
-    syncTouch: true, // Better touch device experience
+    syncTouch: true,
   });
 }
 
