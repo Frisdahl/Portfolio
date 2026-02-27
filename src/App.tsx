@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 import InitialLoader from "./components/InitialLoader";
@@ -70,6 +71,7 @@ function App() {
           </Routes>
         </Suspense>
       </Layout>
+      <SpeedInsights />
     </Router>
   );
 }
