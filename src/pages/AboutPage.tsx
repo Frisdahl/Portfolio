@@ -69,6 +69,7 @@ const AboutPage: React.FC = () => {
 
       // Listen for transition completion (both initial and page-to-page)
       const handleTransitionComplete = () => {
+        console.log("AboutPage: Transition complete event received");
         startEntranceAnimation();
       };
       
@@ -76,19 +77,26 @@ const AboutPage: React.FC = () => {
       window.addEventListener("page-transition-complete", handleTransitionComplete);
 
       // Check if we should reveal immediately (if loader is already gone)
-      const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
+      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
       const isLoaderActive = !!document.querySelector('.initial-loader-wrap');
+      const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
-      if (hasSeenLoader && !isLoaderActive) {
-        startEntranceAnimation();
+      if ((isInitialLoaderDone && !isLoaderActive) || isNavigating) {
+        // Use a tiny delay to ensure everything is mounted
+        const id = setTimeout(() => {
+          startEntranceAnimation();
+          sessionStorage.removeItem("isNavigating");
+        }, 100);
+        return () => clearTimeout(id);
       }
 
       // Safety timeout
       const safetyTimeout = setTimeout(() => {
-        if (!animationTriggered && document.body.style.overflow !== "hidden") {
+        if (!animationTriggered) {
+          console.log("AboutPage: Safety reveal triggered");
           startEntranceAnimation();
         }
-      }, 1500);
+      }, 2000);
 
       // Stuff I Do section reveal
       gsap.from(".stuff-i-do-section", {

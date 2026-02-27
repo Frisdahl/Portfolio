@@ -2,20 +2,7 @@ import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import SplitType from "split-type";
-
-const transitionTrigger: (() => Promise<void>) | null = null;
-
-/**
- * Manually trigger the page transition animation.
- * Returns a promise that resolves when the transition is "at the middle"
- * (screen covered) so you can switch content/scroll.
- */
-export const triggerPageTransition = () => {
-  if (transitionTrigger) {
-    return transitionTrigger();
-  }
-  return Promise.resolve();
-};
+import { _setTransitionTrigger } from "../utils/pageTransition";
 
 const PageTransition = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,7 +36,8 @@ const PageTransition = () => {
           display: "block",
           pointerEvents: "all", // Enable to block clicks behind it
         });
-        containerRef.current.offsetHeight; // Force reflow
+        const _forceReflow = containerRef.current.offsetHeight;
+        console.debug("Reflow triggered", _forceReflow);
       }
 
       // Disable scrolling
@@ -60,16 +48,13 @@ const PageTransition = () => {
         gsap.set(logoSVGRef.current, { opacity: 0, visibility: "hidden" });
       }
 
-      let split: SplitType | null = null;
-      if (textRef.current) {
+      const split = textRef.current ? new SplitType(textRef.current, { types: "chars" }) : null;
+      if (textRef.current && split?.chars) {
         gsap.set(textRef.current, { opacity: 0, visibility: "hidden" });
-        split = new SplitType(textRef.current, { types: "chars" });
-        if (split.chars) {
-          gsap.set(split.chars, {
-            opacity: 0,
-            yPercent: isReducedMotion ? 0 : 100,
-          });
-        }
+        gsap.set(split.chars, {
+          opacity: 0,
+          yPercent: isReducedMotion ? 0 : 100,
+        });
       }
 
       ctxRef.current = gsap.context(() => {
@@ -143,7 +128,8 @@ const PageTransition = () => {
   };
 
   useEffect(() => {
-    // ... (Effect logic remains the same) ...
+    _setTransitionTrigger(() => animate());
+    isFirstMountRef.current = false;
   }, []);
 
   useEffect(() => {

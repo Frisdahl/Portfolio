@@ -232,6 +232,9 @@ const MobileMenuOverlay: FC<{
   ) => {
     e.preventDefault();
     
+    // Global flag for page entrance logic
+    sessionStorage.setItem("isNavigating", "true");
+
     // Flag to handle the special scroll after transition
     const isWorksNavigation = targetSection === "#projects";
 

@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Marquee from "./Marquee";
 import Links from "./Links";
-import { triggerPageTransition } from "./PageTransition";
+import { triggerPageTransition } from "../utils/pageTransition";
 import { scrollTo } from "../utils/smoothScroll";
 
 const Footer: React.FC = () => {

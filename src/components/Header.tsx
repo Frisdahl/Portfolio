@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { scrollTo } from "../utils/smoothScroll";
-import { triggerPageTransition } from "./PageTransition";
+import { triggerPageTransition } from "../utils/pageTransition";
 
 gsap.registerPlugin(ScrollToPlugin);
 

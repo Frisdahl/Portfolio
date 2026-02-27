@@ -66,17 +66,23 @@ const ContactPage: React.FC = () => {
             },
             "-=0.6",
           )
-          .from(
-            submitArea,
-            {
-              y: 20,
-              opacity: 0,
-              duration: 0.8,
-              ease: "power3.out",
-            },
-            "-=0.4",
-          );
+          .from(submitArea, {
+          y: 20,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power3.out"
+        }, "-=0.4");
       }
+
+      // Check if we should reveal immediately
+      const isNavigating = sessionStorage.getItem("isNavigating") === "true";
+      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
+      
+      if (isNavigating || isInitialLoaderDone) {
+        // This ensures if transition events are missed, the form is at least visible or triggers reveal
+        sessionStorage.removeItem("isNavigating");
+      }
+
     }, containerRef);
 
     return () => {

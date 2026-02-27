@@ -1,13 +1,6 @@
 import { useState, useEffect, useCallback, FC } from "react";
 import gsap from "gsap";
 
-/**
- * A simple utility to trigger the coming soon notification from anywhere.
- */
-export const showComingSoon = () => {
-  window.dispatchEvent(new CustomEvent("show-coming-soon"));
-};
-
 const ComingSoon: FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 

@@ -5,55 +5,76 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 // Helper function for seamless horizontal loop from GSAP
-function horizontalLoop(items: any[], config: any) {
-  items = gsap.utils.toArray(items);
-  config = config || {};
-  let tl = gsap.timeline({
-      repeat: config.repeat,
-      paused: config.paused,
-      defaults: { ease: "none" },
-      onReverseComplete: () => {
-        tl.totalTime(tl.rawTime() + tl.duration() * 100);
-      },
-    }),
-    length = items.length,
-    startX = items[0].offsetLeft,
-    times: number[] = [],
-    widths: number[] = [],
-    xPercents: number[] = [],
-    curIndex = 0,
-    pixelsPerSecond = (config.speed || 1) * 100,
-    snap =
-      config.snap === false ? (v: any) => v : gsap.utils.snap(config.snap || 1),
-    totalWidth: number,
-    curX: number,
-    distanceToStart: number,
-    distanceToLoop: number,
-    item: any,
-    i: number;
+interface LoopConfig {
+  repeat?: number;
+  paused?: boolean;
+  speed?: number;
+  snap?: number | boolean;
+  paddingRight?: number | string;
+  reversed?: boolean;
+  modifiers?: Record<string, unknown>;
+  overwrite?: boolean;
+}
 
-  gsap.set(items, {
-    xPercent: (i, el) => {
-      const w = (widths[i] = parseFloat(
+interface LoopTimeline extends gsap.core.Timeline {
+  next: (vars?: Record<string, unknown>) => gsap.core.Tween;
+  previous: (vars?: Record<string, unknown>) => gsap.core.Tween;
+  current: () => number;
+  toIndex: (index: number, vars?: Record<string, unknown>) => gsap.core.Tween;
+  times: number[];
+}
+
+function horizontalLoop(items: HTMLElement[], config: LoopConfig): LoopTimeline {
+  const elements = gsap.utils.toArray(items) as HTMLElement[];
+  const finalConfig = config || {};
+  const tl = gsap.timeline({
+    repeat: finalConfig.repeat,
+    paused: finalConfig.paused,
+    defaults: { ease: "none" },
+    onReverseComplete: () => {
+      tl.totalTime(tl.rawTime() + tl.duration() * 100);
+    },
+  }) as LoopTimeline;
+
+  const length = elements.length;
+  const startX = elements[0].offsetLeft;
+  const times: number[] = [];
+  const widths: number[] = [];
+  const xPercents: number[] = [];
+  let curIndex = 0;
+  const pixelsPerSecond = (finalConfig.speed || 1) * 100;
+  const snap =
+    finalConfig.snap === false
+      ? (v: number) => v
+      : gsap.utils.snap(typeof finalConfig.snap === "number" ? finalConfig.snap : 1);
+  let curX: number;
+  let distanceToStart: number;
+  let distanceToLoop: number;
+  let item: HTMLElement;
+  let i: number;
+
+  gsap.set(elements, {
+    xPercent: (index, el) => {
+      const w = (widths[index] = parseFloat(
         gsap.getProperty(el, "width", "px") as string,
       ));
-      xPercents[i] = snap(
+      xPercents[index] = snap(
         (parseFloat(gsap.getProperty(el, "x", "px") as string) / w) * 100 +
           (gsap.getProperty(el, "xPercent") as number),
       );
-      return xPercents[i];
+      return xPercents[index];
     },
   });
-  gsap.set(items, { x: 0 });
-  totalWidth =
-    items[length - 1].offsetLeft +
+  gsap.set(elements, { x: 0 });
+  const totalWidth =
+    elements[length - 1].offsetLeft +
     (xPercents[length - 1] / 100) * widths[length - 1] -
     startX +
-    items[length - 1].offsetWidth *
-      (gsap.getProperty(items[length - 1], "scaleX") as number) +
-    (parseFloat(config.paddingRight) || 0);
+    elements[length - 1].offsetWidth *
+      (gsap.getProperty(elements[length - 1], "scaleX") as number) +
+    (parseFloat(finalConfig.paddingRight as string) || 0);
   for (i = 0; i < length; i++) {
-    item = items[i];
+    item = elements[i];
     curX = (xPercents[i] / 100) * widths[i];
     distanceToStart = item.offsetLeft + curX - startX;
     distanceToLoop =
@@ -85,27 +106,29 @@ function horizontalLoop(items: any[], config: any) {
       .add("label" + i, distanceToStart / pixelsPerSecond);
     times[i] = distanceToStart / pixelsPerSecond;
   }
-  function toIndex(index: number, vars: any) {
-    vars = vars || {};
-    Math.abs(index - curIndex) > length / 2 &&
-      (index += index > curIndex ? -length : length);
-    let newIndex = gsap.utils.wrap(0, length, index),
-      time = times[newIndex];
-    if (time > tl.time() !== index > curIndex) {
-      vars.modifiers = { time: gsap.utils.wrap(0, tl.duration()) };
-      time += tl.duration() * (index > curIndex ? 1 : -1);
+  function toIndex(index: number, vars: Record<string, unknown>) {
+    const finalVars = vars || {};
+    let targetIndex = index;
+    if (Math.abs(targetIndex - curIndex) > length / 2) {
+      targetIndex += targetIndex > curIndex ? -length : length;
+    }
+    const newIndex = gsap.utils.wrap(0, length, targetIndex);
+    let time = times[newIndex];
+    if (time > tl.time() !== targetIndex > curIndex) {
+      finalVars.modifiers = { time: gsap.utils.wrap(0, tl.duration()) };
+      time += tl.duration() * (targetIndex > curIndex ? 1 : -1);
     }
     curIndex = newIndex;
-    vars.overwrite = true;
-    return tl.tweenTo(time, vars);
+    finalVars.overwrite = true;
+    return tl.tweenTo(time, finalVars);
   }
-  tl.next = (vars: any) => toIndex(curIndex + 1, vars);
-  tl.previous = (vars: any) => toIndex(curIndex - 1, vars);
+  tl.next = (vars: Record<string, unknown>) => toIndex(curIndex + 1, vars);
+  tl.previous = (vars: Record<string, unknown>) => toIndex(curIndex - 1, vars);
   tl.current = () => curIndex;
-  tl.toIndex = (index: number, vars: any) => toIndex(index, vars);
+  tl.toIndex = (index: number, vars: Record<string, unknown>) => toIndex(index, vars);
   tl.times = times;
   tl.progress(1, true).progress(0, true);
-  if (config.reversed) {
+  if (finalConfig.reversed) {
     tl.vars.onReverseComplete?.();
     tl.reverse();
   }
@@ -136,7 +159,7 @@ const Marquee: React.FC<MarqueeProps> = ({
   useEffect(() => {
     if (!railRef.current || !containerRef.current) return;
 
-    let loop: any;
+    let loop: LoopTimeline | null = null;
     let speedTween: gsap.core.Timeline | null = null;
     let scrollTriggerInstance: ScrollTrigger | null = null;
 
@@ -162,14 +185,14 @@ const Marquee: React.FC<MarqueeProps> = ({
           onUpdate: (self) => {
             const targetScale = self.direction * speed;
             
-            speedTween && speedTween.kill();
+            if (speedTween) speedTween.kill();
             speedTween = gsap.timeline()
-              .to(loop, {
+              .to(loop!, {
                 timeScale: targetScale * 1.5, // Reduced boost
                 duration: 0.2,
                 ease: "power1.out"
               })
-              .to(loop, {
+              .to(loop!, {
                 timeScale: targetScale,
                 duration: 0.8, // Faster recovery
                 ease: "power2.out"
@@ -183,9 +206,9 @@ const Marquee: React.FC<MarqueeProps> = ({
 
     return () => {
       clearTimeout(timeoutId);
-      loop?.kill();
-      scrollTriggerInstance?.kill();
-      speedTween?.kill();
+      if (loop) loop.kill();
+      if (scrollTriggerInstance) scrollTriggerInstance.kill();
+      if (speedTween) speedTween.kill();
     };
   }, [speed, dynamicSpeed, text, repeat]);
 

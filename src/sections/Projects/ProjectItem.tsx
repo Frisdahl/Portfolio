@@ -1,7 +1,7 @@
 import React, { useRef, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
-import { showComingSoon } from "../../components/ComingSoon";
+import { showComingSoon } from "../../utils/comingSoon";
 
 interface Project {
   id: number;
