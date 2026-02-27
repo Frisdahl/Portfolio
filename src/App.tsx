@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
-import InitialLoader from "./components/InitialLoader";
 import PageTransition from "./components/PageTransition";
 import ComingSoon from "./components/ComingSoon";
 import "./App.css";
