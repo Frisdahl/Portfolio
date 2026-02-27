@@ -2,32 +2,9 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
-import Marquee from "../../components/Marquee";
 import Links from "../../components/Links";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const SocialIcon = ({
-  href,
-  children,
-  className,
-  style,
-}: {
-  href: string;
-  children: React.ReactNode;
-  className: string;
-  style?: React.CSSProperties;
-}) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className={`transition-colors duration-300 ${className}`}
-    style={style}
-  >
-    {children}
-  </a>
-);
 
 const Hero: React.FC = () => {
   const heroRef = useRef<HTMLDivElement>(null);

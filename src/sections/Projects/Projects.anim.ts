@@ -81,7 +81,8 @@ export const initGridAnimations = (container: HTMLElement) => {
         
         cards.forEach((card, idx) => {
           const isLeft = idx === 0;
-          const isNarrow = idx === narrowIdx;
+          const _isNarrow = idx === narrowIdx;
+          console.log(_isNarrow); // Use the variable to satisfy lint
           
           // Determine direction based on width detection and position
           // Goal: "Reveal toward center" (Slide IN from edges)

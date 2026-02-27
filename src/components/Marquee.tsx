@@ -34,7 +34,7 @@ function horizontalLoop(items: any[], config: any) {
 
   gsap.set(items, {
     xPercent: (i, el) => {
-      let w = (widths[i] = parseFloat(
+      const w = (widths[i] = parseFloat(
         gsap.getProperty(el, "width", "px") as string,
       ));
       xPercents[i] = snap(

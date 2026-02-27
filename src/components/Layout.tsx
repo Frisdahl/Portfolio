@@ -1,7 +1,6 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "./Header";
-import BurgerMenuButton from "./BurgerMenuButton";
 import MobileMenuOverlay from "./MobileMenuOverlay";
 import Footer from "./Footer";
 import { gsap } from "gsap";
@@ -31,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      let mountRetryTimeouts: number[] = [];
+      const mountRetryTimeouts: number[] = [];
 
       const updateHeaderTheme = () => {
         // Sample the element exactly where the header sits (50px from top, middle of screen)
@@ -107,6 +106,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main className="relative z-20 bg-[var(--background)] flex-grow">
         {children}
       </main>
+      <Footer />
     </div>
   );
 };

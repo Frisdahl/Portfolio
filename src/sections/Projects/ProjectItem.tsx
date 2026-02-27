@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import React, { useRef, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
-import { triggerPageTransition } from "../../components/PageTransition";
 import { showComingSoon } from "../../components/ComingSoon";
 
 interface Project {

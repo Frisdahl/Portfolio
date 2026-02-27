@@ -4,7 +4,6 @@ import { scrollTo } from "../utils/smoothScroll";
 import Links from "./Links";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { triggerPageTransition } from "./PageTransition";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -233,25 +232,49 @@ const MobileMenuOverlay: FC<{
   ) => {
     e.preventDefault();
     
+    // Flag to handle the special scroll after transition
+    const isWorksNavigation = targetSection === "#projects";
+
+    if (isWorksNavigation && location.pathname !== "/") {
+      sessionStorage.setItem("isWorksNav", "true");
+    }
+
     // Set flag so onComplete knows to fire the event
     isClosingForNavigation.current = true;
     onClose();
 
-    // Small delay to let navigation happen while menu closes
+    if (isWorksNavigation) {
+      const handleNavComplete = () => {
+        console.log("Menu: Navigation triggered - instant scrolling to projects");
+        scrollTo("#projects", 0, 0, true);
+        window.removeEventListener("page-transition-complete", handleNavComplete);
+      };
+
+      if (location.pathname !== "/") {
+        window.addEventListener("page-transition-complete", handleNavComplete);
+        navigate("/");
+      } else {
+        // If already on homepage, just scroll
+        scrollTo("#projects", 0, 0, true);
+      }
+      return;
+    }
+
+    // Default navigation for other links
     setTimeout(() => {
       if (targetSection) {
         if (targetSection === "#contact") {
-          scrollTo("#contact", 0);
+          scrollTo("#contact", 0, 0, true);
           return;
         }
-
+        
         if (location.pathname !== "/") {
           navigate("/");
           setTimeout(() => {
-            scrollTo(targetSection, 0);
-          }, 150);
+            scrollTo(targetSection, 0, 0, true);
+          }, 300);
         } else {
-          scrollTo(targetSection, 0);
+          scrollTo(targetSection, 0, 0, true);
         }
       } else {
         navigate(to);

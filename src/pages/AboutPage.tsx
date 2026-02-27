@@ -4,7 +4,6 @@ import SplitType from "split-type";
 import AnimatedButton from "../components/AnimatedButton";
 import ServiceItem from "../components/ServiceItem";
 import ExperienceItem from "../components/ExperienceItem";
-import Footer from "../components/Footer";
 import { initAboutItemsAnimation } from "./About.anim";
 
 const AboutPage: React.FC = () => {
@@ -243,7 +242,6 @@ const AboutPage: React.FC = () => {
           </div>{" "}
         </section>
       </div>
-      <Footer />
     </div>
   );
 };

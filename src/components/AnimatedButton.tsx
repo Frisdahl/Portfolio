@@ -14,6 +14,8 @@ interface AnimatedButtonProps {
   showBorder?: boolean;
   className?: string; // Additional classes for the main button element
   fontSize?: string; // e.g., 'text-xs'
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 const AnimatedButton: React.FC<AnimatedButtonProps> = ({
@@ -30,6 +32,8 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   showBorder = true,
   className = "",
   fontSize = "text-base",
+  type = "button",
+  disabled = false,
 }) => {
   const ButtonComponent = link ? "a" : "button";
 
@@ -37,7 +41,9 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     <ButtonComponent
       href={link}
       onClick={onClick}
-      className={`group/btn relative overflow-hidden inline-flex items-center justify-center ${padding} w-fit cursor-pointer rounded-full ${showBorder ? "border-2" : "border-0"} ${baseBorderColor} ${hoverBorderColor} ${baseBgColor} ${baseTextColor} transition-all duration-500 ease-out hover:scale-x-105 ${className}`}
+      type={link ? undefined : type}
+      disabled={link ? undefined : disabled}
+      className={`group/btn relative overflow-hidden inline-flex items-center justify-center ${padding} w-fit cursor-pointer rounded-full ${showBorder ? "border-2" : "border-0"} ${baseBorderColor} ${hoverBorderColor} ${baseBgColor} ${baseTextColor} transition-all duration-500 ease-out hover:scale-x-105 ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
     >
       {/* Sliding background */}
       <span

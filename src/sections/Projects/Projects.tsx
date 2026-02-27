@@ -59,8 +59,8 @@ const Projects: React.FC = () => {
   }, []);
 
   return (
-    <section id="projects" className="mb-48 w-full" ref={containerRef}>
-      <div className="w-full px-8 md:px-16 lg:px-24 mt-32 md:mt-64">
+    <section className="mb-48 w-full" ref={containerRef}>
+      <div id="projects" className="w-full px-8 md:px-16 lg:px-24 mt-32 md:mt-64">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-8 overflow-hidden">
           <div className=" overflow-hidden">

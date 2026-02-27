@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import SplitType from "split-type";
 
-let transitionTrigger: (() => Promise<void>) | null = null;
+const transitionTrigger: (() => Promise<void>) | null = null;
 
 /**
  * Manually trigger the page transition animation.
