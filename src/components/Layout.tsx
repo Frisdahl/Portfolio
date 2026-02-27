@@ -35,7 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div ref={layoutRef} className="flex flex-col min-h-screen">
       <Header />
 
-      <main className="relative z-20 flex-grow">
+      <main className="relative z-20 flex-grow bg-white">
         {children}
       </main>
       <Footer />

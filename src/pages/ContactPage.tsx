@@ -26,32 +26,21 @@ const ContactPage: React.FC = () => {
     if (!containerRef.current) return;
 
     // Initial state: Hidden
-    gsap.set(
-      [headingRef.current, ".form-field-row", ".budget-area", ".submit-area"],
-      {
-        autoAlpha: 0,
-      },
-    );
+    gsap.set([headingRef.current], {
+      autoAlpha: 0,
+    });
 
     const ctx = gsap.context(() => {
       // 1. Create the entrance timeline (initially paused)
       const entranceTl = gsap.timeline({
         paused: true,
-        delay: 0.08,
+        delay: 0.4,
         onStart: () => {
           animationTriggeredRef.current = true;
-          // Ensure elements are visible when animation starts
-          gsap.set(
-            [
-              headingRef.current,
-              ".form-field-row",
-              ".budget-area",
-              ".submit-area",
-            ],
-            {
-              autoAlpha: 1,
-            },
-          );
+          // Ensure heading is visible when animation starts
+          gsap.set([headingRef.current], {
+            autoAlpha: 1,
+          });
         },
       });
 
@@ -75,58 +64,6 @@ const ContactPage: React.FC = () => {
             ease: "power4.out",
           },
         );
-      }
-
-      // Form fields entrance
-      if (formRef.current) {
-        const fields = formRef.current.querySelectorAll(".form-field-row");
-        const budgetArea = formRef.current.querySelector(".budget-area");
-        const submitArea = formRef.current.querySelector(".submit-area");
-
-        entranceTl
-          .fromTo(
-            fields,
-            {
-              y: 30,
-              opacity: 0,
-            },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 1,
-              stagger: 0.15,
-              ease: "power3.out",
-            },
-            "-=0.8",
-          )
-          .fromTo(
-            budgetArea,
-            {
-              y: 20,
-              opacity: 0,
-            },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: "power3.out",
-            },
-            "-=0.6",
-          )
-          .fromTo(
-            submitArea,
-            {
-              y: 20,
-              opacity: 0,
-            },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: "power3.out",
-            },
-            "-=0.4",
-          );
       }
 
       const startEntranceAnimation = () => {
@@ -241,15 +178,15 @@ const ContactPage: React.FC = () => {
     <div
       ref={containerRef}
       id="contact"
-      className="relative w-full min-h-screen pt-32 md:pt-48 bg-[#fefffe] flex flex-col"
+      className="relative w-full min-h-screen pt-32 bg-[#fefffe] flex flex-col"
     >
       <div className="w-full px-8 flex flex-col items-start text-left pb-32 md:pb-48 flex-grow">
         <h2
           ref={headingRef}
-          className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-instrumentsans font-bold tracking-tight text-[#1c1d1e] uppercase leading-[1] mb-16"
+          className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-instrumentsans  font-bold tracking-tight text-[#1c1d1e] leading-[1.2] mb-16 invisible"
         >
-          Let’s work <br />
-          together
+          Let’s Work <br />
+          Together
         </h2>
 
         <form

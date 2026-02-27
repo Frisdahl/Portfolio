@@ -1,9 +1,12 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import AnimatedButton from "../components/AnimatedButton";
 import ServiceItem from "../components/ServiceItem";
 import ExperienceItem from "../components/ExperienceItem";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const AboutPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,6 +72,26 @@ const AboutPage: React.FC = () => {
         "-=0.8",
       );
 
+      const animatedItems = gsap.utils.toArray<HTMLElement>(
+        ".about-animate-item",
+      );
+
+      gsap.set(animatedItems, { y: 24, autoAlpha: 0 });
+
+      animatedItems.forEach((item) => {
+        gsap.to(item, {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: item,
+            start: "top 88%",
+            once: true,
+          },
+        });
+      });
+
       const startEntranceAnimation = () => {
         if (animationTriggeredRef.current) return;
         entranceTl.play();
@@ -126,12 +149,12 @@ const AboutPage: React.FC = () => {
         <div className="w-full flex flex-col items-center text-center gap-16 md:gap-24 mb-48 px-8">
           <h1
             ref={headingRef}
-            className="text-6xl md:text-8xl lg:text-9xl font-instrumentsans font-bold text-[#1c1d1e] uppercase tracking-tight leading-none"
+            className="text-6xl md:text-8xl lg:text-9xl font-instrumentsans font-bold text-[#1c1d1e] uppercase tracking-tight leading-none invisible"
           >
             who am i?
           </h1>
 
-          <div className="about-item w-full max-w-lg aspect-[3/4] rounded-[2rem] md:rounded-full overflow-hidden border border-[#1c1d1e]/10 bg-[#1c1d1e]/5">
+          <div className="about-item w-full max-w-lg aspect-[3/4] rounded-[2rem] md:rounded-full overflow-hidden border border-[#1c1d1e]/10 bg-[#1c1d1e]/5 invisible">
             <img
               src="https://placehold.co/800x1066/fefffe/1c1d1e?text=Portrait"
               alt="Alexander - Product Designer"
@@ -139,7 +162,7 @@ const AboutPage: React.FC = () => {
             />
           </div>
 
-          <div className="about-item w-full flex justify-center text-center">
+          <div className="about-item w-full flex justify-center text-center invisible">
             <p className="text-2xl md:text-3xl lg:text-4xl font-instrumentsans max-w-6xl mx-auto text-[#1c1d1e] leading-tight font-light text-center">
               Based in{" "}
               <img
@@ -155,7 +178,7 @@ const AboutPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="about-item">
+          <div className="about-item invisible">
             <AnimatedButton
               text="download resume"
               padding="px-12 py-7"
