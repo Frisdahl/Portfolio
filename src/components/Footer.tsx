@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Marquee from "./Marquee";
 import Links from "./Links";
@@ -8,6 +8,26 @@ import { scrollTo } from "../utils/smoothScroll";
 const Footer: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isInView, setIsInView] = useState(false);
+  const footerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = footerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleFooterLinkClick = async (
     e: React.MouseEvent,
@@ -32,26 +52,28 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="dark-section relative w-full bg-[#1c1d1e] text-white pt-24 overflow-hidden">
+    <footer ref={footerRef} className="dark-section relative w-full bg-[#1c1d1e] text-white pt-24 overflow-hidden">
       {/* Background Video Layer */}
       <div className="absolute inset-0 z-[1] pointer-events-none">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          className="w-full h-full object-cover opacity-40"
-        >
-          <source
-            src="/projectVideos/herovideo/wave-optimized.webm"
-            type="video/webm"
-          />
-          <source
-            src="/projectVideos/herovideo/wave-optimized.mp4"
-            type="video/mp4"
-          />
-        </video>
+        {isInView && (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-cover opacity-40"
+          >
+            <source
+              src="/projectVideos/herovideo/wave-optimized.webm"
+              type="video/webm"
+            />
+            <source
+              src="/projectVideos/herovideo/wave-optimized.mp4"
+              type="video/mp4"
+            />
+          </video>
+        )}
       </div>
 
       {/* Neutral Dark overlay */}

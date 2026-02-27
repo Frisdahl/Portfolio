@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useRef, useLayoutEffect, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { showComingSoon } from "../../utils/comingSoon";
@@ -27,6 +27,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   aspectClassName = "aspect-square",
 }) => {
   const navigate = useNavigate();
+  const [isInView, setIsInView] = React.useState(false);
 
   const itemRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -34,6 +35,24 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   const contentOverlayRef = useRef<HTMLDivElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const descContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = itemRef.current;
+    if (!el || !project.video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "400px" }, // Load early for smoother experience
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [project.video]);
 
   const handleProjectClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -145,7 +164,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       <div
         className={`relative w-full overflow-hidden rounded-2xl bg-neutral-900 ${fillHeight ? "h-full" : aspectClassName}`}
       >
-        {project.video ? (
+        {project.video && isInView ? (
           <>
             <video
               ref={videoRef}
@@ -167,7 +186,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
               className="absolute inset-0 bg-black/20 z-10 pointer-events-none transition-transform duration-1000 group-hover:scale-105"
             />
           </>
-        ) : (
+        ) : !project.video ? (
           <>
             <img
               src={project.image}
@@ -178,6 +197,8 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             {/* Dark Image Overlay */}
             <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none transition-opacity duration-700 group-hover:opacity-0" />
           </>
+        ) : (
+          <div className="absolute inset-0 bg-neutral-900 animate-pulse" />
         )}
 
         {/* Dual Capsule Overlay */}

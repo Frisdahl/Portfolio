@@ -17,40 +17,7 @@ interface AnimatedMenuLinkProps {
 
 const AnimatedMenuLink = forwardRef<HTMLAnchorElement, AnimatedMenuLinkProps>(
   ({ to, children, onClick }, ref) => {
-    const circleRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLSpanElement>(null);
-
-    const handleMouseEnter = () => {
-      if (circleRef.current && textRef.current) {
-        gsap.to(circleRef.current, {
-          scale: 1,
-          opacity: 1,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-        gsap.to(textRef.current, {
-          x: 20,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-      }
-    };
-
-    const handleMouseLeave = () => {
-      if (circleRef.current && textRef.current) {
-        gsap.to(circleRef.current, {
-          scale: 0,
-          opacity: 0,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-        gsap.to(textRef.current, {
-          x: 0,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-      }
-    };
 
     return (
       <div className="overflow-hidden py-1">
@@ -59,17 +26,10 @@ const AnimatedMenuLink = forwardRef<HTMLAnchorElement, AnimatedMenuLinkProps>(
           to={to}
           className="w-fit relative inline-flex items-center opacity-0"
           onClick={onClick}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
         >
-          <div
-            ref={circleRef}
-            className="absolute left-0 w-[8px] h-[8px] rounded-full bg-[var(--foreground)] opacity-0"
-            style={{ transform: "scale(0)" }}
-          />
           <span
             ref={textRef}
-            className="inline-block tracking-wider text-2xl sm:text-4xl text-[var(--foreground)]"
+            className="inline-block tracking-wider text-5xl sm:text-4xl text-[var(--foreground)]"
           >
             {children}
           </span>
@@ -212,10 +172,12 @@ const MobileMenuOverlay: FC<{
           onComplete: () => {
             if (isClosingForNavigation.current) {
               isClosingForNavigation.current = false;
-              console.log("Menu: Overlay gone - dispatching transition complete");
+              console.log(
+                "Menu: Overlay gone - dispatching transition complete",
+              );
               window.dispatchEvent(new CustomEvent("page-transition-complete"));
             }
-          }
+          },
         },
         "-=0.6",
       );
@@ -232,7 +194,7 @@ const MobileMenuOverlay: FC<{
     targetSection?: string,
   ) => {
     e.preventDefault();
-    
+
     // Global flag for page entrance logic
     sessionStorage.setItem("isNavigating", "true");
 
@@ -249,9 +211,14 @@ const MobileMenuOverlay: FC<{
 
     if (isWorksNavigation) {
       const handleNavComplete = () => {
-        console.log("Menu: Navigation triggered - instant scrolling to projects");
+        console.log(
+          "Menu: Navigation triggered - instant scrolling to projects",
+        );
         scrollTo("#projects", 0, 0, true);
-        window.removeEventListener("page-transition-complete", handleNavComplete);
+        window.removeEventListener(
+          "page-transition-complete",
+          handleNavComplete,
+        );
       };
 
       if (location.pathname !== "/") {
@@ -271,7 +238,7 @@ const MobileMenuOverlay: FC<{
           scrollTo("#contact", 0, 0, true);
           return;
         }
-        
+
         if (location.pathname !== "/") {
           navigate("/");
           setTimeout(() => {
@@ -295,38 +262,50 @@ const MobileMenuOverlay: FC<{
       {/* The actual menu panel */}
       <div
         ref={panelRef}
-        className="mobile-menu-panel fixed top-0 right-0 w-full sm:w-[500px] h-full sm:h-auto sm:max-h-screen bg-[var(--background)] overflow-y-auto px-8 pt-24 sm:pt-16 pb-12 text-left text-[var(--foreground)] shadow-2xl sm:rounded-tl-2xl sm:rounded-bl-2xl sm:rounded-br-2xl"
+        className="mobile-menu-panel fixed top-0 right-0 w-full sm:w-[500px] h-full sm:h-auto sm:max-h-screen bg-[var(--background)] overflow-y-auto px-8 pt-24 sm:pt-16 pb-12 flex flex-col items-center justify-center text-center text-[var(--foreground)] shadow-2xl sm:rounded-tl-2xl sm:rounded-bl-2xl sm:rounded-br-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Main Nav */}
-        <div className="mb-12 sm:mb-16">
+        <div className="w-full flex flex-col items-center justify-center flex-grow">
           <h3
             ref={menuLabelRef}
-            className="text-[10px] uppercase tracking-[0.3em] text-[var(--foreground)] font-medium mb-10 opacity-0"
+            className="hidden sm:block text-[10px] uppercase tracking-[0.3em] text-[var(--foreground)] font-medium mb-10 opacity-0"
           >
             Menu
           </h3>
-          <nav className="text-3xl sm:text-4xl text-[var(--foreground)] font-normal flex flex-col space-y-3 sm:space-y-5 mb-12 sm:mb-16">
+          <nav className="text-5xl sm:text-4xl text-[var(--foreground)] font-normal flex flex-col items-center space-y-10 sm:space-y-5 mb-12 sm:mb-16">
             <AnimatedMenuLink
-              ref={(el: HTMLAnchorElement | null) => { navLinksRef.current[0] = el; }}
+              ref={(el: HTMLAnchorElement | null) => {
+                navLinksRef.current[0] = el;
+              }}
               to="/"
-              onClick={(e: MouseEvent<HTMLAnchorElement>) => handleLinkClick(e, "/", "#projects")}
+              onClick={(e: MouseEvent<HTMLAnchorElement>) =>
+                handleLinkClick(e, "/", "#projects")
+              }
               isOpen={isOpen}
             >
               Works
             </AnimatedMenuLink>
             <AnimatedMenuLink
-              ref={(el: HTMLAnchorElement | null) => { navLinksRef.current[1] = el; }}
+              ref={(el: HTMLAnchorElement | null) => {
+                navLinksRef.current[1] = el;
+              }}
               to="/about"
-              onClick={(e: MouseEvent<HTMLAnchorElement>) => handleLinkClick(e, "/about")}
+              onClick={(e: MouseEvent<HTMLAnchorElement>) =>
+                handleLinkClick(e, "/about")
+              }
               isOpen={isOpen}
             >
               About
             </AnimatedMenuLink>
             <AnimatedMenuLink
-              ref={(el: HTMLAnchorElement | null) => { navLinksRef.current[2] = el; }}
+              ref={(el: HTMLAnchorElement | null) => {
+                navLinksRef.current[2] = el;
+              }}
               to="/contact"
-              onClick={(e: MouseEvent<HTMLAnchorElement>) => handleLinkClick(e, "/contact")}
+              onClick={(e: MouseEvent<HTMLAnchorElement>) =>
+                handleLinkClick(e, "/contact")
+              }
               isOpen={isOpen}
             >
               Contact
@@ -335,14 +314,15 @@ const MobileMenuOverlay: FC<{
         </div>
 
         {/* Social / Footer Info */}
-        <div ref={footerRef} className="mt-auto opacity-0">
-          <div className="border-t border-black/5 pt-8 sm:pt-10">
+        <div ref={footerRef} className="w-full mt-auto opacity-0">
+          <div className="border-t border-black/5 pt-8 sm:pt-10 flex justify-center">
             <Links
               links={[
                 { label: "Facebook", href: "#facebook" },
                 { label: "LinkedIn", href: "#linkedin" },
                 { label: "Instagram", href: "#instagram" },
               ]}
+              className="flex justify-center gap-8 sm:gap-12"
               linkClassName="text-[10px] uppercase font-medium tracking-[0.4em] py-1"
               textColor="text-[var(--foreground)] opacity-60"
               underlineColor="bg-[var(--foreground)] opacity-60"

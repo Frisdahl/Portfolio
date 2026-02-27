@@ -1,7 +1,8 @@
-import React, { useLayoutEffect, useRef, useEffect } from "react";
+import React, { useLayoutEffect, useRef, useEffect, useState } from "react";
 import { initVideoShowcaseAnimations } from "./VideoShowcase.anim";
 
 const VideoShowcase: React.FC = () => {
+  const [isInView, setIsInView] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoWrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -10,25 +11,26 @@ const VideoShowcase: React.FC = () => {
   const longTextRef = useRef<HTMLParagraphElement>(null);
   const smallTextRef = useRef<HTMLParagraphElement>(null);
 
-  // Pause video when not visible for better performance
+  // Lazy load video and control playback
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    const container = containerRef.current;
+    if (!container) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            video.play().catch(() => {}); // Resume playback
+            setIsInView(true);
+            videoRef.current?.play().catch(() => {});
           } else {
-            video.pause(); // Pause when off-screen
+            videoRef.current?.pause();
           }
         });
       },
-      { threshold: 0.25 }, // Trigger when 25% visible
+      { threshold: 0.1, rootMargin: "200px" }, // Start loading 200px before it enters
     );
 
-    observer.observe(video);
+    observer.observe(container);
 
     return () => observer.disconnect();
   }, []);
@@ -68,16 +70,26 @@ const VideoShowcase: React.FC = () => {
               ref={videoWrapperRef}
               className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl z-10 bg-neutral-900"
             >
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                src="/projectVideos/videoshowcase/promo_h264.mp4"
-              />
+              {isInView && (
+                <video
+                  ref={videoRef}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                >
+                  <source
+                    src="/projectVideos/videoshowcase/promo_vp9.webm"
+                    type="video/webm"
+                  />
+                  <source
+                    src="/projectVideos/videoshowcase/promo_h264.mp4"
+                    type="video/mp4"
+                  />
+                </video>
+              )}
             </div>
           </div>
 

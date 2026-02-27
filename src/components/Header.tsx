@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({
             src="/images/Portfolio-logo.svg"
             alt="Portfolio Logo"
             className={`h-12 transition-all duration-500 ${
-              isInverted && !isDark ? "filter invert" : ""
+              isInverted && !isDark && !isMobileMenuOpen ? "filter invert" : ""
             }`}
           />
         </Link>

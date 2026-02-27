@@ -9,6 +9,7 @@ import { initAboutItemsAnimation } from "./About.anim";
 const AboutPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const animationTriggeredRef = useRef(false);
 
   useLayoutEffect(() => {
     if (!containerRef.current) return;
@@ -19,11 +20,9 @@ const AboutPage: React.FC = () => {
     });
 
     const ctx = gsap.context(() => {
-      let animationTriggered = false;
-
       const startEntranceAnimation = () => {
-        if (animationTriggered) return;
-        animationTriggered = true;
+        if (animationTriggeredRef.current) return;
+        animationTriggeredRef.current = true;
         console.log("AboutPage: Running entrance animation");
 
         // Show elements for animation
@@ -97,7 +96,7 @@ const AboutPage: React.FC = () => {
 
       // Safety timeout
       const safetyTimeout = setTimeout(() => {
-        if (!animationTriggered) {
+        if (!animationTriggeredRef.current) {
           console.log("AboutPage: Safety reveal triggered");
           startEntranceAnimation();
         }

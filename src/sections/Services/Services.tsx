@@ -258,12 +258,12 @@ const Services: React.FC = () => {
                     setProgress(0);
                   }}
                 >
-                  <span className="text-4xl font-instrumentsans font-bold w-12 shrink-0">
+                  <span className="text-2xl md:text-4xl font-instrumentsans font-bold w-12 shrink-0">
                     {service.id}
                   </span>
 
                   <div
-                    className={`relative h-px shrink-0 ml-12 mr-6 transition-all duration-700 ease-in-out ${
+                    className={`relative h-px shrink-0 ml-4 md:ml-12 mr-6 transition-all duration-700 ease-in-out ${
                       isActive ? "w-16 md:w-20 lg:w-24" : "w-8 md:w-10 lg:w-12"
                     }`}
                   >
@@ -276,7 +276,7 @@ const Services: React.FC = () => {
                     )}
                   </div>
 
-                  <h3 className="text-4xl font-instrumentsans font-bold whitespace-nowrap">
+                  <h3 className="text-2xl md:text-4xl font-instrumentsans font-bold whitespace-nowrap">
                     {service.name}
                   </h3>
                 </div>
@@ -289,7 +289,7 @@ const Services: React.FC = () => {
             <div key={displayIndex} ref={rightContentRef} className="w-full">
               <h4
                 ref={smallTitleRef}
-                className="text-3xl mb-6 font-instrumentsans font-bold"
+                className="text-2xl md:text-3xl mb-6 font-instrumentsans font-bold"
               >
                 {services[displayIndex].smallTitle}
               </h4>
