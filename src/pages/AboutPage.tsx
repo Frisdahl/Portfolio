@@ -20,105 +20,73 @@ const AboutPage: React.FC = () => {
     });
 
     const ctx = gsap.context(() => {
-      const startEntranceAnimation = () => {
-        if (animationTriggeredRef.current) return;
-        animationTriggeredRef.current = true;
-        console.log("AboutPage: Running entrance animation");
-
-        // Show elements for animation
-        gsap.set([headingRef.current, ".about-item"], { 
-          autoAlpha: 1 
-        });
-
-        // Heading animation (Hero/Contact Style)
-        if (headingRef.current) {
-          const split = new SplitType(headingRef.current, { 
-            types: "lines,words" 
-          });
-          gsap.set(split.lines, { overflow: "hidden" });
-          
-          gsap.fromTo(split.words, {
-            yPercent: 100,
-            opacity: 0,
-          }, {
-            yPercent: 0,
-            opacity: 1,
-            duration: 1.2,
-            stagger: 0.03,
-            ease: "power4.out",
-          });
+      // 1. Create the entrance timeline (initially paused)
+      const entranceTl = gsap.timeline({ 
+        paused: true,
+        delay: 0.2, // Slight breathing room after transition
+        onStart: () => {
+          animationTriggeredRef.current = true;
+          // Ensure elements are visible when animation starts
+          gsap.set([headingRef.current, ".about-item"], { autoAlpha: 1 });
         }
+      });
 
-        // Content elements staggered reveal (Tightened)
-        gsap.fromTo(".about-item", {
-          y: 30,
+      // Heading animation
+      if (headingRef.current) {
+        const split = new SplitType(headingRef.current, { types: "lines,words" });
+        gsap.set(split.lines, { overflow: "hidden" });
+        entranceTl.fromTo(split.words, {
+          yPercent: 100,
           opacity: 0,
         }, {
-          y: 0,
+          yPercent: 0,
           opacity: 1,
-          duration: 1.0,
-          stagger: 0.1,
-          ease: "power3.out",
-          delay: 0.4,
+          duration: 1.2,
+          stagger: 0.03,
+          ease: "power4.out",
         });
+      }
+
+      // Content elements reveal
+      entranceTl.fromTo(".about-item", {
+        y: 30,
+        opacity: 0,
+      }, {
+        y: 0,
+        opacity: 1,
+        duration: 1.0,
+        stagger: 0.1,
+        ease: "power3.out",
+      }, "-=0.8");
+
+      const startEntranceAnimation = () => {
+        if (animationTriggeredRef.current) return;
+        entranceTl.play();
+        sessionStorage.removeItem("isNavigating");
       };
 
-      // 1. Line-reveal animations for all service/experience items
-      // Add a tiny delay to ensure children are rendered
-      const aboutItemsTimeout = setTimeout(() => {
-        if (containerRef.current) {
-          initAboutItemsAnimation(containerRef.current);
-        }
-      }, 100);
-
-      // Listen for transition completion (both initial and page-to-page)
-      const handleTransitionComplete = () => {
-        console.log("AboutPage: Transition complete event received");
-        startEntranceAnimation();
-      };
-      
+      // 2. Coordination logic
+      const handleTransitionComplete = () => startEntranceAnimation();
       window.addEventListener("initial-loader-complete", handleTransitionComplete);
       window.addEventListener("page-transition-complete", handleTransitionComplete);
 
-      // Check if we should reveal immediately (if loader is already gone)
       const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
       const isLoaderActive = !!document.querySelector('.initial-loader-wrap');
       const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
-      if ((isInitialLoaderDone && !isLoaderActive) || isNavigating) {
-        // Use a tiny delay to ensure everything is mounted
-        const id = setTimeout(() => {
-          startEntranceAnimation();
-          sessionStorage.removeItem("isNavigating");
-        }, 100);
-        return () => clearTimeout(id);
+      if (!isNavigating && isInitialLoaderDone && !isLoaderActive) {
+        startEntranceAnimation();
       }
 
-      // Safety timeout
       const safetyTimeout = setTimeout(() => {
-        if (!animationTriggeredRef.current) {
-          console.log("AboutPage: Safety reveal triggered");
-          startEntranceAnimation();
-        }
-      }, 2000);
-
-      // Stuff I Do section reveal
-      gsap.from(".stuff-i-do-section", {
-        opacity: 0,
-        y: 60,
-        duration: 1.5,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".stuff-i-do-section",
-          start: "top 80%",
-        },
-      });
+        if (!animationTriggeredRef.current) startEntranceAnimation();
+      }, 1500);
 
       return () => {
         window.removeEventListener("initial-loader-complete", handleTransitionComplete);
         window.removeEventListener("page-transition-complete", handleTransitionComplete);
         clearTimeout(safetyTimeout);
-        clearTimeout(aboutItemsTimeout);
+        entranceTl.kill();
       };
     }, containerRef);
 

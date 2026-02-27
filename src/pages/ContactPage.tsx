@@ -12,6 +12,7 @@ const ContactPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const animationTriggeredRef = useRef(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -24,65 +25,106 @@ const ContactPage: React.FC = () => {
   useLayoutEffect(() => {
     if (!containerRef.current) return;
 
+    // Initial state: Hidden
+    gsap.set([headingRef.current, ".form-field-row", ".budget-area", ".submit-area"], { 
+      autoAlpha: 0 
+    });
+
     const ctx = gsap.context(() => {
-      // 1. Staggered Text Reveal for Heading
+      // 1. Create the entrance timeline (initially paused)
+      const entranceTl = gsap.timeline({ 
+        paused: true,
+        delay: 0.2, // Slight breathing room after transition
+        onStart: () => {
+          animationTriggeredRef.current = true;
+          // Ensure elements are visible when animation starts
+          gsap.set([headingRef.current, ".form-field-row", ".budget-area", ".submit-area"], { 
+            autoAlpha: 1 
+          });
+        }
+      });
+
+      // Heading staggered text reveal
       if (headingRef.current) {
-        const split = new SplitType(headingRef.current, {
-          types: "lines,words",
-        });
+        const split = new SplitType(headingRef.current, { types: "lines,words" });
         gsap.set(split.lines, { overflow: "hidden" });
-        gsap.from(split.words, {
+        entranceTl.fromTo(split.words, {
           yPercent: 100,
           opacity: 0,
+        }, {
+          opacity: 1,
+          yPercent: 0,
           duration: 1.2,
           stagger: 0.05,
           ease: "power4.out",
-          delay: 0.2,
         });
       }
 
-      // 2. Form Fields Entrance Animation
+      // Form fields entrance
       if (formRef.current) {
         const fields = formRef.current.querySelectorAll(".form-field-row");
         const budgetArea = formRef.current.querySelector(".budget-area");
         const submitArea = formRef.current.querySelector(".submit-area");
 
-        const tl = gsap.timeline({ delay: 0.8 });
-
-        tl.from(fields, {
+        entranceTl.fromTo(fields, {
           y: 30,
           opacity: 0,
+        }, {
+          y: 0,
+          opacity: 1,
           duration: 1,
           stagger: 0.15,
           ease: "power3.out",
-        })
-          .from(
-            budgetArea,
-            {
-              y: 20,
-              opacity: 0,
-              duration: 0.8,
-              ease: "power3.out",
-            },
-            "-=0.6",
-          )
-          .from(submitArea, {
+        }, "-=0.8")
+        .fromTo(budgetArea, {
           y: 20,
           opacity: 0,
+        }, {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        }, "-=0.6")
+        .fromTo(submitArea, {
+          y: 20,
+          opacity: 0,
+        }, {
+          y: 0,
+          opacity: 1,
           duration: 0.8,
           ease: "power3.out"
         }, "-=0.4");
       }
 
-      // Check if we should reveal immediately
-      const isNavigating = sessionStorage.getItem("isNavigating") === "true";
-      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
-      
-      if (isNavigating || isInitialLoaderDone) {
-        // This ensures if transition events are missed, the form is at least visible or triggers reveal
+      const startEntranceAnimation = () => {
+        if (animationTriggeredRef.current) return;
+        entranceTl.play();
         sessionStorage.removeItem("isNavigating");
+      };
+
+      // 2. Coordination logic
+      const handleTransitionComplete = () => startEntranceAnimation();
+      window.addEventListener("initial-loader-complete", handleTransitionComplete);
+      window.addEventListener("page-transition-complete", handleTransitionComplete);
+
+      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
+      const isLoaderActive = !!document.querySelector('.initial-loader-wrap');
+      const isNavigating = sessionStorage.getItem("isNavigating") === "true";
+
+      if (!isNavigating && isInitialLoaderDone && !isLoaderActive) {
+        startEntranceAnimation();
       }
 
+      const safetyTimeout = setTimeout(() => {
+        if (!animationTriggeredRef.current) startEntranceAnimation();
+      }, 1500);
+
+      return () => {
+        window.removeEventListener("initial-loader-complete", handleTransitionComplete);
+        window.removeEventListener("page-transition-complete", handleTransitionComplete);
+        clearTimeout(safetyTimeout);
+        entranceTl.kill();
+      };
     }, containerRef);
 
     return () => {

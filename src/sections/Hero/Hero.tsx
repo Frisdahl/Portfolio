@@ -14,35 +14,27 @@ const Hero: React.FC = () => {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!heroRef.current || !containerRef.current) return;
-
-    // Synchronously hide elements that will be animated in
-    gsap.set([videoRef.current, headlineRef.current, footerRef.current], {
-      autoAlpha: 0,
-    });
-
+      useEffect(() => {
+        if (!heroRef.current || !containerRef.current) return;
+    
+        // Synchronously hide elements that will be animated in
+        // DO NOT hide videoRef.current here as we want it visible immediately
+        gsap.set([headlineRef.current, footerRef.current], {
+          autoAlpha: 0,
+        });
     let animationTriggered = false;
-    const startEntranceAnimation = () => {
-      if (animationTriggered) return;
-      animationTriggered = true;
-
-      // Show elements for animation
-      gsap.set([videoRef.current, headlineRef.current, footerRef.current], {
-        autoAlpha: 1,
-      });
-
-      // Initial Load Animation
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      // Fade in video (starting from its base opacity)
-      tl.fromTo(
-        videoRef.current,
-        { scale: 1.1, opacity: 0 },
-        { opacity: 0.4, scale: 1.06, duration: 2.5, ease: "power2.inOut" },
-      );
-
-      // Split headline for staggered animation (Contact Page Style)
+          const startEntranceAnimation = () => {
+            if (animationTriggered) return;
+            animationTriggered = true;
+      
+            // Show elements for animation
+            gsap.set([headlineRef.current, footerRef.current], {
+              autoAlpha: 1,
+            });
+    
+            // Initial Load Animation
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      // 1. Heading slide up (Split headline)
       if (headlineRef.current) {
         const split = new SplitType(headlineRef.current, {
           types: "lines,words",
@@ -58,16 +50,16 @@ const Hero: React.FC = () => {
             stagger: 0.05,
             ease: "power4.out",
           },
-          "-=1.8",
+          0.1, // Small initial delay
         );
       }
 
-      // Fade in footer area
+      // 2. Footer area slide up (socials and paragraph)
       tl.fromTo(
         footerRef.current,
         { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 1.2 },
-        "-=1.2",
+        { opacity: 1, y: 0, duration: 1.2, visibility: "visible" },
+        "-=0.8",
       );
     };
 
@@ -151,7 +143,6 @@ const Hero: React.FC = () => {
         className="dark-section relative h-[100vh] w-full bg-[#1c1d1e] overflow-hidden flex flex-col justify-between pt-32 pb-4 md:pb-8 will-change-[clip-path]"
         style={{ clipPath: "inset(0% 0% 0% 0%)" }}
       >
-        {/* Layer B: Video Background */}
         <div className="absolute inset-0 z-[1] pointer-events-none">
           <video
             ref={videoRef}
@@ -160,7 +151,8 @@ const Hero: React.FC = () => {
             loop
             playsInline
             preload="metadata"
-            className="w-full h-full object-cover transform-gpu opacity-40"
+            className="w-full h-full object-cover transform-gpu"
+            style={{ opacity: 0.4, visibility: "visible", display: "block" }}
           >
             <source
               src="/projectVideos/herovideo/wave-optimized.webm"
@@ -172,12 +164,6 @@ const Hero: React.FC = () => {
             />
           </video>
         </div>
-
-        {/* Layer C: Neutral Dark Overlay */}
-        <div
-          className="absolute inset-0 z-[2] pointer-events-none"
-          style={{ backgroundColor: "rgba(28, 29, 30, 0.1)" }}
-        />
 
         {/* Top Content: Headline Wrap */}
         <div className="relative z-[10] px-8">

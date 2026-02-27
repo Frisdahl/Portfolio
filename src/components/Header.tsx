@@ -50,12 +50,14 @@ const Header: React.FC = () => {
 
   const handleLogoClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    await triggerPageTransition();
-
-    if (location.pathname === "/") {
-      scrollTo(0, 0);
-    } else {
+    
+    if (location.pathname !== "/") {
+      sessionStorage.setItem("isNavigating", "true");
+      sessionStorage.setItem("isHomeNav", "true");
+      await triggerPageTransition();
       navigate("/");
+    } else {
+      scrollTo(0, 1.5, 0, false);
     }
   };
 
@@ -75,16 +77,20 @@ const Header: React.FC = () => {
 
     if (section) {
       if (location.pathname !== "/") {
+        // Set specific nav flags for HomePage reveal logic
+        sessionStorage.setItem("targetSection", section);
+        
         await triggerPageTransition();
         navigate("/");
-        setTimeout(() => scrollTo(section, 0, 0, true), 100);
       } else {
-        scrollTo(section, 0, 0, true);
+        // If already on home page, just smooth scroll with offset
+        scrollTo(section, 1.5, -120, false);
       }
       return;
     }
 
     if (location.pathname !== to) {
+      sessionStorage.setItem("isNavigating", "true");
       await triggerPageTransition();
       navigate(to);
     }

@@ -8,31 +8,50 @@ import { scrollTo } from "../utils/smoothScroll";
 
 function HomePage() {
   const [isVisible, setIsVisible] = useState(() => {
-    // Initial state based on whether we are navigating to works
-    return sessionStorage.getItem("isWorksNav") !== "true";
+    // Initial state based on whether we are navigating to specific sections
+    return !sessionStorage.getItem("targetSection") && !sessionStorage.getItem("isHomeNav");
   });
 
   useLayoutEffect(() => {
-    const isWorksNav = sessionStorage.getItem("isWorksNav") === "true";
-    if (isWorksNav) {
-      const handleTransitionComplete = () => {
-        // Jump immediately
-        scrollTo("#projects", 0, 0, true);
+    const targetSection = sessionStorage.getItem("targetSection");
+    const isHomeNav = sessionStorage.getItem("isHomeNav") === "true";
+    
+    if (targetSection || isHomeNav) {
+      const reveal = () => {
+        // 1. Force the scroll jump while invisible
+        if (targetSection) {
+          scrollTo(targetSection, 0, -120, true);
+        } else if (isHomeNav) {
+          scrollTo(0, 0, 0, true);
+        }
         
-        // Short delay to ensure scroll happened before showing
-        setTimeout(() => {
-          setIsVisible(true);
-          sessionStorage.removeItem("isWorksNav");
-        }, 50);
+        // 2. Clear flags and show page
+        sessionStorage.removeItem("targetSection");
+        sessionStorage.removeItem("isHomeNav");
+        
+        // Small delay to ensure browser handled the jump before fading in
+        setTimeout(() => setIsVisible(true), 50);
+      };
+
+      const handleTransitionComplete = () => {
+        reveal();
       };
 
       window.addEventListener("page-transition-complete", handleTransitionComplete);
-      return () => window.removeEventListener("page-transition-complete", handleTransitionComplete);
+      
+      const safetyTimeout = setTimeout(reveal, 1000);
+
+      return () => {
+        window.removeEventListener("page-transition-complete", handleTransitionComplete);
+        clearTimeout(safetyTimeout);
+      };
+    } else {
+      setIsVisible(true);
     }
   }, []);
 
   return (
-    <div className={`HomePage transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+    <div className="HomePage">
       <Hero />
       <VideoShowcase />
       <Services />

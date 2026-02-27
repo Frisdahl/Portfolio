@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 import InitialLoader from "./components/InitialLoader";
+import PageTransition from "./components/PageTransition";
 import ComingSoon from "./components/ComingSoon";
 import "./App.css";
 
@@ -56,7 +57,8 @@ function App() {
   return (
     <Router>
       <div className="noise-grain" />
-      <InitialLoader />
+      {/* <InitialLoader /> */}
+      <PageTransition />
       <SpeedInsights />
       <ScrollToTop />
       <ComingSoon />

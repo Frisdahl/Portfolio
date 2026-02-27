@@ -12,6 +12,16 @@ const InitialLoader: React.FC = () => {
   const contentWrapRef = useRef<HTMLDivElement>(null);
   const columnsRef = useRef<(HTMLDivElement | null)[]>([]);
   const [isVisible, setIsVisible] = useState(true);
+  const [columnCount, setColumnCount] = useState(12);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setColumnCount(window.innerWidth < 640 ? 5 : 12);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -122,16 +132,20 @@ const InitialLoader: React.FC = () => {
       ref={containerRef}
       className="initial-loader-wrap fixed inset-0 z-[100000] flex items-center justify-center bg-transparent pointer-events-auto"
     >
-      {/* 12 Columns Background */}
+      {/* Dynamic Columns Background */}
       <div className="absolute inset-0 flex w-full h-full z-0 overflow-hidden">
-        {[...Array(12)].map((_, i) => (
+        {[...Array(columnCount)].map((_, i) => (
           <div
             key={i}
             ref={(el) => {
               columnsRef.current[i] = el;
             }}
-            className="h-[101%] -mt-[0.5%] w-[8.5%] -mx-[0.1%] bg-[var(--background)] flex-grow origin-right"
-            style={{ willChange: "transform" }}
+            className="h-[101%] -mt-[0.5%] bg-[var(--background)] flex-grow origin-right"
+            style={{ 
+              willChange: "transform",
+              width: `${100 / columnCount}%`,
+              margin: "0 -0.1%" 
+            }}
           />
         ))}
       </div>
