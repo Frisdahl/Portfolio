@@ -18,6 +18,33 @@ function HomePage() {
     const maxAttempts = 40;
     let retryTimeout: number | null = null;
 
+    const alignToTarget = (target: string, run = 0) => {
+      const targetElement = document.querySelector(
+        target,
+      ) as HTMLElement | null;
+      if (!targetElement) return;
+
+      const desiredTop = 120;
+      const currentTop = targetElement.getBoundingClientRect().top;
+      const delta = Math.abs(currentTop - desiredTop);
+
+      if (delta <= 12 || run >= 6) {
+        sessionStorage.removeItem("targetSection");
+        sessionStorage.removeItem("isNavigating");
+
+        if (location.hash) {
+          navigate(location.pathname, { replace: true });
+        }
+        return;
+      }
+
+      scrollTo(target, 0, -120, true);
+      retryTimeout = window.setTimeout(
+        () => alignToTarget(target, run + 1),
+        120,
+      );
+    };
+
     const attemptScrollToTarget = () => {
       const target = location.hash || sessionStorage.getItem("targetSection");
       if (!target) return;
@@ -27,12 +54,7 @@ function HomePage() {
       if (targetElement) {
         scrollTo(target, 0, -120, true);
         requestAnimationFrame(() => scrollTo(target, 0, -120, true));
-        sessionStorage.removeItem("targetSection");
-        sessionStorage.removeItem("isNavigating");
-
-        if (location.hash) {
-          navigate(location.pathname, { replace: true });
-        }
+        retryTimeout = window.setTimeout(() => alignToTarget(target), 100);
         return;
       }
 
