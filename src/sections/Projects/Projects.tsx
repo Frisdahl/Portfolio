@@ -65,8 +65,8 @@ const Projects: React.FC = () => {
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-8 overflow-hidden">
           <div className=" overflow-hidden">
             <h2 className="project-header-text text-2xl md:text-3xl lg:text-5xl w-full text-left font-instrumentsans font-semibold text-[#1c1d1e] leading-tight">
-              Take a look at some of <br className="hidden md:block" />
-              my earlier work
+              A glimpse of <br className="hidden md:block" />
+              my work
             </h2>
           </div>
           <div className="max-w-sm md:text-right overflow-hidden">

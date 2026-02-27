@@ -231,7 +231,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             {/* Title Capsule - Dark Glass */}
             <div
               ref={titleContainerRef}
-              className="backdrop-blur-md bg-black/50 border border-white/10 px-3 py-2 md:px-5 md:py-3 rounded-full flex items-center gap-2 md:gap-3 shadow-2xl"
+              className="backdrop-blur-md bg-black/50 border border-white/10 px-3 py-2 md:px-5 md:py-3 rounded-lg flex items-center gap-2 md:gap-3 shadow-2xl"
             >
               <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-white flex-shrink-0 animate-pulse-fast" />
               <h3 className="font-switzer font-medium uppercase text-[10px] md:text-sm lg:text-base text-white tracking-wider leading-none">
@@ -242,7 +242,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             {/* Description Capsule - White Glass */}
             <div
               ref={descContainerRef}
-              className="backdrop-blur-md bg-white/20 border border-white/30 px-3 py-2 md:px-5 md:py-3 rounded-full shadow-2xl"
+              className="backdrop-blur-md bg-white/20 border border-white/30 px-3 py-2 md:px-5 md:py-3 rounded-lg shadow-2xl"
             >
               <p className="font-switzer uppercase text-[8px] md:text-[10px] lg:text-[11px] font-medium tracking-[0.15em] text-white/90 leading-none">
                 {project.categories.join(" — ")}

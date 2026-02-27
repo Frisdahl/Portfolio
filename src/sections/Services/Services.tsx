@@ -223,7 +223,7 @@ const Services: React.FC = () => {
           */}
           <div ref={headingTextRef} className="w-full">
             <span
-              className="inline-block h-1"
+              className="hidden lg:inline-block h-1"
               style={{ width: "calc(var(--nav-width, 25%) + 3rem)" }}
               aria-hidden="true"
             ></span>
@@ -234,7 +234,7 @@ const Services: React.FC = () => {
       </div>
 
       {/* Services */}
-      <div className="w-full" style={{ paddingLeft: "calc(var(--nav-width, 25%) + 3rem)" }}>
+      <div className="w-full lg:pl-[calc(var(--nav-width,25%)+3rem)]">
         <div className="flex flex-col mb-12">
           <p className="text-sm uppercase mb-4 font-switzer font-semibold tracking-[0.2em] text-[#1c1d1e]/40">
             Services
