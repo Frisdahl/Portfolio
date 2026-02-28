@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 import lenis from "../utils/lenis";
 
 export default function ScrollToTop() {
   const { pathname } = useLocation();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const hasPendingSectionTarget = !!sessionStorage.getItem("targetSection");
     const isPendingHomeNav = sessionStorage.getItem("isHomeNav") === "true";
     const hasHash = Boolean(window.location.hash);

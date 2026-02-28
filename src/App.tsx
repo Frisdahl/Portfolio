@@ -1,9 +1,8 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useLayoutEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
-import PageTransition from "./components/PageTransition";
 import ComingSoon from "./components/ComingSoon";
 import "./App.css";
 
@@ -16,6 +15,13 @@ const ContactPage = lazy(() => import("./pages/ContactPage"));
 
 function App() {
   useSmoothScroll();
+
+  useLayoutEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     console.clear();
@@ -62,7 +68,11 @@ function App() {
       <ComingSoon />
 
       <Layout>
-        <Suspense fallback={null}>
+        <Suspense
+          fallback={
+            <div className="w-full min-h-screen bg-[var(--background)]" />
+          }
+        >
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />

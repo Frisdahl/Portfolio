@@ -87,6 +87,7 @@ const Header: React.FC = () => {
         autoAlpha: 1,
         y: 0,
         duration: 0.8,
+        delay: 0.25,
         ease: "power3.out",
       }).to(
         [talkButtonRef.current, menuButtonRef.current],
@@ -97,7 +98,7 @@ const Header: React.FC = () => {
           stagger: 0.08,
           ease: "power3.out",
         },
-        "-=0.45",
+        "-=0.35",
       );
 
       entranceTimelineRef.current = tl;
@@ -271,7 +272,7 @@ const Header: React.FC = () => {
           ref={nameRef}
           to="/"
           onClick={handleLogoClick}
-          className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1c1d1e] leading-[1.0] pt-1"
+          className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1c1d1e] leading-[1.0] pt-1 opacity-0"
         >
           <span className="text-lg md:text-xl lg:text-2xl uppercase font-medium tracking-tight">
             <span className="italic">A</span>lexander
@@ -290,7 +291,7 @@ const Header: React.FC = () => {
             <button
               ref={talkButtonRef}
               onClick={(e) => handleLinkClick(e, "/contact")}
-              className="group/talk h-10 sm:h-12 px-10 rounded-full bg-[#1c1d1e] text-[#fefffe] text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:opacity-90 cursor-pointer flex items-center justify-center overflow-hidden relative min-w-[160px]"
+              className="group/talk h-10 sm:h-12 px-10 rounded-full bg-[#1c1d1e] text-[#fefffe] text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:opacity-90 cursor-pointer flex items-center justify-center overflow-hidden relative min-w-[160px] opacity-0"
             >
               <span className="whitespace-nowrap transition-transform duration-500 group-hover/talk:translate-x-3 font-medium">
                 Let's talk
@@ -307,7 +308,7 @@ const Header: React.FC = () => {
               ref={menuButtonRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-expanded={isMenuOpen}
-              className={`group/menu h-10 sm:h-12 px-10 min-w-[160px] rounded-full text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:brightness-110 cursor-pointer flex items-center justify-between gap-4 overflow-hidden ${
+              className={`group/menu h-10 sm:h-12 px-10 min-w-[160px] rounded-full text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:brightness-110 cursor-pointer flex items-center justify-between gap-4 overflow-hidden opacity-0 ${
                 isMenuOpen
                   ? "bg-[#fefeff]"
                   : isPastHero
