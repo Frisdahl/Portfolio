@@ -13,11 +13,14 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [isPastHero, setIsPastHero] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const talkButtonRef = useRef<HTMLButtonElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const navButtonsRef = useRef<HTMLElement>(null);
   const nameRef = useRef<HTMLAnchorElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const entranceTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
   const isHomePage = location.pathname === "/";
 
@@ -26,7 +29,10 @@ const Header: React.FC = () => {
     const updateHeaderDimensions = () => {
       if (nameRef.current) {
         const width = nameRef.current.offsetWidth;
-        document.documentElement.style.setProperty("--name-width", `${width}px`);
+        document.documentElement.style.setProperty(
+          "--name-width",
+          `${width}px`,
+        );
       }
     };
 
@@ -52,9 +58,83 @@ const Header: React.FC = () => {
     return () => {
       ctx.revert();
       window.removeEventListener("resize", updateHeaderDimensions);
-      window.removeEventListener("page-transition-complete", updateHeaderDimensions);
+      window.removeEventListener(
+        "page-transition-complete",
+        updateHeaderDimensions,
+      );
     };
   }, [location.pathname, isHomePage]);
+
+  // Header entrance animation (name + buttons)
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      if (
+        !nameRef.current ||
+        !talkButtonRef.current ||
+        !menuButtonRef.current
+      ) {
+        return;
+      }
+
+      gsap.set(
+        [nameRef.current, talkButtonRef.current, menuButtonRef.current],
+        {
+          autoAlpha: 0,
+          y: -12,
+        },
+      );
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(nameRef.current, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      }).to(
+        [talkButtonRef.current, menuButtonRef.current],
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.08,
+          ease: "power3.out",
+        },
+        "-=0.45",
+      );
+
+      entranceTimelineRef.current = tl;
+
+      const playEntrance = () => {
+        if (entranceTimelineRef.current?.progress() === 0) {
+          entranceTimelineRef.current.play();
+        }
+      };
+
+      window.addEventListener("initial-loader-complete", playEntrance);
+      window.addEventListener("page-transition-complete", playEntrance);
+
+      const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
+      const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
+      const isNavigating = sessionStorage.getItem("isNavigating") === "true";
+
+      if (hasSeenLoader && !isLoaderActive && !isNavigating) {
+        playEntrance();
+      }
+
+      const safetyTimeout = setTimeout(
+        playEntrance,
+        isLoaderActive ? 6000 : 120,
+      );
+
+      return () => {
+        window.removeEventListener("initial-loader-complete", playEntrance);
+        window.removeEventListener("page-transition-complete", playEntrance);
+        clearTimeout(safetyTimeout);
+      };
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   // 2. Synchronized Animation Timeline Setup
   useLayoutEffect(() => {
@@ -76,9 +156,9 @@ const Header: React.FC = () => {
       });
 
       // Create the Master Timeline
-      const tl = gsap.timeline({ 
+      const tl = gsap.timeline({
         paused: true,
-        defaults: { ease: "power3.inOut" } 
+        defaults: { ease: "power3.inOut" },
       });
 
       // Sequence: Panel -> Items (Button handled by React state + CSS for maximum smoothness)
@@ -86,15 +166,18 @@ const Header: React.FC = () => {
         autoAlpha: 1,
         clipPath: "inset(0% 0% 0% 0%)",
         duration: 0.6,
-        ease: "expo.out"
-      })
-      .to(items, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.4,
-        stagger: 0.06,
-        ease: "power2.out"
-      }, "-=0.4");
+        ease: "expo.out",
+      }).to(
+        items,
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.4,
+          stagger: 0.06,
+          ease: "power2.out",
+        },
+        "-=0.4",
+      );
 
       timelineRef.current = tl;
     });
@@ -121,7 +204,7 @@ const Header: React.FC = () => {
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current && 
+        dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
         menuButtonRef.current &&
         !menuButtonRef.current.contains(event.target as Node)
@@ -151,7 +234,11 @@ const Header: React.FC = () => {
     }
   };
 
-  const handleLinkClick = async (e: React.MouseEvent | null, to: string, section?: string) => {
+  const handleLinkClick = async (
+    e: React.MouseEvent | null,
+    to: string,
+    section?: string,
+  ) => {
     if (e && e.preventDefault) e.preventDefault();
     setIsMenuOpen(false);
 
@@ -179,7 +266,7 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[220] pointer-events-none py-6 md:py-10 px-6 md:px-10 lg:px-12 xl:px-16">
+    <header className="fixed top-0 left-0 right-0 z-[220] pointer-events-none py-6 md:py-10 px-6 md:px-10 lg:px-4 xl:px-6">
       <div className="flex items-start justify-between w-full relative">
         {/* Logo Replacement: Stylized Name */}
         <Link
@@ -198,8 +285,12 @@ const Header: React.FC = () => {
 
         {/* Nav on the far right */}
         <div className="flex flex-col items-end gap-2 relative">
-          <nav className="pointer-events-auto flex items-start gap-2 shrink-0">
+          <nav
+            ref={navButtonsRef}
+            className="pointer-events-auto flex items-start gap-2 shrink-0"
+          >
             <button
+              ref={talkButtonRef}
               onClick={(e) => handleLinkClick(e, "/contact")}
               className="group/talk h-10 sm:h-12 px-10 rounded-full bg-[#1c1d1e] text-[#fefffe] text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:opacity-90 cursor-pointer flex items-center justify-center overflow-hidden relative min-w-[160px]"
             >
@@ -213,28 +304,40 @@ const Header: React.FC = () => {
                 <ArrowIcon className="w-4 h-4" />
               </div>
             </button>
-            
+
             <button
               ref={menuButtonRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-expanded={isMenuOpen}
               className={`group/menu h-10 sm:h-12 px-10 min-w-[160px] rounded-full text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:brightness-110 cursor-pointer flex items-center justify-between gap-4 overflow-hidden ${
-                isMenuOpen 
-                  ? "bg-[#fefeff]" 
-                  : (isPastHero ? "bg-white/30 backdrop-blur-2xl" : "bg-[#e4e6ef]")
+                isMenuOpen
+                  ? "bg-[#fefeff]"
+                  : isPastHero
+                    ? "bg-white/30 backdrop-blur-2xl"
+                    : "bg-[#e4e6ef]"
               }`}
             >
               <div className="relative h-10 sm:h-12 flex-grow overflow-hidden pointer-events-none">
-                <div 
+                <div
                   className="flex flex-col w-full h-[200%] transition-transform duration-[600ms] ease-[cubic-bezier(0.7,0,0.3,1)]"
-                  style={{ transform: isMenuOpen ? 'translateY(-50%)' : 'translateY(0%)' }}
+                  style={{
+                    transform: isMenuOpen
+                      ? "translateY(-50%)"
+                      : "translateY(0%)",
+                  }}
                 >
-                  <span className="h-1/2 flex items-center justify-start">Menu</span>
-                  <span className="h-1/2 flex items-center justify-start">Close</span>
+                  <span className="h-1/2 flex items-center justify-start">
+                    Menu
+                  </span>
+                  <span className="h-1/2 flex items-center justify-start">
+                    Close
+                  </span>
                 </div>
               </div>
 
-              <div className={`flex items-center gap-1.5 transition-transform duration-400 ease-[cubic-bezier(0.7,0,0.3,1)] ${isMenuOpen ? "rotate-90" : "group-hover/menu:rotate-90"}`}>
+              <div
+                className={`flex items-center gap-1.5 transition-transform duration-400 ease-[cubic-bezier(0.7,0,0.3,1)] ${isMenuOpen ? "rotate-90" : "group-hover/menu:rotate-90"}`}
+              >
                 <div className="w-1.5 h-1.5 rounded-full bg-current transition-colors duration-500" />
                 <div className="w-1.5 h-1.5 rounded-full bg-current transition-colors duration-500" />
               </div>
@@ -247,7 +350,7 @@ const Header: React.FC = () => {
             className="pointer-events-auto absolute top-full right-0 mt-2 w-full min-w-[320px] bg-[#fefeff] rounded-[1.5rem] shadow-2xl border border-[#1c1d1e]/5 overflow-hidden flex flex-col p-3 invisible opacity-0"
           >
             {menuItems.map((item) => {
-              const isActive = item.section 
+              const isActive = item.section
                 ? location.pathname === "/" && location.hash === item.section
                 : location.pathname === item.to && !location.hash;
 
@@ -261,11 +364,19 @@ const Header: React.FC = () => {
                   }`}
                 >
                   <div className="relative h-8 overflow-hidden flex-grow pointer-events-none">
-                    <div className={`flex flex-col transition-transform duration-[600ms] ease-[cubic-bezier(0.7,0,0.3,1)] h-[200%] ${
-                      isActive ? "translate-y-0" : "group-hover/item:-translate-y-1/2"
-                    }`}>
-                      <span className="h-1/2 flex items-center">{item.label}</span>
-                      <span className="h-1/2 flex items-center">{item.label}</span>
+                    <div
+                      className={`flex flex-col transition-transform duration-[600ms] ease-[cubic-bezier(0.7,0,0.3,1)] h-[200%] ${
+                        isActive
+                          ? "translate-y-0"
+                          : "group-hover/item:-translate-y-1/2"
+                      }`}
+                    >
+                      <span className="h-1/2 flex items-center">
+                        {item.label}
+                      </span>
+                      <span className="h-1/2 flex items-center">
+                        {item.label}
+                      </span>
                     </div>
                   </div>
 

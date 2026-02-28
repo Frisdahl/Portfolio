@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useLayoutEffect } from "react";
+import React, { useRef, useLayoutEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
@@ -67,49 +67,8 @@ const services: ServiceItem[] = [
 ];
 
 const Services: React.FC = () => {
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const headingVideoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const rowsContainerRef = useRef<HTMLDivElement>(null);
-
-  // Ensure heading video plays reliably
-  useEffect(() => {
-    const video = headingVideoRef.current;
-    if (!video) return;
-
-    const playVideo = () => {
-      video.play().catch(() => {});
-    };
-
-    playVideo();
-    const interval = setInterval(playVideo, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Heading Entrance Animation
-  useLayoutEffect(() => {
-    if (!headingRef.current) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headingRef.current,
-        { y: 30, opacity: 0 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: "top 90%",
-            once: true,
-          },
-        },
-      );
-    }, headingRef);
-
-    return () => ctx.revert();
-  }, []);
 
   // Per-Row Animations
   useLayoutEffect(() => {
@@ -206,39 +165,6 @@ const Services: React.FC = () => {
       ref={sectionRef}
       className="w-full text-[#1d1d1f] text-left font-aeonik px-6 md:px-10 lg:px-4 xl:px-6"
     >
-      {/* Heading - 12 Column Grid */}
-      <div className="w-full mb-24 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Main Heading Text starts from Col 3 */}
-        <h2
-          ref={headingRef}
-          className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl text-[#1d1d1f] font-aeonik font-regular leading-[1.5] tracking-tight text-left lg:col-start-3 lg:col-span-10"
-        >
-          I design and build digital experiences for ambitious brands — blending
-          structure, clarity, and{" "}
-          <span className="inline-flex items-center justify-center align-middle mx-4 w-[1.8em] md:w-[2.5em] aspect-video rounded-full overflow-hidden bg-black/5 relative">
-            <video
-              ref={headingVideoRef}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              className="w-full h-full object-cover"
-            >
-              <source
-                src="/projectVideos/herovideo/wave-optimized.webm"
-                type="video/webm"
-              />
-              <source
-                src="/projectVideos/herovideo/wave-optimized.mp4"
-                type="video/mp4"
-              />
-            </video>
-          </span>{" "}
-          purposeful motion.
-        </h2>
-      </div>
-
       {/* Services List Container */}
       <div className="w-full">
         <div className="bg-[#1d1d1f] text-[#f4f4f5] rounded-[2rem] md:rounded-[3rem] p-6 md:p-8">
@@ -248,14 +174,10 @@ const Services: React.FC = () => {
               <p className="text-sm uppercase mb-4 font-aeonik font-semibold tracking-[0.2em] text-white/40">
                 Services
               </p>
-              <h3 className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-medium text-white leading-tight tracking-tight max-w-6xl">
-                Evolving with every brief and built for impact, my process{" "}
-                <br className="hidden md:block" />
-                spans design, development, and brand strategy—aligning{" "}
-                <br className="hidden md:block" />
-                vision with execution to bring clarity and edge to every{" "}
-                <br className="hidden md:block" />
-                project.
+              <h3 className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-medium text-white leading-tight tracking-tight w-full">
+                Evolving with every brief and built for impact, my process spans
+                design, development, and brand strategy—aligning vision with
+                execution to bring clarity and edge to every project.
               </h3>
             </div>
           </div>
@@ -276,9 +198,9 @@ const Services: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* lg:col-span-3: Service Name (Now Normal Case) */}
+                    {/* lg:col-span-3: Service Name */}
                     <div className="lg:col-span-3">
-                      <h3 className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-medium text-white leading-tight tracking-tight">
+                      <h3 className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-medium text-white leading-tight tracking-tight service-name">
                         {service.name}
                       </h3>
                     </div>

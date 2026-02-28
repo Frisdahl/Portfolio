@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Hero from "../sections/Hero/Hero";
 import Projects from "../sections/Projects/Projects";
 import Services from "../sections/Services/Services";
+import TechStack from "../sections/TechStack/TechStack";
+import Manifesto from "../sections/Manifesto/Manifesto";
 // import VideoShowcase from "../sections/VideoShowcase/VideoShowcase";
 import BrandsMarquee from "../sections/Collaboration/BrandsMarquee";
 // import Expectations from "../sections/Expectations/Expectations";
@@ -36,9 +38,9 @@ function HomePage() {
         <VideoShowcase />
       </div> */}
 
-      {/* Services Section */}
+      {/* Manifesto Section */}
       <div className="mb-32 md:mb-48 lg:mb-64">
-        <Services />
+        <Manifesto />
       </div>
 
       {/* Projects Section */}
@@ -46,10 +48,20 @@ function HomePage() {
         <Projects />
       </div>
 
-      {/* Brands Marquee Section */}
+      {/* Services Section */}
       <div className="mb-32 md:mb-48 lg:mb-64">
-        <BrandsMarquee />
+        <Services />
       </div>
+
+      {/* Tech Stack Section */}
+      <div className="mb-32 md:mb-48 lg:mb-64">
+        <TechStack />
+      </div>
+
+      {/* Brands Marquee Section */}
+      {/*       <div className="mb-32 md:mb-48 lg:mb-64">
+        <BrandsMarquee />
+      </div> */}
 
       {/* <Expectations />
       <Collaboration /> */}

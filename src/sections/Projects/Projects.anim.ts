@@ -48,36 +48,23 @@ export const initGridAnimations = (container: HTMLElement) => {
       if (headerText && subText) {
         gsap.set([headerText, subText], { opacity: 1 });
 
-        const splitHeader = new SplitType(headerText, { types: "lines,words" });
-        const splitSub = new SplitType(subText, { types: "lines,words" });
-
-        const headerLines = splitHeader.lines ?? [];
-        const subLines = splitSub.lines ?? [];
-        const headerWords = splitHeader.words ?? [];
-        const subWords = splitSub.words ?? [];
-
-        gsap.set([...headerLines, ...subLines], {
-          overflow: "hidden",
-          display: "block",
-        });
-
-        gsap.set([...headerWords, ...subWords], {
-          display: "inline-block",
-          willChange: "transform, opacity",
-        });
-
-        gsap.from([...headerWords, ...subWords], {
-          y: 24,
-          opacity: 0,
-          duration: 1.15,
-          stagger: 0.028,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: headerText,
-            start: "top 85%",
-            once: true,
+        // Removed SplitType as it breaks the custom AnimatedLetter logic
+        gsap.fromTo(
+          [headerText, subText],
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1.15,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: headerText,
+              start: "top 85%",
+              once: true,
+            },
           },
-        });
+        );
       }
 
       const rows = container.querySelectorAll(".project-row");

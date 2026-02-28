@@ -194,9 +194,11 @@ const Marquee: React.FC<MarqueeProps> = ({
     >
       <div ref={railRef} className="flex whitespace-nowrap">
         {[...Array(repeat)].map((_, i) => (
-          <span key={i} className={`marquee-item inline-block ${itemClassName}`}>
-            {text}
-          </span>
+          <span 
+            key={i} 
+            className={`marquee-item inline-block ${itemClassName}`}
+            dangerouslySetInnerHTML={{ __html: text }}
+          />
         ))}
       </div>
     </div>

@@ -134,7 +134,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     >
       {/* Media Container - Clickable and Hoverable */}
       <div
-        className={`relative w-full overflow-hidden rounded-[1.5rem] md:rounded-[2rem] cursor-pointer transform translate-z-0 ${fillHeight ? "h-full" : aspectClassName}`}
+        className={`relative w-full overflow-hidden rounded-[1.5rem] md:rounded-xl cursor-pointer transform translate-z-0 ${fillHeight ? "h-full" : aspectClassName}`}
         onClick={handleProjectClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -169,12 +169,12 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#1c1d1e] to-transparent z-10 pointer-events-none" />
 
           <Marquee
-            text={`${project.categories.join("  •  ")}  •  `}
+            text={`${project.categories.join(' <span class="inline-block scale-[2.2] mx-3 text-white">•</span> ')} <span class="inline-block scale-[2.2] mx-3 text-white">•</span> `}
             speed={0.3}
             repeat={12}
             paddingRight={0}
             direction={-1}
-            itemClassName="text-[10px] md:text-xs uppercase tracking-[0.2em] font-light pr-4 text-white opacity-60"
+            itemClassName="text-[10px] md:text-xs uppercase tracking-[0.2em] font-light pr-4 text-white opacity-100 flex items-center"
           />
         </div>
       </div>
@@ -182,28 +182,28 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       <div className="mt-6 flex flex-col gap-1 w-full text-[#1c1d1e]">
         {/* Row 1: Title (left) | Year (right) */}
         <div className="flex items-end justify-between w-full">
-          <div 
+          <div
             className="relative flex items-center h-8 md:h-10 cursor-pointer overflow-hidden pr-12"
             onClick={handleProjectClick}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            <div 
-              ref={arrowRef} 
+            <div
+              ref={arrowRef}
               className="absolute left-0 opacity-0 pointer-events-none flex items-center z-10 will-change-[transform,opacity]"
             >
               <ArrowIcon className="w-5 h-5 md:w-6 md:h-6 text-[#1c1d1e]" />
             </div>
 
             <div ref={titleContainerRef} className="will-change-transform">
-              <h3 className="font-aeonik font-medium text-2xl md:text-3xl text-[#1c1d1e] leading-tight tracking-tight whitespace-nowrap uppercase">
+              <h3 className="font-aeonik text-2xl md:text-3xl text-[#1c1d1e] font-medium leading-tight tracking-tight whitespace-nowrap uppercase">
                 {project.title}
               </h3>
             </div>
           </div>
 
           <div className="pb-1 md:pb-1.5 md:pr-4">
-            <span className="font-aeonik text-sm md:text-base font-medium uppercase tracking-widest text-[#1c1d1e]">
+            <span className="font-aeonik text-sm md:text-base font-regular uppercase tracking-widest text-[#1c1d1e]">
               {project.year || "2024"}
             </span>
           </div>
@@ -211,7 +211,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
         {/* Row 2: Tags (Plain text) */}
         <div className="flex items-center gap-2 opacity-60">
-          <p className="text-[10px] md:text-xs font-medium uppercase tracking-[0.15em]">
+          <p className=" md:text-sm font-medium uppercase tracking-[0.15em]">
             {project.tags?.join(" • ")}
           </p>
         </div>

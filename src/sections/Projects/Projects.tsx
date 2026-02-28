@@ -1,13 +1,48 @@
 import React, { useLayoutEffect, useRef } from "react";
 import ProjectItem from "./ProjectItem";
 import { initGridAnimations } from "./Projects.anim";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const workHeadingData = [
+  { char: "W", order: 1 },
+  { char: "o", order: -1 },
+  { char: "r", order: 2 },
+  { char: "k", order: 3 },
+];
+
+const AnimatedLetter = ({ char, order }: { char: string; order: number }) => {
+  if (order < 0) {
+    return <span className="inline-block">{char}</span>;
+  }
+  return (
+    <span className="relative inline-block overflow-hidden align-bottom h-[1em]">
+      <span
+        className="project-letter-inner block relative will-change-transform"
+        data-order={order}
+      >
+        <span
+          className="absolute bottom-full left-0 right-0 text-center pointer-events-none select-none opacity-0 transition-opacity duration-300"
+          style={{ opacity: "var(--letter-opacity, 0)" }}
+          aria-hidden="true"
+        >
+          {char}
+        </span>
+        <span className="block leading-none">{char}</span>
+      </span>
+    </span>
+  );
+};
 
 const projects = [
   {
     id: 1,
     title: "NordWear",
     categories: [
-      "Tone & voice",
+      "Tone",
+      "voice",
       "Tailwind CSS",
       "Lenis",
       "UI",
@@ -58,32 +93,49 @@ const projects = [
     year: "2023",
     tags: ["Portfolio", "Project", "Design"],
   },
-  {
-    id: 5,
-    title: "Project Five",
-    categories: ["gsap", "motion", "Tailwind CSS", "Lenis", "UI", "UX"],
-    image: "https://placehold.co/1200x800",
-    link: "#",
-    year: "2022",
-    tags: ["Portfolio", "Project", "Design"],
-  },
-  {
-    id: 6,
-    title: "Project Six",
-    categories: ["Next.js", "Tailwind CSS", "Lenis", "UI", "UX", "motion"],
-    image: "https://placehold.co/1200x800",
-    link: "#",
-    year: "2022",
-    tags: ["Portfolio", "Project", "Design"],
-  },
 ];
 
 const Projects: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const workHeadingRef = useRef<HTMLHeadingElement>(null);
 
   useLayoutEffect(() => {
     if (!containerRef.current) return;
     const ctx = initGridAnimations(containerRef.current);
+
+    // Scroll Animation for "Work" text
+    if (workHeadingRef.current) {
+      const animatedLetters = Array.from(
+        workHeadingRef.current.querySelectorAll(".project-letter-inner"),
+      ) as HTMLElement[];
+
+      animatedLetters.sort((a, b) => {
+        return (
+          parseInt(a.dataset.order || "0") - parseInt(b.dataset.order || "0")
+        );
+      });
+
+      gsap.to(animatedLetters, {
+        yPercent: 100,
+        stagger: 0.15,
+        ease: "none",
+        scrollTrigger: {
+          trigger: workHeadingRef.current,
+          start: "top 95%",
+          end: "bottom 30%",
+          scrub: 1.5,
+          onUpdate: (self) => {
+            // Set opacity based on progress so they don't show at the very top
+            const opacity = self.progress > 0.01 ? 1 : 0;
+            document.documentElement.style.setProperty(
+              "--letter-opacity",
+              opacity.toString(),
+            );
+          },
+        },
+      });
+    }
+
     return () => ctx.revert();
   }, []);
 
@@ -97,10 +149,15 @@ const Projects: React.FC = () => {
     <section className="w-full" ref={containerRef}>
       <div id="projects" className="w-full px-6 md:px-10 lg:px-4 xl:px-6">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-16 md:mb-24 overflow-hidden">
+        <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-8 md:mb-8 overflow-hidden">
           <div className="overflow-hidden flex-shrink-0">
-            <h2 className="project-header-text text-5xl md:text-7xl lg:text-8xl xl:text-9xl w-full text-left font-aeonik font-medium text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase">
-              featured Work
+            <h2
+              ref={workHeadingRef}
+              className="project-header-text text-5xl md:text-7xl lg:text-8xl xl:text-[10rem] w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
+            >
+              {workHeadingData.map((item, i) => (
+                <AnimatedLetter key={i} char={item.char} order={item.order} />
+              ))}
             </h2>
           </div>
           <div className="max-w-sm text-left overflow-hidden">
@@ -112,7 +169,7 @@ const Projects: React.FC = () => {
         </div>
 
         {/* Project Grid */}
-        <div className="space-y-16 md:space-y-24">
+        <div className="space-y-16 md:space-y-24 pt-16">
           {projectRows.map((rowItems, rowIndex) => (
             <div
               key={rowIndex}

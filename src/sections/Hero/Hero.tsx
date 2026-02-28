@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Links from "../../components/Links";
+import SplitType from "split-type";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,61 +11,96 @@ const Hero: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-  const [videoRatio, setVideoRatio] = React.useState<number>(16 / 9);
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      const { videoWidth, videoHeight } = videoRef.current;
-      setVideoRatio(videoWidth / videoHeight);
-    }
-  };
 
   useEffect(() => {
-    if (!heroRef.current || !containerRef.current) return;
+    if (
+      !heroRef.current ||
+      !containerRef.current ||
+      !videoContainerRef.current ||
+      !videoRef.current ||
+      !headlineRef.current
+    ) {
+      return;
+    }
 
-    // Synchronously hide elements that will be animated in
-    gsap.set([videoContainerRef.current, headlineRef.current], {
-      autoAlpha: 0,
+    const tl = gsap.timeline({
+      paused: true,
+      defaults: { ease: "power3.out" },
+    });
+    let splitHeadline: SplitType | null = null;
+
+    const startEntranceAnimation = () => {
+      sessionStorage.removeItem("isNavigating");
+      tl.play();
+    };
+
+    const initialCenterMask =
+      "inset(calc(50% - 50px) calc(50% - 100px) calc(50% - 50px) calc(50% - 100px) round 0.5rem)";
+
+    splitHeadline = new SplitType(headlineRef.current, {
+      types: "lines",
+      lineClass: "hero-headline-line",
     });
 
-    let animationTriggered = false;
-    const startEntranceAnimation = () => {
-      if (animationTriggered) return;
-      animationTriggered = true;
-      sessionStorage.removeItem("isNavigating");
+    // Initial state (centered 200x100 mask)
+    gsap.set(videoContainerRef.current, {
+      autoAlpha: 0,
+      clipPath: initialCenterMask,
+      willChange: "clip-path, opacity",
+    });
+    gsap.set(videoRef.current, {
+      scale: 1.08,
+      transformOrigin: "50% 50%",
+      force3D: true,
+      willChange: "transform",
+    });
+    gsap.set(splitHeadline.lines, {
+      autoAlpha: 0,
+      yPercent: 100,
+      display: "block",
+      overflow: "hidden",
+    });
 
-      // Show elements for animation
-      gsap.set([videoContainerRef.current, headlineRef.current], {
-        autoAlpha: 1,
-      });
-
-      // Initial Load Animation
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      // 1. Headline entrance
-      tl.fromTo(
-        headlineRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, delay: 0.2, ease: "power3.out" },
-      );
-
-      // 2. Video container fade and slight lift
-      tl.fromTo(
+    // Headline line reveal first, then video mask reveal with tight timing
+    tl.to(splitHeadline.lines, {
+      autoAlpha: 1,
+      yPercent: 0,
+      duration: 0.75,
+      stagger: 0.08,
+      ease: "power3.out",
+    })
+      .to(
         videoContainerRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" },
-        "-=0.8",
+        {
+          autoAlpha: 1,
+          duration: 0.01,
+        },
+        "-=0.08",
+      )
+      .to(
+        videoContainerRef.current,
+        {
+          clipPath: "inset(0% 0% 0% 0% round 1.5rem)",
+          duration: 1.1,
+          ease: "expo.inOut",
+        },
+        "<",
+      )
+      .to(
+        videoRef.current,
+        {
+          scale: 1,
+          duration: 1.1,
+          ease: "expo.inOut",
+        },
+        "<",
       );
-    };
 
-    // Listen for loader completion
-    const handleLoaderComplete = () => {
-      startEntranceAnimation();
-    };
+    // Trigger Logic
+    const handleLoaderComplete = () => startEntranceAnimation();
     window.addEventListener("initial-loader-complete", handleLoaderComplete);
     window.addEventListener("page-transition-complete", handleLoaderComplete);
 
-    // Check if we should reveal immediately
     const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
     const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
     const isNavigating = sessionStorage.getItem("isNavigating") === "true";
@@ -74,12 +109,9 @@ const Hero: React.FC = () => {
       startEntranceAnimation();
     }
 
-    // Safety timeout
     const safetyTimeout = setTimeout(
       () => {
-        if (!animationTriggered) {
-          startEntranceAnimation();
-        }
+        if (tl.progress() === 0) startEntranceAnimation();
       },
       isLoaderActive ? 6000 : 100,
     );
@@ -94,6 +126,9 @@ const Hero: React.FC = () => {
         handleLoaderComplete,
       );
       clearTimeout(safetyTimeout);
+      gsap.set(videoContainerRef.current, { clearProps: "willChange" });
+      gsap.set(videoRef.current, { clearProps: "willChange" });
+      if (splitHeadline) splitHeadline.revert();
     };
   }, []);
 
@@ -107,18 +142,13 @@ const Hero: React.FC = () => {
         ref={heroRef}
         className="relative h-full w-full flex flex-col pt-6 md:pt-10 px-6 md:px-10 lg:px-4 xl:px-6"
       >
-        {/* Top Layout Header (Alignment only) */}
+        {/* Top Layout Header */}
         <div className="flex items-start w-full mb-8 md:mb-8 shrink-0">
-          {/* Logo Spacer */}
           <div
             className="w-10 sm:w-12 md:w-14 shrink-0 opacity-0 pointer-events-none"
             aria-hidden="true"
           />
-
-          {/* Larger gap to push heading more to the right */}
           <div className="w-20 md:w-40 lg:w-60 shrink-0" />
-
-          {/* Heading in the flow of the page */}
           <h1
             ref={headlineRef}
             className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-normal text-[#1c1d1e] tracking-tight text-left leading-[1.05]"
@@ -127,10 +157,7 @@ const Hero: React.FC = () => {
             experiences that connect with <br />
             their audience.
           </h1>
-
           <div className="flex-grow" />
-
-          {/* Nav Buttons Spacer (~200px based on button width) */}
           <div
             className="w-40 md:w-48 lg:w-56 shrink-0 opacity-0 pointer-events-none"
             aria-hidden="true"
@@ -140,7 +167,7 @@ const Hero: React.FC = () => {
         {/* Middle Content: Video Container */}
         <div
           ref={videoContainerRef}
-          className="relative w-full overflow-hidden flex-grow mb-4 md:mb-8"
+          className="relative w-full overflow-hidden flex-grow mb-4 md:mb-8 bg-black shadow-2xl"
           style={{
             borderRadius: "clamp(1rem, 2vw, 1.5rem)",
           }}
@@ -152,9 +179,7 @@ const Hero: React.FC = () => {
             loop
             playsInline
             preload="auto"
-            onLoadedMetadata={handleLoadedMetadata}
-            className="w-full h-full object-cover translate-z-0 backface-hidden"
-            style={{ opacity: 1, visibility: "visible", display: "block" }}
+            className="w-full h-full object-cover"
           >
             <source
               src="/projectVideos/videoshowcase/promo_vp9.webm"
@@ -167,14 +192,6 @@ const Hero: React.FC = () => {
           </video>
         </div>
       </section>
-
-      <style>{`
-        @media (prefers-reduced-motion: reduce) {
-          .transform-gpu {
-            transform: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

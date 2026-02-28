@@ -56,7 +56,7 @@ function App() {
   return (
     <Router>
       {/* <InitialLoader /> */}
-      <PageTransition />
+      {/* <PageTransition /> */}
       <SpeedInsights />
       <ScrollToTop />
       <ComingSoon />
