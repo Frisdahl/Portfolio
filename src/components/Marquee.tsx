@@ -141,8 +141,9 @@ interface MarqueeProps {
   className?: string;
   itemClassName?: string;
   repeat?: number;
-  direction?: 1 | -1;
+  direction?: 1 | -1; // 1 for right-to-left, -1 for left-to-right (GSAP default)
   dynamicSpeed?: boolean;
+  paddingRight?: number;
 }
 
 const Marquee: React.FC<MarqueeProps> = ({
@@ -151,7 +152,8 @@ const Marquee: React.FC<MarqueeProps> = ({
   className = "",
   itemClassName = "",
   repeat = 8,
-  dynamicSpeed = true,
+  paddingRight = 100,
+  direction = 1,
 }) => {
   const railRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -160,8 +162,6 @@ const Marquee: React.FC<MarqueeProps> = ({
     if (!railRef.current || !containerRef.current) return;
 
     let loop: LoopTimeline | null = null;
-    let speedTween: gsap.core.Timeline | null = null;
-    let scrollTriggerInstance: ScrollTrigger | null = null;
 
     // Small timeout to ensure DOM is fully rendered and styles applied
     const timeoutId = setTimeout(() => {
@@ -173,33 +173,10 @@ const Marquee: React.FC<MarqueeProps> = ({
       loop = horizontalLoop(items, {
         repeat: -1,
         speed: speed,
-        paddingRight: 100,
+        paddingRight: paddingRight,
         paused: false,
+        reversed: direction === 1,
       });
-
-      if (dynamicSpeed) {
-        scrollTriggerInstance = ScrollTrigger.create({
-          trigger: containerRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          onUpdate: (self) => {
-            const targetScale = self.direction * speed;
-            
-            if (speedTween) speedTween.kill();
-            speedTween = gsap.timeline()
-              .to(loop!, {
-                timeScale: targetScale * 1.5, // Reduced boost
-                duration: 0.2,
-                ease: "power1.out"
-              })
-              .to(loop!, {
-                timeScale: targetScale,
-                duration: 0.8, // Faster recovery
-                ease: "power2.out"
-              }, "+=0.1");
-          },
-        });
-      }
 
       ScrollTrigger.refresh();
     }, 100);
@@ -207,10 +184,8 @@ const Marquee: React.FC<MarqueeProps> = ({
     return () => {
       clearTimeout(timeoutId);
       if (loop) loop.kill();
-      if (scrollTriggerInstance) scrollTriggerInstance.kill();
-      if (speedTween) speedTween.kill();
     };
-  }, [speed, dynamicSpeed, text, repeat]);
+  }, [speed, text, repeat, paddingRight, direction]);
 
   return (
     <div

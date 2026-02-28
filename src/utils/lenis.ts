@@ -4,11 +4,11 @@ let lenis: Lenis | null = null;
 
 if (typeof window !== "undefined") {
   lenis = new Lenis({
-    lerp: 0.1, // More consistent smoothness
+    lerp: 0.08, // Slightly faster for responsiveness
     wheelMultiplier: 1,
-    touchMultiplier: 1, // Reduced for natural mobile feel
+    touchMultiplier: 1.5, // Better for touch devices
     infinite: false,
-    syncTouch: true,
+    syncTouch: false, // Disabling syncTouch improves video playback on touch
   });
 }
 

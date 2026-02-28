@@ -146,10 +146,10 @@ const AboutPage: React.FC = () => {
     >
       <div className="w-full flex flex-col items-center pb-64">
         {/* Top Section: Hero-ish Centered Single Column */}
-        <div className="w-full flex flex-col items-center text-center gap-16 md:gap-24 mb-48 px-8">
+        <div className="w-full flex flex-col items-center text-center gap-16 md:gap-24 mb-48 px-6 md:px-10 lg:px-12 xl:px-16">
           <h1
             ref={headingRef}
-            className="text-6xl md:text-8xl lg:text-9xl font-instrumentsans font-bold text-[#1c1d1e] uppercase tracking-tight leading-none invisible"
+            className="text-6xl md:text-8xl lg:text-9xl font-aeonik font-bold text-[#1c1d1e] uppercase tracking-tight leading-none invisible"
           >
             who am i?
           </h1>
@@ -163,7 +163,7 @@ const AboutPage: React.FC = () => {
           </div>
 
           <div className="about-item w-full flex justify-center text-center invisible">
-            <p className="text-2xl md:text-3xl lg:text-4xl font-instrumentsans max-w-6xl mx-auto text-[#1c1d1e] leading-tight font-light text-center">
+            <p className="text-2xl md:text-3xl lg:text-4xl font-aeonik max-w-6xl mx-auto text-[#1c1d1e] leading-tight font-light text-center">
               Based in{" "}
               <img
                 src="/images/danish-flag.svg"
@@ -194,10 +194,10 @@ const AboutPage: React.FC = () => {
         </div>
 
         {/* Stuff I Do Section: Two Columns (Left Aligned) */}
-        <section className="stuff-i-do-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-24 px-8">
+        <section className="stuff-i-do-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-24 px-6 md:px-10 lg:px-12 xl:px-16">
           {/* Left Column: Section Title */}
           <div className="w-full md:w-1/3">
-            <h2 className="text-4xl md:text-5xl font-instrumentsans font-bold text-[#1c1d1e] uppercase md:sticky md:top-32">
+            <h2 className="text-4xl md:text-5xl font-aeonik font-bold text-[#1c1d1e] uppercase md:sticky md:top-32">
               stuff i do
             </h2>
           </div>
@@ -222,10 +222,10 @@ const AboutPage: React.FC = () => {
         </section>
 
         {/* Experience & Education Section: Two Columns */}
-        <section className="experience-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-32 px-8">
+        <section className="experience-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-32 px-6 md:px-10 lg:px-12 xl:px-16">
           {/* Left Column: Section Title */}
           <div className="w-full md:w-1/3">
-            <h2 className="text-4xl md:text-5xl font-instrumentsans font-bold text-[#1c1d1e] uppercase md:sticky md:top-32">
+            <h2 className="text-4xl md:text-5xl font-aeonik font-bold text-[#1c1d1e] uppercase md:sticky md:top-32">
               EXPERIENCE & <br /> EDUCATION
             </h2>
           </div>

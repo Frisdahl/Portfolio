@@ -47,7 +47,7 @@ const ComingSoon: FC = () => {
       className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100000] hidden items-center gap-3 backdrop-blur-xl bg-black/80 border border-white/10 px-6 py-3 rounded-full shadow-2xl pointer-events-none"
     >
       <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-      <span className="text-white font-switzer uppercase text-[10px] tracking-[0.25em] font-medium whitespace-nowrap">
+      <span className="text-white font-aeonik uppercase text-[10px] tracking-[0.25em] font-medium whitespace-nowrap">
         Project case study coming soon
       </span>
     </div>

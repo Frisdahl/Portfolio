@@ -55,7 +55,6 @@ function App() {
 
   return (
     <Router>
-      <div className="noise-grain" />
       {/* <InitialLoader /> */}
       <PageTransition />
       <SpeedInsights />

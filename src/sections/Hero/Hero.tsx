@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplitType from "split-type";
 import Links from "../../components/Links";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -10,18 +9,25 @@ const Hero: React.FC = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
+  const [videoRatio, setVideoRatio] = React.useState<number>(16 / 9);
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      const { videoWidth, videoHeight } = videoRef.current;
+      setVideoRatio(videoWidth / videoHeight);
+    }
+  };
 
   useEffect(() => {
     if (!heroRef.current || !containerRef.current) return;
 
     // Synchronously hide elements that will be animated in
-    // DO NOT hide videoRef.current here as we want it visible immediately
-    gsap.set([headlineRef.current, footerRef.current], {
+    gsap.set([videoContainerRef.current, headlineRef.current], {
       autoAlpha: 0,
     });
+
     let animationTriggered = false;
     const startEntranceAnimation = () => {
       if (animationTriggered) return;
@@ -29,37 +35,25 @@ const Hero: React.FC = () => {
       sessionStorage.removeItem("isNavigating");
 
       // Show elements for animation
-      gsap.set([headlineRef.current, footerRef.current], {
+      gsap.set([videoContainerRef.current, headlineRef.current], {
         autoAlpha: 1,
       });
 
       // Initial Load Animation
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      // 1. Heading slide up (Split headline)
-      if (headlineRef.current) {
-        const split = new SplitType(headlineRef.current, {
-          types: "lines,words",
-        });
-        gsap.set(split.lines, { overflow: "hidden" });
-        tl.fromTo(
-          split.words,
-          { yPercent: 100, opacity: 0 },
-          {
-            opacity: 1,
-            yPercent: 0,
-            duration: 1.5,
-            stagger: 0.05,
-            ease: "power4.out",
-          },
-          0.6, // Small initial delay
-        );
-      }
 
-      // 2. Footer area slide up (socials and paragraph)
+      // 1. Headline entrance
       tl.fromTo(
-        footerRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 1.2, visibility: "visible" },
+        headlineRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.2, delay: 0.2, ease: "power3.out" },
+      );
+
+      // 2. Video container fade and slight lift
+      tl.fromTo(
+        videoContainerRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" },
         "-=0.8",
       );
     };
@@ -71,21 +65,19 @@ const Hero: React.FC = () => {
     window.addEventListener("initial-loader-complete", handleLoaderComplete);
     window.addEventListener("page-transition-complete", handleLoaderComplete);
 
-    // Check if we should reveal immediately (e.g. not the first load or loader already finished)
+    // Check if we should reveal immediately
     const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
     const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
     const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
     if (hasSeenLoader && !isLoaderActive && !isNavigating) {
-      console.log("Hero: Internal navigation detected, revealing immediately");
       startEntranceAnimation();
     }
 
-    // Safety timeout - only long on first load
+    // Safety timeout
     const safetyTimeout = setTimeout(
       () => {
         if (!animationTriggered) {
-          console.log("Hero: Safety timeout triggered");
           startEntranceAnimation();
         }
       },
@@ -105,132 +97,84 @@ const Hero: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!heroRef.current || !containerRef.current) return;
-
-    // Scroll-driven Wipe Transition
-    gsap.to(heroRef.current, {
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-        pin: true,
-        pinSpacing: false,
-      },
-      clipPath: "inset(0% 0% 100% 0%)",
-      ease: "none",
-    });
-
-    // Subtle Parallax for video
-    gsap.to(videoRef.current, {
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-      },
-      y: "10%",
-      ease: "none",
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
-  }, []);
-
   return (
     <div
       ref={containerRef}
       id="hero"
-      className="hero-container relative w-full"
+      className="hero-container relative w-full h-screen bg-[var(--background)] overflow-hidden"
     >
       <section
         ref={heroRef}
-        className="dark-section relative h-[100vh] w-full bg-[#1c1d1e] overflow-hidden flex flex-col justify-between pt-32 pb-4 md:pb-8 will-change-[clip-path]"
-        style={{ clipPath: "inset(0% 0% 0% 0%)" }}
+        className="relative h-full w-full flex flex-col pt-6 md:pt-10 px-6 md:px-10 lg:px-4 xl:px-6"
       >
-        <div className="absolute inset-0 z-[1] pointer-events-none">
+        {/* Top Layout Header (Alignment only) */}
+        <div className="flex items-start w-full mb-8 md:mb-8 shrink-0">
+          {/* Logo Spacer */}
+          <div
+            className="w-10 sm:w-12 md:w-14 shrink-0 opacity-0 pointer-events-none"
+            aria-hidden="true"
+          />
+
+          {/* Larger gap to push heading more to the right */}
+          <div className="w-20 md:w-40 lg:w-60 shrink-0" />
+
+          {/* Heading in the flow of the page */}
+          <h1
+            ref={headlineRef}
+            className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-normal text-[#1c1d1e] tracking-tight text-left leading-[1.05]"
+          >
+            I help brands create digital <br />
+            experiences that connect with <br />
+            their audience.
+          </h1>
+
+          <div className="flex-grow" />
+
+          {/* Nav Buttons Spacer (~200px based on button width) */}
+          <div
+            className="w-40 md:w-48 lg:w-56 shrink-0 opacity-0 pointer-events-none"
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* Middle Content: Video Container */}
+        <div
+          ref={videoContainerRef}
+          className="relative w-full overflow-hidden flex-grow mb-4 md:mb-8"
+          style={{
+            borderRadius: "clamp(1rem, 2vw, 1.5rem)",
+          }}
+        >
           <video
             ref={videoRef}
             autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
-            className="w-full h-full object-cover transform-gpu"
-            style={{ opacity: 0.4, visibility: "visible", display: "block" }}
+            preload="auto"
+            onLoadedMetadata={handleLoadedMetadata}
+            className="w-full h-full object-cover translate-z-0 backface-hidden"
+            style={{ opacity: 1, visibility: "visible", display: "block" }}
           >
             <source
-              src="/projectVideos/herovideo/wave-optimized.webm"
+              src="/projectVideos/videoshowcase/promo_vp9.webm"
               type="video/webm"
             />
             <source
-              src="/projectVideos/herovideo/wave-optimized.mp4"
+              src="/projectVideos/videoshowcase/promo_h264.mp4"
               type="video/mp4"
             />
           </video>
         </div>
+      </section>
 
-        {/* Top Content: Headline Wrap */}
-        <div className="relative z-[10] px-8">
-          <div className="flex flex-col items-start text-left gap-8 md:gap-10">
-            <h1
-              ref={headlineRef}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-instrumentsans font-bold text-white tracking-tight leading-[1.2]"
-            >
-              Immersive Websites, <br />
-              Designed With Clarity.
-            </h1>
-          </div>
-        </div>
-
-        {/* Bottom Content Area */}
-        <div ref={contentRef} className="relative z-[10] w-full">
-          <div ref={footerRef} className="w-full opacity-0">
-            {/* Elements ABOVE the divider */}
-            <div className="px-8">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
-                <div className="flex items-center space-x-6">
-                  <img
-                    src="/images/danish-flag.svg"
-                    alt="Danish Flag"
-                    className="h-6 rounded-full"
-                  />
-                  <Links
-                    links={[
-                      { label: "IG", href: "#" },
-                      { label: "FB", href: "#" },
-                      { label: "LK", href: "#" },
-                      { label: "TEL", href: "#" },
-                      { label: "MAIL", href: "#" },
-                    ]}
-                    className="flex space-x-6"
-                    textColor="text-white"
-                    underlineColor="bg-white"
-                  />
-                </div>
-
-                <p className="text-xs md:text-sm max-w-sm text-left md:text-right leading-relaxed font-switzer font-light uppercase tracking-wider text-white opacity-60">
-                  I help ambitious brands launch digital experiences and
-                  strengthen their identity through strategic, custom design.
-                </p>
-              </div>
-
-              {/* Divider (Also aligned to sides) */}
-              <hr className="w-full h-px border-0 bg-white opacity-10" />
-            </div>
-          </div>
-        </div>
-
-        <style>{`
+      <style>{`
         @media (prefers-reduced-motion: reduce) {
           .transform-gpu {
             transform: none !important;
           }
         }
       `}</style>
-      </section>
     </div>
   );
 };

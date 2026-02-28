@@ -6,46 +6,75 @@ const projects = [
   {
     id: 1,
     title: "NordWear",
-    categories: ["design", "frontend", "backend", "database"],
+    categories: [
+      "Tone & voice",
+      "Tailwind CSS",
+      "Lenis",
+      "UI",
+      "UX",
+      "Next.js",
+      "gsap",
+      "motion",
+    ],
     image: "/images/Bang&Olufsen.webp",
     video: "/projectVideos/NordWear/NordWear-trailer-web.mp4",
     link: "https://nordwear-shop.dk/",
+    year: "2024",
+    tags: ["Portfolio", "Project", "Design"],
   },
   {
     id: 2,
     title: "Visuel Atelier",
-    categories: ["Branding", "Creative Direction", "UI/UX"],
+    categories: ["UI", "UX", "gsap", "motion", "Tailwind CSS", "Lenis"],
     image: "/images/Visuel-Atelier.webp",
     link: "",
+    year: "2023",
+    tags: ["Portfolio", "Project", "Design"],
   },
   {
     id: 3,
     title: "Bang & Olufsen",
-    categories: ["Animation", "3D", "Web Development"],
+    categories: [
+      "Next.js",
+      "gsap",
+      "motion",
+      "Tailwind CSS",
+      "Lenis",
+      "UI",
+      "UX",
+    ],
     image: "/images/Bang&Olufsen.webp",
     video: "/projectVideos/bang-olufsen-iphone-trailer.mp4",
     link: "#",
+    year: "2024",
+    tags: ["Portfolio", "Project", "Design"],
   },
   {
     id: 4,
     title: "Project Four",
-    categories: ["Graphic Design", "Illustration"],
+    categories: ["Tone & voice", "UI", "UX", "Next.js", "gsap", "motion"],
     image: "https://placehold.co/1200x800",
     link: "#",
+    year: "2023",
+    tags: ["Portfolio", "Project", "Design"],
   },
   {
     id: 5,
     title: "Project Five",
-    categories: ["Product Design", "Prototyping"],
+    categories: ["gsap", "motion", "Tailwind CSS", "Lenis", "UI", "UX"],
     image: "https://placehold.co/1200x800",
     link: "#",
+    year: "2022",
+    tags: ["Portfolio", "Project", "Design"],
   },
   {
     id: 6,
     title: "Project Six",
-    categories: ["Branding", "Web Design"],
+    categories: ["Next.js", "Tailwind CSS", "Lenis", "UI", "UX", "motion"],
     image: "https://placehold.co/1200x800",
     link: "#",
+    year: "2022",
+    tags: ["Portfolio", "Project", "Design"],
   },
 ];
 
@@ -58,64 +87,48 @@ const Projects: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
+  // Helper to chunk projects into rows of 2
+  const projectRows = [];
+  for (let i = 0; i < projects.length; i += 2) {
+    projectRows.push(projects.slice(i, i + 2));
+  }
+
   return (
-    <section className="mb-48 w-full" ref={containerRef}>
-      <div id="projects" className="w-full px-8 mt-32 md:mt-64">
+    <section className="w-full" ref={containerRef}>
+      <div id="projects" className="w-full px-6 md:px-10 lg:px-4 xl:px-6">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-8 overflow-hidden">
-          <div className=" overflow-hidden">
-            <h2 className="project-header-text text-2xl md:text-3xl lg:text-5xl w-full text-left font-instrumentsans font-semibold text-[#1c1d1e] leading-tight">
-              A glimpse of <br className="hidden md:block" />
-              my work
+        <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-16 md:mb-24 overflow-hidden">
+          <div className="overflow-hidden flex-shrink-0">
+            <h2 className="project-header-text text-5xl md:text-7xl lg:text-8xl xl:text-9xl w-full text-left font-aeonik font-medium text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase">
+              featured Work
             </h2>
           </div>
-          <div className="max-w-sm md:text-right overflow-hidden">
-            <p className="project-header-subtext font-switzer text-base md:text-lg text-[#1c1d1e] opacity-40 leading-relaxed tracking-wider">
-              Handcrafted Experiences for <br className="hidden md:block" />
-              Brands of All Sizes, Worldwide
+          <div className="max-w-sm text-left overflow-hidden">
+            <p className="project-header-subtext uppercase font-aeonik text-lg md:text-md text-[#1c1d1e] opacity-60 leading-tight">
+              a selection of my most passionately crafted works with
+              forward-thinking clients and friends over the years.
             </p>
           </div>
         </div>
 
-        <div className="space-y-8">
-          {/* Row 1: Large horizontal video row */}
-          <section className="project-row project-row--large grid grid-cols-1 md:grid-cols-12">
-            <article className="project-card md:col-span-12 h-auto">
-              <ProjectItem
-                project={projects[0]}
-                index={0}
-                fillHeight={false}
-                aspectClassName="aspect-video"
-              />
-            </article>
-          </section>
-
-          {/* Row 2: Alternating Narrow (Left) and Wide (Right) */}
-          <section className="project-row grid grid-cols-1 md:grid-cols-12 gap-8">
-            <article className="project-card md:col-span-4 h-[50vh] md:h-[80vh]">
-              <ProjectItem project={projects[1]} index={1} fillHeight={true} />
-            </article>
-            <article className="project-card md:col-span-8 h-[50vh] md:h-[80vh]">
-              <ProjectItem project={projects[2]} index={2} fillHeight={true} />
-            </article>
-          </section>
-
-          {/* Row 3: Single wide width (Full width) */}
-          <section className="project-row project-row--large grid grid-cols-1 md:grid-cols-12">
-            <article className="project-card md:col-span-12 h-[50vh] md:h-[80vh]">
-              <ProjectItem project={projects[3]} index={3} fillHeight={true} />
-            </article>
-          </section>
-
-          {/* Row 4: Alternating Wide (Left) and Narrow (Right) */}
-          <section className="project-row grid grid-cols-1 md:grid-cols-12 gap-8">
-            <article className="project-card md:col-span-8 h-[50vh] md:h-[80vh]">
-              <ProjectItem project={projects[4]} index={4} fillHeight={true} />
-            </article>
-            <article className="project-card md:col-span-4 h-[50vh] md:h-[80vh]">
-              <ProjectItem project={projects[5]} index={5} fillHeight={true} />
-            </article>
-          </section>
+        {/* Project Grid */}
+        <div className="space-y-16 md:space-y-24">
+          {projectRows.map((rowItems, rowIndex) => (
+            <div
+              key={rowIndex}
+              className="project-row grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 md:gap-y-24"
+            >
+              {rowItems.map((project, index) => (
+                <div key={project.id} className="project-card">
+                  <ProjectItem
+                    project={project}
+                    index={rowIndex * 2 + index}
+                    aspectClassName="aspect-[4/3]"
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     </section>

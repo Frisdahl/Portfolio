@@ -251,7 +251,7 @@ const Expectations: React.FC = () => {
       <div className=" mx-auto px-8 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-24 xl:gap-32 items-start">
           <div className="text-left lg:-mt-24 lg:col-span-1">
-            <p className="font-switzer uppercase tracking-[0.3em] text-xs text-[var(--foreground)] mix-blend-difference opacity-50">
+            <p className="font-aeonik uppercase tracking-[0.3em] text-xs text-[var(--foreground)] mix-blend-difference opacity-50">
               What You Can Expect
             </p>
             <h2 className="text-6xl md:text-6xl lg:text-7xl xl:text-8xl mb-8 uppercase text-[var(--foreground)] leading-tight whitespace-nowrap">

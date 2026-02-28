@@ -18,19 +18,19 @@ const ExperienceItem: React.FC<ExperienceItemProps> = ({
   return (
     <div className="about-animate-item w-full py-8 md:py-10 first:pt-0 opacity-0">
       <div className="flex flex-col gap-3 mb-4">
-        <h3 className="text-3xl md:text-3xl font-instrumentsans font-bold text-[#1c1d1e] uppercase">
+        <h3 className="text-3xl md:text-3xl font-aeonik font-bold text-[#1c1d1e] uppercase">
           {title}
         </h3>
         <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4">
-          <p className="text-lg md:text-xl font-instrumentsans font-bold text-[#7d7d7d] uppercase tracking-wide">
+          <p className="text-lg md:text-xl font-aeonik font-bold text-[#7d7d7d] uppercase tracking-wide">
             {subtitle}
           </p>
-          <span className="text-lg md:text-xl font-instrumentsans font-bold text-[#7d7d7d] md:text-right whitespace-nowrap">
+          <span className="text-lg md:text-xl font-aeonik font-bold text-[#7d7d7d] md:text-right whitespace-nowrap">
             {dates}
           </span>
         </div>
       </div>
-      <p className="text-lg md:text-xl font-instrumentsans text-[#1c1d1e]/70 leading-relaxed max-w-2xl">
+      <p className="text-lg md:text-xl font-aeonik text-[#1c1d1e]/70 leading-relaxed max-w-2xl">
         {description}
       </p>
       {showDivider && (

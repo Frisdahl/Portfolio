@@ -1,7 +1,9 @@
-import React, { useRef, useLayoutEffect, useEffect } from "react";
+import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { showComingSoon } from "../../utils/comingSoon";
+import Marquee from "../../components/Marquee";
+import ArrowIcon from "../../components/ArrowIcon";
 
 interface Project {
   id: number;
@@ -11,6 +13,8 @@ interface Project {
   image: string;
   video?: string;
   link: string;
+  year?: string;
+  tags?: string[];
 }
 
 interface ProjectItemProps {
@@ -27,14 +31,11 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   aspectClassName = "aspect-square",
 }) => {
   const navigate = useNavigate();
-  const [isInView, setIsInView] = React.useState(false);
-
+  const [isInView, setIsInView] = useState(false);
   const itemRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const videoOverlayRef = useRef<HTMLDivElement>(null); // New ref for the dark video overlay
-  const contentOverlayRef = useRef<HTMLDivElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
-  const descContainerRef = useRef<HTMLDivElement>(null);
+  const arrowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = itemRef.current;
@@ -47,12 +48,21 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           observer.disconnect();
         }
       },
-      { rootMargin: "400px" }, // Load early for smoother experience
+      { rootMargin: "400px" },
     );
 
     observer.observe(el);
     return () => observer.disconnect();
   }, [project.video]);
+
+  useLayoutEffect(() => {
+    if (arrowRef.current) {
+      gsap.set(arrowRef.current, { x: -35, opacity: 0 });
+    }
+    if (titleContainerRef.current) {
+      gsap.set(titleContainerRef.current, { x: 0 });
+    }
+  }, []);
 
   const handleProjectClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -73,102 +83,46 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     ? project.video
     : `/${project.video}`;
 
-  useLayoutEffect(() => {
-    if (!itemRef.current) return;
-
-    const isMobileOrTablet = window.matchMedia("(max-width: 1024px)").matches;
-
-    if (isMobileOrTablet) {
-      // Always visible on mobile/tablet
-      gsap.set(contentOverlayRef.current, { opacity: 1 });
-      gsap.set([titleContainerRef.current, descContainerRef.current], {
-        y: 0,
-        opacity: 1,
-      });
-      // Also fade out the video overlay a bit more on mobile so video is clearer
-      if (videoOverlayRef.current) {
-        gsap.set(videoOverlayRef.current, { opacity: 0.1 });
-      }
-    } else {
-      // Desktop: Initial hidden state for hover effect
-      gsap.set(contentOverlayRef.current, { opacity: 0 });
-      gsap.set([titleContainerRef.current, descContainerRef.current], {
-        y: 30,
-        opacity: 0,
-      });
-    }
-
-    return () => {};
-  }, []);
-
   const handleMouseEnter = () => {
-    if (window.matchMedia("(max-width: 1024px)").matches) return;
-
-    // Play video
     if (videoRef.current) {
       videoRef.current.play().catch(() => undefined);
     }
 
-    // Fade out dark video overlay
-    if (videoOverlayRef.current) {
-      gsap.to(videoOverlayRef.current, {
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.inOut",
-      });
-    }
-
-    // Show content capsules
-    if (contentOverlayRef.current) {
-      gsap.to(contentOverlayRef.current, {
+    if (arrowRef.current && titleContainerRef.current) {
+      gsap.to(arrowRef.current, {
+        x: 0,
         opacity: 1,
-        duration: 0.4,
-        ease: "power2.out",
+        duration: 0.6,
+        ease: "power4.inOut",
+        overwrite: "auto",
       });
-
-      gsap.to([titleContainerRef.current, descContainerRef.current], {
-        y: 0,
-        opacity: 1,
-        duration: 0.7,
-        stagger: 0.08,
-        ease: "power4.out",
-        delay: 0.05,
+      gsap.to(titleContainerRef.current, {
+        x: 35,
+        duration: 0.6,
+        ease: "power4.inOut",
+        overwrite: "auto",
       });
     }
   };
 
   const handleMouseLeave = () => {
-    if (window.matchMedia("(max-width: 1024px)").matches) return;
-
-    // Pause video
     if (videoRef.current) {
       videoRef.current.pause();
     }
 
-    // Fade in dark video overlay
-    if (videoOverlayRef.current) {
-      gsap.to(videoOverlayRef.current, {
-        opacity: 1,
-        duration: 0.6,
-        ease: "power2.inOut",
-      });
-    }
-
-    // Hide content capsules
-    if (contentOverlayRef.current) {
-      gsap.to([descContainerRef.current, titleContainerRef.current], {
-        y: 15,
+    if (arrowRef.current && titleContainerRef.current) {
+      gsap.to(arrowRef.current, {
+        x: -35,
         opacity: 0,
-        duration: 0.4,
-        stagger: 0.05,
-        ease: "power2.in",
+        duration: 0.5,
+        ease: "power4.inOut",
+        overwrite: "auto",
       });
-
-      gsap.to(contentOverlayRef.current, {
-        opacity: 0,
-        duration: 0.4,
-        ease: "power2.in",
-        delay: 0.2,
+      gsap.to(titleContainerRef.current, {
+        x: 0,
+        duration: 0.5,
+        ease: "power4.inOut",
+        overwrite: "auto",
       });
     }
   };
@@ -176,90 +130,92 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   return (
     <div
       ref={itemRef}
-      className={`w-full cursor-pointer group ${fillHeight ? "h-full flex flex-col" : ""}`}
-      onClick={handleProjectClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      className={`w-full group ${fillHeight ? "h-full flex flex-col" : ""}`}
     >
+      {/* Media Container - Clickable and Hoverable */}
       <div
-        className={`relative w-full overflow-hidden rounded-2xl bg-neutral-900 ${fillHeight ? "h-full" : aspectClassName}`}
+        className={`relative w-full overflow-hidden rounded-[1.5rem] md:rounded-[2rem] cursor-pointer transform translate-z-0 ${fillHeight ? "h-full" : aspectClassName}`}
+        onClick={handleProjectClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {project.video && isInView ? (
-          <>
-            <video
-              ref={videoRef}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-              muted
-              playsInline
-              loop={true}
-              preload="metadata"
-              autoPlay={window.matchMedia("(max-width: 1024px)").matches}
-            >
-              <source src={videoSrc} type="video/mp4" />
-              <source
-                src={videoSrc.replace(".mp4", ".webm")}
-                type="video/webm"
-              />
-            </video>
-            {/* Dark Video Overlay */}
-            <div
-              ref={videoOverlayRef}
-              className="absolute inset-0 bg-black/20 z-10 pointer-events-none transition-transform duration-1000 group-hover:scale-105"
-            />
-          </>
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            muted
+            playsInline
+            loop={true}
+            preload="metadata"
+          >
+            <source src={videoSrc} type="video/mp4" />
+            <source src={videoSrc.replace(".mp4", ".webm")} type="video/webm" />
+          </video>
         ) : !project.video ? (
-          <>
-            <img
-              src={project.image}
-              alt={project.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-              loading="lazy"
-            />
-            {/* Dark Image Overlay */}
-            <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none transition-opacity duration-700 group-hover:opacity-0" />
-          </>
+          <img
+            src={project.image}
+            alt={project.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
         ) : (
           <div className="absolute inset-0 bg-neutral-900 animate-pulse" />
         )}
 
-        {/* Dual Capsule Overlay */}
-        <div
-          ref={contentOverlayRef}
-          className="absolute inset-0 flex items-end justify-start p-4 md:p-6 lg:p-8 z-20 pointer-events-none"
-        >
-          <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full">
-            {/* Title Capsule - Dark Glass */}
-            <div
-              ref={titleContainerRef}
-              className="backdrop-blur-md bg-black/50 border border-white/10 px-3 py-2 md:px-5 md:py-3 rounded-lg flex items-center gap-2 md:gap-3 shadow-2xl"
+        {/* Marquee at the bottom of the video */}
+        <div className="absolute bottom-0 left-0 w-full bg-[#1c1d1e] py-3 z-20 overflow-hidden">
+          {/* Side Fades */}
+          <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#1c1d1e] to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#1c1d1e] to-transparent z-10 pointer-events-none" />
+
+          <Marquee
+            text={`${project.categories.join("  •  ")}  •  `}
+            speed={0.3}
+            repeat={12}
+            paddingRight={0}
+            direction={-1}
+            itemClassName="text-[10px] md:text-xs uppercase tracking-[0.2em] font-light pr-4 text-white opacity-60"
+          />
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-1 w-full text-[#1c1d1e]">
+        {/* Row 1: Title (left) | Year (right) */}
+        <div className="flex items-end justify-between w-full">
+          <div 
+            className="relative flex items-center h-8 md:h-10 cursor-pointer overflow-hidden pr-12"
+            onClick={handleProjectClick}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div 
+              ref={arrowRef} 
+              className="absolute left-0 opacity-0 pointer-events-none flex items-center z-10 will-change-[transform,opacity]"
             >
-              <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-white flex-shrink-0 animate-pulse-fast" />
-              <h3 className="font-switzer font-medium uppercase text-[10px] md:text-sm lg:text-base text-white tracking-wider leading-none">
+              <ArrowIcon className="w-5 h-5 md:w-6 md:h-6 text-[#1c1d1e]" />
+            </div>
+
+            <div ref={titleContainerRef} className="will-change-transform">
+              <h3 className="font-aeonik font-medium text-2xl md:text-3xl text-[#1c1d1e] leading-tight tracking-tight whitespace-nowrap uppercase">
                 {project.title}
               </h3>
             </div>
+          </div>
 
-            {/* Description Capsule - White Glass */}
-            <div
-              ref={descContainerRef}
-              className="backdrop-blur-md bg-white/20 border border-white/30 px-3 py-2 md:px-5 md:py-3 rounded-lg shadow-2xl"
-            >
-              <p className="font-switzer uppercase text-[8px] md:text-[10px] lg:text-[11px] font-medium tracking-[0.15em] text-white/90 leading-none">
-                {project.categories.join(" — ")}
-              </p>
-            </div>
+          <div className="pb-1 md:pb-1.5 md:pr-4">
+            <span className="font-aeonik text-sm md:text-base font-medium uppercase tracking-widest text-[#1c1d1e]">
+              {project.year || "2024"}
+            </span>
           </div>
         </div>
+
+        {/* Row 2: Tags (Plain text) */}
+        <div className="flex items-center gap-2 opacity-60">
+          <p className="text-[10px] md:text-xs font-medium uppercase tracking-[0.15em]">
+            {project.tags?.join(" • ")}
+          </p>
+        </div>
       </div>
-      <style>{`
-        @keyframes pulse-fast {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.3; }
-        }
-        .animate-pulse-fast {
-          animation: pulse-fast 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-      `}</style>
     </div>
   );
 };

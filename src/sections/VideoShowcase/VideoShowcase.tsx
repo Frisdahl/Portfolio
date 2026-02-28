@@ -62,7 +62,7 @@ const VideoShowcase: React.FC = () => {
       ref={containerRef}
       className="relative w-full bg-transparent pt-48 md:pt-64 pb-32 md:pb-48 flex items-center overflow-hidden"
     >
-      <div className="w-full max-w-[1920px] mx-auto px-8">
+      <div className="w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:px-12 xl:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-12 lg:gap-20">
           {/* Video Column */}
           <div className="lg:col-span-7 flex justify-center lg:justify-start">
@@ -70,26 +70,24 @@ const VideoShowcase: React.FC = () => {
               ref={videoWrapperRef}
               className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl z-10 bg-neutral-900"
             >
-              {isInView && (
-                <video
-                  ref={videoRef}
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                >
-                  <source
-                    src="/projectVideos/videoshowcase/promo_vp9.webm"
-                    type="video/webm"
-                  />
-                  <source
-                    src="/projectVideos/videoshowcase/promo_h264.mp4"
-                    type="video/mp4"
-                  />
-                </video>
-              )}
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover translate-z-0 backface-hidden"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+              >
+                <source
+                  src="/projectVideos/videoshowcase/promo_vp9.webm"
+                  type="video/webm"
+                />
+                <source
+                  src="/projectVideos/videoshowcase/promo_h264.mp4"
+                  type="video/mp4"
+                />
+              </video>
             </div>
           </div>
 
@@ -101,7 +99,7 @@ const VideoShowcase: React.FC = () => {
             <div className="flex flex-col gap-4 md:gap-6">
               <h2
                 ref={headingRef}
-                className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-instrumentsans font-bold text-[#1c1d1e] tracking-tight leading-[1.1]"
+                className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-aeonik font-bold text-[#1c1d1e] tracking-tight leading-[1.1]"
               >
                 I design and
                 <br />
@@ -109,7 +107,7 @@ const VideoShowcase: React.FC = () => {
               </h2>{" "}
               <p
                 ref={longTextRef}
-                className="font-switzer text-lg md:text-xl lg:text-2xl tracking-tight text-[#1c1d1e] max-w-xl mx-auto lg:mx-0 opacity-70"
+                className="font-aeonik text-lg md:text-xl lg:text-2xl tracking-tight text-[#1c1d1e] max-w-xl mx-auto lg:mx-0 opacity-70"
               >
                 Focused on creating digital experiences that bridge the gap
                 between visual aesthetics and technical excellence.
@@ -118,7 +116,7 @@ const VideoShowcase: React.FC = () => {
 
             <p
               ref={smallTextRef}
-              className="font-switzer text-xs md:text-sm uppercase tracking-[0.3em] text-[#1c1d1e] opacity-40"
+              className="font-aeonik text-xs md:text-sm uppercase tracking-[0.3em] text-[#1c1d1e] opacity-40"
             >
               ( Creative Direction & Web Development )
             </p>

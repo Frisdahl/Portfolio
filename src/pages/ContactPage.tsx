@@ -178,12 +178,12 @@ const ContactPage: React.FC = () => {
     <div
       ref={containerRef}
       id="contact"
-      className="relative w-full min-h-screen pt-32 bg-[#fefffe] flex flex-col"
+      className="relative w-full min-h-screen pt-32 bg-[var(--background)] flex flex-col"
     >
-      <div className="w-full px-8 flex flex-col items-start text-left pb-32 md:pb-48 flex-grow">
+      <div className="w-full px-6 md:px-10 lg:px-12 xl:px-16 flex flex-col items-start text-left pb-32 md:pb-48 flex-grow">
         <h2
           ref={headingRef}
-          className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-instrumentsans  font-bold tracking-tight text-[#1c1d1e] leading-[1.2] mb-16 invisible"
+          className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-aeonik  font-bold tracking-tight text-[#1c1d1e] leading-[1.2] mb-16 invisible"
         >
           Let’s Work <br />
           Together

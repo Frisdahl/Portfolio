@@ -147,7 +147,7 @@ const BrandsMarquee: React.FC = () => {
   return (
     <section
       ref={containerRef}
-      className="relative w-full pb-48 overflow-hidden bg-[#fefffe]"
+      className="relative w-full overflow-hidden bg-[var(--background)]"
       style={{ "--tileSkew": "-12deg" } as React.CSSProperties}
     >
       {/* Visual Polish */}
@@ -159,11 +159,11 @@ const BrandsMarquee: React.FC = () => {
         }}
       />
 
-      <div className="flex flex-col md:flex-row px-8 items-start md:items-end justify-between gap-8 overflow-hidden">
+      <div className="flex flex-col md:flex-row px-6 md:px-10 lg:px-12 xl:px-16 items-start md:items-end justify-between gap-8 overflow-hidden">
         <div className=" overflow-hidden">
           <h2
             ref={headerRef}
-            className="project-header-text text-2xl md:text-3xl lg:text-5xl w-full text-left font-instrumentsans font-semibold text-[#1c1d1e] leading-tight"
+            className="project-header-text text-2xl md:text-3xl lg:text-5xl w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-tight"
           >
             Brands & creative teams <br className="hidden md:block" />
             I’ve collaborated with
@@ -172,7 +172,7 @@ const BrandsMarquee: React.FC = () => {
         <div className="max-w-sm md:text-right overflow-hidden">
           <p
             ref={subtextRef}
-            className="project-header-subtext font-switzer text-base md:text-lg text-[#1c1d1e] opacity-40 leading-relaxed tracking-wider"
+            className="project-header-subtext font-aeonik text-base md:text-lg text-[#1c1d1e] opacity-40 leading-relaxed tracking-wider"
           >
             Trusted by brands & <br className="hidden md:block" /> creative
             teams worldwide
@@ -206,7 +206,7 @@ const BrandsMarquee: React.FC = () => {
                     className="w-24 md:w-40 h-auto object-contain"
                   />
                 ) : (
-                  <span className="text-xl md:text-2xl font-instrumentsans font-bold text-[#1c1d1e]/20 group-hover:text-[#1c1d1e] uppercase tracking-tight transition-colors duration-300">
+                  <span className="text-xl md:text-2xl font-aeonik font-bold text-[#1c1d1e]/20 group-hover:text-[#1c1d1e] uppercase tracking-tight transition-colors duration-300">
                     {brand.name}
                   </span>
                 )}
