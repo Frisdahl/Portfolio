@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import lenis from "./lenis";
-import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const useSmoothScroll = () => {
@@ -13,18 +12,19 @@ const useSmoothScroll = () => {
     // Connect GSAP's ScrollTrigger to the Lenis instance
     lenis.on("scroll", ScrollTrigger.update);
 
-    // Small delay to ensure DOM is ready
-    setTimeout(() => {
+    // Ensure top sync after mount without timer drift
+    requestAnimationFrame(() => {
       lenis?.scrollTo(0, { immediate: true });
       ScrollTrigger.refresh();
-    }, 100);
+    });
 
-    const ticker = (time: number) => {
-      lenis?.raf(time * 1000);
+    let rafId = 0;
+    const raf = (time: number) => {
+      lenis?.raf(time);
+      rafId = window.requestAnimationFrame(raf);
     };
 
-    gsap.ticker.add(ticker);
-    gsap.ticker.lagSmoothing(0);
+    rafId = window.requestAnimationFrame(raf);
 
     // Refresh ScrollTrigger on body resize
     const onResize = () => ScrollTrigger.refresh();
@@ -32,7 +32,7 @@ const useSmoothScroll = () => {
 
     return () => {
       // Clean up listeners
-      gsap.ticker.remove(ticker);
+      window.cancelAnimationFrame(rafId);
       lenis?.off("scroll", ScrollTrigger.update);
       window.removeEventListener("resize", onResize);
       lenis?.stop();

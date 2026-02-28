@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 
 const Hero: React.FC = () => {
@@ -57,6 +56,8 @@ const Hero: React.FC = () => {
       yPercent: 100,
       display: "block",
       overflow: "hidden",
+      paddingBottom: "0.08em",
+      marginBottom: "-0.08em",
     });
 
     // Headline line reveal first, then video mask reveal with tight timing
@@ -66,6 +67,12 @@ const Hero: React.FC = () => {
       duration: 0.75,
       stagger: 0.08,
       ease: "power3.out",
+      onComplete: () => {
+        gsap.set(splitHeadline?.lines || [], {
+          overflow: "visible",
+          clearProps: "paddingBottom,marginBottom",
+        });
+      },
     })
       .to(
         videoContainerRef.current,
@@ -176,7 +183,7 @@ const Hero: React.FC = () => {
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
             className="w-full h-full object-cover"
           >
             <source
