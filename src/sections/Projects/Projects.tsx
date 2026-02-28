@@ -4,8 +4,6 @@ import { initGridAnimations } from "./Projects.anim";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
-
 const workHeadingData = [
   { char: "W", order: 1 },
   { char: "o", order: -1 },

@@ -3,8 +3,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 
-gsap.registerPlugin(ScrollTrigger);
-
 const Manifesto: React.FC = () => {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const splitRef = useRef<SplitType | null>(null);

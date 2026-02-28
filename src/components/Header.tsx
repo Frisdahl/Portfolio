@@ -6,8 +6,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ArrowIcon from "./ArrowIcon";
 
-gsap.registerPlugin(ScrollTrigger);
-
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();

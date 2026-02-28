@@ -3,8 +3,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 
-gsap.registerPlugin(ScrollTrigger);
-
 interface ServiceItem {
   id: string;
   name: string;

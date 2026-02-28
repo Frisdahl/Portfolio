@@ -4,8 +4,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Observer } from "gsap/all";
 import SplitType from "split-type";
 
-gsap.registerPlugin(Observer, ScrollTrigger);
-
 interface Brand {
   name: string;
   href?: string;
