@@ -147,7 +147,7 @@ const Footer: React.FC = () => {
           <div className="absolute inset-0 z-[2] bg-[#1c1d1e]/45 pointer-events-none" />
 
           {/* Footer Content */}
-          <div className="relative z-[10] w-full px-6 md:px-10 lg:px-12 xl:px-16 pt-24 flex flex-col md:flex-row justify-between items-start gap-12 pb-12">
+          <div className="relative z-[10] w-full px-4 md:px-10 lg:px-12 xl:px-16 pt-24 flex flex-col md:flex-row justify-between items-start gap-12 pb-12">
             <div className="flex flex-col items-start text-left">
               <h3 className="text-2xl md:text-3xl lg:text-5xl font-bold font-aeonik uppercase leading-tight mb-8 max-w-xl text-white">
                 Available for <br /> select projects
@@ -212,7 +212,7 @@ const Footer: React.FC = () => {
 
           {/* Bottom Divider & Marquee */}
           <div className="relative z-[10] w-full">
-            <div className="w-full px-6 md:px-10 lg:px-12 xl:px-16 mb-10">
+            <div className="w-full px-4 md:px-10 lg:px-12 xl:px-16 mb-10">
               <hr className="w-full h-px border-0 bg-white opacity-10" />
             </div>
             <div className="w-full pb-8">

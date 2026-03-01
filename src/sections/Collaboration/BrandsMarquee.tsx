@@ -134,7 +134,7 @@ const BrandsMarquee: React.FC = () => {
       <div
         className="absolute inset-0 opacity-[0.02] pointer-events-none"
         style={{
-          backgroundImage: "radial-gradient(#000 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(#000 0.6px, transparent 0.6px)",
           backgroundSize: "60px 60px",
         }}
       />

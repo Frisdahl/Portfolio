@@ -147,26 +147,26 @@ const Hero: React.FC = () => {
     >
       <section
         ref={heroRef}
-        className="relative h-full w-full flex flex-col pt-6 md:pt-10 px-6 md:px-10 lg:px-4 xl:px-6"
+        className="relative h-full w-full flex flex-col pt-16 md:pt-10 px-4 md:px-10 lg:px-4 xl:px-6"
       >
         {/* Top Layout Header */}
-        <div className="flex items-start w-full mb-8 md:mb-8 shrink-0">
+        <div className="order-2 md:order-1 flex items-start w-full mt-8 md:mt-0 mb-0 md:mb-8 shrink-0">
           <div
-            className="w-10 sm:w-12 md:w-14 shrink-0 opacity-0 pointer-events-none"
+            className="hidden md:block w-10 sm:w-12 md:w-14 shrink-0 opacity-0 pointer-events-none"
             aria-hidden="true"
           />
-          <div className="w-20 md:w-40 lg:w-60 shrink-0" />
+          <div className="hidden md:block w-20 md:w-40 lg:w-60 shrink-0" />
           <h1
             ref={headlineRef}
-            className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-normal text-[#1c1d1e] tracking-tight text-left leading-[1.05]"
+            className="w-full md:w-auto text-2xl md:text-4xl lg:text-5xl font-aeonik font-normal text-[#1c1d1e] tracking-tight text-left leading-[1.05]"
           >
             I help brands create digital <br />
             experiences that connect with <br />
             their audience.
           </h1>
-          <div className="flex-grow" />
+          <div className="hidden md:block flex-grow" />
           <div
-            className="w-40 md:w-48 lg:w-56 shrink-0 opacity-0 pointer-events-none"
+            className="hidden md:block w-40 md:w-48 lg:w-56 shrink-0 opacity-0 pointer-events-none"
             aria-hidden="true"
           />
         </div>
@@ -174,7 +174,7 @@ const Hero: React.FC = () => {
         {/* Middle Content: Video Container */}
         <div
           ref={videoContainerRef}
-          className="relative w-full overflow-hidden flex-grow mb-4 md:mb-8 bg-black shadow-2xl"
+          className="order-1 md:order-2 relative w-full overflow-hidden flex-grow mb-0 md:mb-8 bg-black shadow-2xl"
           style={{
             borderRadius: "clamp(1rem, 2vw, 1.5rem)",
           }}

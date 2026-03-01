@@ -189,7 +189,7 @@ const Services: React.FC = () => {
     <section
       id="services"
       ref={sectionRef}
-      className="w-full text-[#1d1d1f] text-left font-aeonik px-6 md:px-10 lg:px-4 xl:px-6"
+      className="w-full text-[#1d1d1f] text-left font-aeonik px-4 md:px-10 lg:px-4 xl:px-6"
     >
       {/* Services List Container */}
       <div className="w-full">
@@ -226,14 +226,14 @@ const Services: React.FC = () => {
 
                     {/* lg:col-span-3: Service Name */}
                     <div className="lg:col-span-4">
-                      <h3 className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-medium text-white leading-tight tracking-tight service-name">
+                      <h3 className="text-2xl md:text-4xl lg:text-4xl font-aeonik font-medium text-white leading-tight tracking-tight service-name">
                         {service.name}
                       </h3>
                     </div>
 
                     {/* lg:col-span-3: Description & Tags */}
                     <div className="lg:col-span-3 flex flex-col gap-8 overflow-hidden">
-                      <p className="service-description text-lg font-aeonik font-medium leading-relaxed text-left text-[#f4f4f5]">
+                      <p className="service-description text-md font-aeonik font-medium leading-relaxed text-left text-[#f4f4f5]">
                         {service.description}
                       </p>
 

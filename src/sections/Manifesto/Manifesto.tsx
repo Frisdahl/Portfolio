@@ -102,12 +102,12 @@ const Manifesto: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="w-full px-6 md:px-10 lg:px-12 xl:px-16 font-aeonik"
+      className="w-full px-4 md:px-10 lg:px-12 xl:px-16 font-aeonik"
     >
       <div className="w-full mb-24 overflow-hidden">
         <h2
           ref={headingRef}
-          className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl text-[#1c1d1e] font-aeonik font-bold leading-[1.2] tracking-tight text-center"
+          className="text-4xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-8xl text-[#1c1d1e] font-aeonik font-bold leading-[1.2] tracking-tight text-center"
         >
           I design and build digital experiences for ambitious brands — blending
           structure, clarity, and purposeful motion.

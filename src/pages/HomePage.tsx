@@ -98,36 +98,36 @@ function HomePage() {
 
       {/* Manifesto Section */}
       <DeferredSection
-        className="mb-32 md:mb-48 lg:mb-64"
+        className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="900px"
-        fallbackClassName="w-full min-h-[40vh]"
+        fallbackClassName="w-full min-h-[700px] md:min-h-[900px]"
       >
         <Manifesto />
       </DeferredSection>
 
       {/* Projects Section */}
       <DeferredSection
-        className="mb-32 md:mb-48 lg:mb-64"
+        className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="1400px"
-        fallbackClassName="w-full min-h-[60vh]"
+        fallbackClassName="w-full min-h-[1000px] md:min-h-[1400px]"
       >
         <Projects />
       </DeferredSection>
 
       {/* Services Section */}
       <DeferredSection
-        className="mb-32 md:mb-48 lg:mb-64"
+        className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="1200px"
-        fallbackClassName="w-full min-h-[60vh]"
+        fallbackClassName="w-full min-h-[900px] md:min-h-[1200px]"
       >
         <Services />
       </DeferredSection>
 
       {/* Tech Stack Section */}
       <DeferredSection
-        className="mb-32 md:mb-48 lg:mb-64"
+        className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="900px"
-        fallbackClassName="w-full min-h-[45vh]"
+        fallbackClassName="w-full min-h-[700px] md:min-h-[900px]"
       >
         <TechStack />
       </DeferredSection>

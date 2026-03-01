@@ -144,13 +144,13 @@ const Projects: React.FC = () => {
 
   return (
     <section className="w-full" ref={containerRef}>
-      <div id="projects" className="w-full px-6 md:px-10 lg:px-4 xl:px-6">
+      <div id="projects" className="w-full px-4 md:px-10 lg:px-4 xl:px-6">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-8 md:mb-8 overflow-hidden">
+        <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-8 md:mb-8 overflow-hidden sm-flex">
           <div className="overflow-hidden flex-shrink-0">
             <h2
               ref={workHeadingRef}
-              className="project-header-text text-5xl md:text-7xl lg:text-8xl xl:text-[10rem] w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
+              className="project-header-text text-7xl md:text-7xl lg:text-8xl xl:text-[10rem] w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
             >
               {workHeadingData.map((item, i) => (
                 <AnimatedLetter key={i} char={item.char} order={item.order} />
@@ -158,7 +158,7 @@ const Projects: React.FC = () => {
             </h2>
           </div>
           <div className="max-w-sm text-left overflow-hidden">
-            <p className="project-header-subtext uppercase font-aeonik text-lg md:text-md text-[#1c1d1e] opacity-60 leading-tight">
+            <p className="project-header-subtext uppercase font-aeonik text-lg md:text-md font-medium text-[#1c1d1e] leading-tight">
               a selection of my most passionately crafted works with
               forward-thinking clients and friends over the years.
             </p>

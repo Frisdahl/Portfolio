@@ -105,6 +105,31 @@ const TechStack: React.FC = () => {
     },
   ];
 
+  const allItems = [...row1, ...row2];
+  const totalRows = Math.ceil(allItems.length / 2);
+
+  const getMobileBorderClasses = (index: number) => {
+    const row = Math.floor(index / 2);
+    const col = index % 2;
+    const isTopRow = row === 0;
+    const isBottomRow = row === totalRows - 1;
+    const isGsapNextRow = row === 1;
+
+    if (isTopRow) {
+      return `${col === 0 ? "border-r" : ""} border-b`;
+    }
+
+    if (isBottomRow) {
+      return `${col === 0 ? "border-r" : ""} border-t`;
+    }
+
+    if (isGsapNextRow) {
+      return `${col === 0 ? "border-r" : ""} border-b`;
+    }
+
+    return `${col === 0 ? "border-r" : ""}`;
+  };
+
   useLayoutEffect(() => {
     const activeId = hoveredIdx;
     const activeElement = document.getElementById(activeId);
@@ -160,12 +185,12 @@ const TechStack: React.FC = () => {
   }, []);
 
   return (
-    <section className="w-full px-6 md:px-10 lg:px-4 xl:px-6 font-aeonik">
+    <section className="w-full px-4 md:px-10 lg:px-4 xl:px-6 font-aeonik">
       {/* Heading Area */}
       <div className="mb-16 md:mb-24">
         <h2
           ref={headingRef}
-          className="text-5xl md:text-7xl lg:text-8xl xl:text-[10rem] font-bold uppercase tracking-tight text-[#1c1d1e] leading-[0.8] mb-12"
+          className="text-7xl md:text-7xl lg:text-8xl xl:text-[10rem] font-bold uppercase tracking-tight text-[#1c1d1e] leading-[0.8] mb-12"
         >
           <span className="inline-block whitespace-nowrap">
             {headingData[0].map((item, i) => (
@@ -185,14 +210,34 @@ const TechStack: React.FC = () => {
         </h2>
 
         <div className="text-left">
-          <p className="text-xs md:text-sm uppercase font-semibold tracking-wide text-[#1c1d1e]">
+          <p className="uppercase font-aeonik text-lg md:text-md font-medium text-[#1c1d1e] leading-tight">
             Professional At
           </p>
         </div>
       </div>
 
-      {/* Grid Container */}
-      <div ref={containerRef} className="w-full relative">
+      {/* Mobile Grid */}
+      <div className="grid grid-cols-2 md:hidden">
+        {allItems.map((item, index) => (
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            id={`mobile-${item.id}`}
+            key={`mobile-${item.id}`}
+            className={`h-32 bg-[var(--background)] border-[#1c1d1e]/10 flex items-center justify-center ${getMobileBorderClasses(index)}`}
+          >
+            <img
+              src={item.icon}
+              alt={item.name}
+              className="w-12 h-12 object-contain brightness-0"
+            />
+          </a>
+        ))}
+      </div>
+
+      {/* Desktop Grid Container */}
+      <div ref={containerRef} className="w-full relative hidden md:block">
         {/* Shared Hover Background */}
         <div
           ref={bgRef}
