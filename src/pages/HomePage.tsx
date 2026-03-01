@@ -1,18 +1,76 @@
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {
+  Suspense,
+  lazy,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { useLocation } from "react-router-dom";
 import Hero from "../sections/Hero/Hero";
-import Projects from "../sections/Projects/Projects";
-import Services from "../sections/Services/Services";
-import TechStack from "../sections/TechStack/TechStack";
-import Manifesto from "../sections/Manifesto/Manifesto";
 // import VideoShowcase from "../sections/VideoShowcase/VideoShowcase";
-import BrandsMarquee from "../sections/Collaboration/BrandsMarquee";
 // import Expectations from "../sections/Expectations/Expectations";
 // import Collaboration from "../sections/Collaboration/Collaboration";
 
+const Manifesto = lazy(() => import("../sections/Manifesto/Manifesto"));
+const Projects = lazy(() => import("../sections/Projects/Projects"));
+const Services = lazy(() => import("../sections/Services/Services"));
+const TechStack = lazy(() => import("../sections/TechStack/TechStack"));
+
+type DeferredSectionProps = {
+  className: string;
+  containIntrinsicSize: string;
+  fallbackClassName: string;
+  children: ReactNode;
+};
+
+function DeferredSection({
+  className,
+  containIntrinsicSize,
+  fallbackClassName,
+  children,
+}: DeferredSectionProps) {
+  const [shouldMount, setShouldMount] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = sectionRef.current;
+    if (!element || shouldMount) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldMount(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "400px 0px" },
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [shouldMount]);
+
+  return (
+    <div
+      ref={sectionRef}
+      className={className}
+      style={{ contentVisibility: "auto", containIntrinsicSize }}
+    >
+      {shouldMount ? (
+        <Suspense fallback={<div className={fallbackClassName} />}>
+          {children}
+        </Suspense>
+      ) : (
+        <div className={fallbackClassName} />
+      )}
+    </div>
+  );
+}
+
 function HomePage() {
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (location.hash) {
@@ -39,24 +97,40 @@ function HomePage() {
       </div> */}
 
       {/* Manifesto Section */}
-      <div className="mb-32 md:mb-48 lg:mb-64">
+      <DeferredSection
+        className="mb-32 md:mb-48 lg:mb-64"
+        containIntrinsicSize="900px"
+        fallbackClassName="w-full min-h-[40vh]"
+      >
         <Manifesto />
-      </div>
+      </DeferredSection>
 
       {/* Projects Section */}
-      <div className="mb-32 md:mb-48 lg:mb-64">
+      <DeferredSection
+        className="mb-32 md:mb-48 lg:mb-64"
+        containIntrinsicSize="1400px"
+        fallbackClassName="w-full min-h-[60vh]"
+      >
         <Projects />
-      </div>
+      </DeferredSection>
 
       {/* Services Section */}
-      <div className="mb-32 md:mb-48 lg:mb-64">
+      <DeferredSection
+        className="mb-32 md:mb-48 lg:mb-64"
+        containIntrinsicSize="1200px"
+        fallbackClassName="w-full min-h-[60vh]"
+      >
         <Services />
-      </div>
+      </DeferredSection>
 
       {/* Tech Stack Section */}
-      <div className="mb-32 md:mb-48 lg:mb-64">
+      <DeferredSection
+        className="mb-32 md:mb-48 lg:mb-64"
+        containIntrinsicSize="900px"
+        fallbackClassName="w-full min-h-[45vh]"
+      >
         <TechStack />
-      </div>
+      </DeferredSection>
 
       {/* Brands Marquee Section */}
       {/*       <div className="mb-32 md:mb-48 lg:mb-64">

@@ -1,9 +1,8 @@
-import { Suspense, lazy, useEffect, useLayoutEffect } from "react";
+import { Suspense, lazy, useEffect, useLayoutEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
-import ComingSoon from "./components/ComingSoon";
 import "./App.css";
 
 import useSmoothScroll from "./utils/useSmoothScroll";
@@ -12,8 +11,11 @@ import useSmoothScroll from "./utils/useSmoothScroll";
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
+const ComingSoon = lazy(() => import("./components/ComingSoon"));
 
 function App() {
+  const [showNonCriticalUI, setShowNonCriticalUI] = useState(false);
+
   useSmoothScroll();
 
   useLayoutEffect(() => {
@@ -24,6 +26,24 @@ function App() {
   }, []);
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let idleId: number | null = null;
+
+    const revealNonCriticalUI = () => setShowNonCriticalUI(true);
+
+    if ("requestIdleCallback" in window) {
+      idleId = (
+        window as Window & {
+          requestIdleCallback: (
+            cb: IdleRequestCallback,
+            opts?: IdleRequestOptions,
+          ) => number;
+        }
+      ).requestIdleCallback(revealNonCriticalUI, { timeout: 1500 });
+    } else {
+      timeoutId = setTimeout(revealNonCriticalUI, 600);
+    }
+
     console.clear();
 
     console.log(
@@ -57,15 +77,30 @@ function App() {
       "%c👉 frisdahlmarketing@gmail.com",
       "font-size:14px; color:#ffffff; font-family: 'Switzer', sans-serif; text-decoration: underline;",
     );
+
+    return () => {
+      if (timeoutId !== null) clearTimeout(timeoutId);
+      if (idleId !== null && "cancelIdleCallback" in window) {
+        (
+          window as Window & {
+            cancelIdleCallback: (id: number) => void;
+          }
+        ).cancelIdleCallback(idleId);
+      }
+    };
   }, []);
 
   return (
     <Router>
       {/* <InitialLoader /> */}
       {/* <PageTransition /> */}
-      <SpeedInsights />
+      {showNonCriticalUI && <SpeedInsights />}
       <ScrollToTop />
-      <ComingSoon />
+      {showNonCriticalUI && (
+        <Suspense fallback={null}>
+          <ComingSoon />
+        </Suspense>
+      )}
 
       <Layout>
         <Suspense

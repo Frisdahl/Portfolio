@@ -1,14 +1,29 @@
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 
+gsap.registerPlugin(ScrollTrigger);
+
 const Manifesto: React.FC = () => {
+  const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const splitRef = useRef<SplitType | null>(null);
 
-  useLayoutEffect(() => {
-    if (!headingRef.current) return;
+  useEffect(() => {
+    if (!headingRef.current || !sectionRef.current) return;
+
+    let hasInitialized = false;
+    let removeResizeListener: (() => void) | null = null;
+    let breakpointKey = "";
+
+    const getBreakpointKey = () => {
+      const width = window.innerWidth;
+      if (width >= 1280) return "xl";
+      if (width >= 1024) return "lg";
+      if (width >= 768) return "md";
+      return "sm";
+    };
 
     const runSplit = () => {
       if (splitRef.current) splitRef.current.revert();
@@ -41,24 +56,54 @@ const Manifesto: React.FC = () => {
             trigger: headingRef.current,
             start: "top 85%",
             once: true,
-          }
-        }
+          },
+        },
       );
     };
 
-    runSplit();
+    const initAnimations = () => {
+      if (hasInitialized) return;
+      hasInitialized = true;
+      breakpointKey = getBreakpointKey();
 
-    const handleResize = () => runSplit();
-    window.addEventListener("resize", handleResize);
+      runSplit();
+
+      const handleResize = () => {
+        const nextKey = getBreakpointKey();
+        if (nextKey === breakpointKey) return;
+        breakpointKey = nextKey;
+        runSplit();
+      };
+      window.addEventListener("resize", handleResize);
+      removeResizeListener = () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          initAnimations();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "250px 0px" },
+    );
+
+    observer.observe(sectionRef.current);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+      removeResizeListener?.();
       if (splitRef.current) splitRef.current.revert();
     };
   }, []);
 
   return (
-    <section className="w-full px-6 md:px-10 lg:px-12 xl:px-16 font-aeonik">
+    <section
+      ref={sectionRef}
+      className="w-full px-6 md:px-10 lg:px-12 xl:px-16 font-aeonik"
+    >
       <div className="w-full mb-24 overflow-hidden">
         <h2
           ref={headingRef}

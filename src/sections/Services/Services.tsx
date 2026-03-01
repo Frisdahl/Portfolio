@@ -1,6 +1,5 @@
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 
 interface ServiceItem {
@@ -69,92 +68,121 @@ const Services: React.FC = () => {
   const rowsContainerRef = useRef<HTMLDivElement>(null);
 
   // Per-Row Animations
-  useLayoutEffect(() => {
-    if (!rowsContainerRef.current) return;
+  useEffect(() => {
+    const container = rowsContainerRef.current;
+    if (!container) return;
 
-    const rows = gsap.utils.toArray(".service-row") as HTMLElement[];
-    const ctx = gsap.context(() => {
-      rows.forEach((row) => {
-        const id = row.querySelector(".service-id-text");
-        const name = row.querySelector(".service-name");
-        const desc = row.querySelector(".service-description");
-        const img = row.querySelector(".service-image");
+    const splitInstances: SplitType[] = [];
+    let hasInitialized = false;
+    let cleanupAnimations: (() => void) | null = null;
 
-        // Initial setup
-        gsap.set([id, name], { opacity: 0, y: 40 });
-        if (img) {
-          gsap.set(img, { yPercent: -101, scale: 1.1, opacity: 0 });
-        }
+    const initAnimations = () => {
+      if (hasInitialized) return;
+      hasInitialized = true;
 
-        // Split description into lines and hide them
-        const splitDesc = new SplitType(desc as HTMLElement, {
-          types: "lines",
-        });
-        if (splitDesc.lines) {
-          gsap.set(splitDesc.lines, { opacity: 0, y: 20 });
-        }
+      const rows = gsap.utils.toArray(".service-row") as HTMLElement[];
+      const ctx = gsap.context(() => {
+        rows.forEach((row) => {
+          const id = row.querySelector(".service-id-text");
+          const name = row.querySelector(".service-name");
+          const desc = row.querySelector(".service-description");
+          const img = row.querySelector(".service-image");
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: row,
-            start: "top 85%",
-            once: true,
-          },
-        });
+          gsap.set([id, name], { opacity: 0, y: 40 });
+          if (img) {
+            gsap.set(img, { yPercent: -101, scale: 1.1, opacity: 0 });
+          }
 
-        // 1. ID first
-        tl.to(id, {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "expo.out",
-        });
+          let splitDesc: SplitType | null = null;
+          if (desc) {
+            splitDesc = new SplitType(desc as HTMLElement, {
+              types: "lines",
+            });
+            splitInstances.push(splitDesc);
+          }
 
-        // 2. Name second
-        tl.to(
-          name,
-          {
+          if (splitDesc?.lines) {
+            gsap.set(splitDesc.lines, { opacity: 0, y: 20 });
+          }
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: row,
+              start: "top 85%",
+              once: true,
+            },
+          });
+
+          tl.to(id, {
             opacity: 1,
             y: 0,
             duration: 1,
             ease: "expo.out",
-          },
-          "-=0.8",
-        );
+          });
 
-        // 3. Description lines third
-        if (splitDesc.lines) {
           tl.to(
-            splitDesc.lines,
+            name,
             {
               opacity: 1,
               y: 0,
-              duration: 0.8,
-              stagger: 0.05,
-              ease: "expo.out",
-            },
-            "-=0.7",
-          );
-        }
-
-        // 4. Image last (Slide down)
-        if (img) {
-          tl.to(
-            img,
-            {
-              yPercent: 0,
-              scale: 1,
-              opacity: 1,
-              duration: 1.5,
+              duration: 1,
               ease: "expo.out",
             },
             "-=0.8",
           );
-        }
-      });
-    }, rowsContainerRef);
 
-    return () => ctx.revert();
+          if (splitDesc?.lines) {
+            tl.to(
+              splitDesc.lines,
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.05,
+                ease: "expo.out",
+              },
+              "-=0.7",
+            );
+          }
+
+          if (img) {
+            tl.to(
+              img,
+              {
+                yPercent: 0,
+                scale: 1,
+                opacity: 1,
+                duration: 1.5,
+                ease: "expo.out",
+              },
+              "-=0.8",
+            );
+          }
+        });
+      }, rowsContainerRef);
+
+      cleanupAnimations = () => {
+        ctx.revert();
+        splitInstances.forEach((split) => split.revert());
+      };
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          initAnimations();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
+
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+      cleanupAnimations?.();
+    };
   }, []);
 
   return (
@@ -168,7 +196,7 @@ const Services: React.FC = () => {
         <div className="bg-[#1d1d1f] text-[#f4f4f5] rounded-[2rem] md:rounded-[3rem] p-6 md:p-8">
           {/* Header Section - 12 Column Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8 px-8">
-            <div className="flex flex-col mb-16 lg:col-start-3 lg:col-span-10">
+            <div className="flex flex-col mb-16 lg:col-start-2 lg:col-span-10">
               <p className="text-sm uppercase mb-4 font-aeonik font-semibold tracking-[0.2em] text-white/40">
                 Services
               </p>
@@ -190,14 +218,14 @@ const Services: React.FC = () => {
                   {/* Individual Service Item - 12 Column Grid */}
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-16 md:py-20 lg:items-stretch items-start px-8">
                     {/* lg:col-span-2: Service ID */}
-                    <div className="lg:col-span-2 pt-2 service-id">
+                    <div className="lg:col-span-1 pt-2 service-id">
                       <span className="service-id-text text-sm md:text-base font-aeonik text-[#f4f4f5] font-bold block">
                         {service.id}
                       </span>
                     </div>
 
                     {/* lg:col-span-3: Service Name */}
-                    <div className="lg:col-span-3">
+                    <div className="lg:col-span-4">
                       <h3 className="text-2xl md:text-4xl lg:text-5xl font-aeonik font-medium text-white leading-tight tracking-tight service-name">
                         {service.name}
                       </h3>

@@ -36,6 +36,8 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const arrowRef = useRef<HTMLDivElement>(null);
+  const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasPrewarmedRef = useRef(false);
 
   useEffect(() => {
     const el = itemRef.current;
@@ -54,6 +56,34 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     observer.observe(el);
     return () => observer.disconnect();
   }, [project.video]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !project.video || !isInView || hasPrewarmedRef.current)
+      return;
+
+    hasPrewarmedRef.current = true;
+
+    const prewarm = async () => {
+      try {
+        video.currentTime = 0;
+        await video.play();
+        video.pause();
+      } catch {
+        // Ignore if browser blocks prewarm play; hover play still works.
+      }
+    };
+
+    prewarm();
+  }, [isInView, project.video]);
+
+  useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useLayoutEffect(() => {
     if (arrowRef.current) {
@@ -84,6 +114,11 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     : `/${project.video}`;
 
   const handleMouseEnter = () => {
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+      pauseTimeoutRef.current = null;
+    }
+
     if (videoRef.current) {
       videoRef.current.play().catch(() => undefined);
     }
@@ -107,7 +142,10 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   const handleMouseLeave = () => {
     if (videoRef.current) {
-      videoRef.current.pause();
+      const video = videoRef.current;
+      pauseTimeoutRef.current = setTimeout(() => {
+        video.pause();
+      }, 120);
     }
 
     if (arrowRef.current && titleContainerRef.current) {
@@ -147,6 +185,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             playsInline
             loop={true}
             preload="metadata"
+            disablePictureInPicture
           >
             <source src={videoSrc} type="video/mp4" />
             <source src={videoSrc.replace(".mp4", ".webm")} type="video/webm" />
