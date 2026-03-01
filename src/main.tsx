@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Observer } from "gsap/Observer";
+import { Observer } from "gsap/all";
 
 if (typeof window !== "undefined") {
   const forceTop = () => {

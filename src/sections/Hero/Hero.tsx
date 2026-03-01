@@ -77,7 +77,6 @@ const Hero: React.FC = () => {
       },
     })
       .to(
-        videoContainerRef.current,
         videoContainerElement,
         {
           autoAlpha: 1,
