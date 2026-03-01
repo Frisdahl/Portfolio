@@ -2,7 +2,6 @@ import React, { useLayoutEffect, useRef } from "react";
 import ProjectItem from "./ProjectItem";
 import { initGridAnimations } from "./Projects.anim";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const workHeadingData = [
   { char: "W", order: 1 },

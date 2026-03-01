@@ -25,6 +25,8 @@ const Hero: React.FC = () => {
       defaults: { ease: "power3.out" },
     });
     let splitHeadline: SplitType | null = null;
+    const videoElement = videoRef.current;
+    const videoContainerElement = videoContainerRef.current;
 
     const startEntranceAnimation = () => {
       sessionStorage.removeItem("isNavigating");
@@ -40,12 +42,12 @@ const Hero: React.FC = () => {
     });
 
     // Initial state (centered 200x100 mask)
-    gsap.set(videoContainerRef.current, {
+    gsap.set(videoContainerElement, {
       autoAlpha: 0,
       clipPath: initialCenterMask,
       willChange: "clip-path, opacity",
     });
-    gsap.set(videoRef.current, {
+    gsap.set(videoElement, {
       scale: 1.08,
       transformOrigin: "50% 50%",
       force3D: true,
@@ -76,6 +78,7 @@ const Hero: React.FC = () => {
     })
       .to(
         videoContainerRef.current,
+        videoContainerElement,
         {
           autoAlpha: 1,
           duration: 0.01,
@@ -83,7 +86,7 @@ const Hero: React.FC = () => {
         "-=0.08",
       )
       .to(
-        videoContainerRef.current,
+        videoContainerElement,
         {
           clipPath: "inset(0% 0% 0% 0% round 1.5rem)",
           duration: 1.1,
@@ -92,7 +95,7 @@ const Hero: React.FC = () => {
         "<",
       )
       .to(
-        videoRef.current,
+        videoElement,
         {
           scale: 1,
           duration: 1.1,
@@ -131,8 +134,8 @@ const Hero: React.FC = () => {
         handleLoaderComplete,
       );
       clearTimeout(safetyTimeout);
-      gsap.set(videoContainerRef.current, { clearProps: "willChange" });
-      gsap.set(videoRef.current, { clearProps: "willChange" });
+      gsap.set(videoContainerElement, { clearProps: "willChange" });
+      gsap.set(videoElement, { clearProps: "willChange" });
       if (splitHeadline) splitHeadline.revert();
     };
   }, []);

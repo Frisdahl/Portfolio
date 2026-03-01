@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef, useEffect, useState } from "react";
 import { initVideoShowcaseAnimations } from "./VideoShowcase.anim";
 
 const VideoShowcase: React.FC = () => {
-  const [isInView, setIsInView] = useState(false);
+  const [, setIsInView] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoWrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);

@@ -15,7 +15,8 @@ import VercelIcon from "../../assets/icons/experienceIcons/Vercel.svg";
 gsap.registerPlugin(ScrollTrigger);
 
 const headingData = [
-  [ // Modern
+  [
+    // Modern
     { char: "M", order: 1 },
     { char: "o", order: 3 },
     { char: "d", order: 2 },
@@ -23,19 +24,21 @@ const headingData = [
     { char: "r", order: 5 },
     { char: "n", order: -1 },
   ],
-  [ // Tech
+  [
+    // Tech
     { char: "T", order: 6 },
     { char: "e", order: 7 },
     { char: "c", order: -1 },
     { char: "h", order: -1 },
   ],
-  [ // Stack
+  [
+    // Stack
     { char: "S", order: 8 },
     { char: "t", order: -1 },
     { char: "a", order: -1 },
     { char: "c", order: 9 },
     { char: "k", order: 10 },
-  ]
+  ],
 ];
 
 const AnimatedLetter = ({ char, order }: { char: string; order: number }) => {
@@ -45,7 +48,12 @@ const AnimatedLetter = ({ char, order }: { char: string; order: number }) => {
   return (
     <span className="relative inline-flex overflow-hidden align-bottom">
       <span className="tech-letter-inner block relative" data-order={order}>
-        <span className="absolute bottom-full left-0 right-0 text-center" aria-hidden="true">{char}</span>
+        <span
+          className="absolute bottom-full left-0 right-0 text-center"
+          aria-hidden="true"
+        >
+          {char}
+        </span>
         <span>{char}</span>
       </span>
     </span>
@@ -97,10 +105,8 @@ const TechStack: React.FC = () => {
     },
   ];
 
-  const allItems = [...row1, ...row2];
-
   useLayoutEffect(() => {
-    const activeId = hoveredIdx; 
+    const activeId = hoveredIdx;
     const activeElement = document.getElementById(activeId);
 
     if (activeElement && bgRef.current && containerRef.current) {
@@ -127,24 +133,26 @@ const TechStack: React.FC = () => {
       // 2. Heading Scroll Animation Logic
       if (headingRef.current) {
         const animatedLetters = Array.from(
-          headingRef.current.querySelectorAll('.tech-letter-inner')
+          headingRef.current.querySelectorAll(".tech-letter-inner"),
         ) as HTMLElement[];
 
         // Sort sequentially based on the order assigned
         animatedLetters.sort((a, b) => {
-          return parseInt(a.dataset.order || "0") - parseInt(b.dataset.order || "0");
+          return (
+            parseInt(a.dataset.order || "0") - parseInt(b.dataset.order || "0")
+          );
         });
 
         gsap.to(animatedLetters, {
           yPercent: 100,
           stagger: 0.15,
-          ease: "none", 
+          ease: "none",
           scrollTrigger: {
             trigger: headingRef.current,
             start: "top 80%",
             end: "bottom 30%",
             scrub: 1.5, // 1.5s smoothing for a very premium feel
-          }
+          },
         });
       }
     });
@@ -155,21 +163,27 @@ const TechStack: React.FC = () => {
     <section className="w-full px-6 md:px-10 lg:px-4 xl:px-6 font-aeonik">
       {/* Heading Area */}
       <div className="mb-16 md:mb-24">
-        <h2 
+        <h2
           ref={headingRef}
           className="text-5xl md:text-7xl lg:text-8xl xl:text-[10rem] font-bold uppercase tracking-tight text-[#1c1d1e] leading-[0.8] mb-12"
         >
           <span className="inline-block whitespace-nowrap">
-            {headingData[0].map((item, i) => <AnimatedLetter key={i} char={item.char} order={item.order} />)}
+            {headingData[0].map((item, i) => (
+              <AnimatedLetter key={i} char={item.char} order={item.order} />
+            ))}
           </span>
           <br />
           <span className="inline-block whitespace-nowrap">
-            {headingData[1].map((item, i) => <AnimatedLetter key={i} char={item.char} order={item.order} />)}
+            {headingData[1].map((item, i) => (
+              <AnimatedLetter key={i} char={item.char} order={item.order} />
+            ))}
             <span className="inline-block w-[0.25em]"></span>
-            {headingData[2].map((item, i) => <AnimatedLetter key={i} char={item.char} order={item.order} />)}
+            {headingData[2].map((item, i) => (
+              <AnimatedLetter key={i} char={item.char} order={item.order} />
+            ))}
           </span>
         </h2>
-        
+
         <div className="text-left">
           <p className="text-xs md:text-sm uppercase font-semibold tracking-wide text-[#1c1d1e]">
             Professional At
