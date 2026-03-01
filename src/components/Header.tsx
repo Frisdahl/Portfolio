@@ -4,6 +4,7 @@ import { scrollTo } from "../utils/smoothScroll";
 import { triggerPageTransition } from "../utils/pageTransition";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 import ArrowIcon from "./ArrowIcon";
 
 const Header: React.FC = () => {
@@ -74,31 +75,45 @@ const Header: React.FC = () => {
         return;
       }
 
-      gsap.set(
-        [nameRef.current, talkButtonRef.current, menuButtonRef.current],
-        {
-          autoAlpha: 0,
-          y: -12,
-        },
+      // 1. Setup SplitType for the name
+      const nameSpans = nameRef.current.querySelectorAll("span.uppercase");
+      const splits = Array.from(nameSpans).map(
+        (span) => new SplitType(span as HTMLElement, { types: "lines" })
       );
+      
+      const lines = splits.flatMap(s => s.lines);
+
+      // 2. Initial State
+      gsap.set(lines, { yPercent: 100 });
+      gsap.set([talkButtonRef.current, menuButtonRef.current], {
+        autoAlpha: 0,
+        y: 20,
+      });
+      // Show the main container but the text is hidden by yPercent + overflow
+      gsap.set(nameRef.current, { autoAlpha: 1 }); 
 
       const tl = gsap.timeline({ paused: true });
-      tl.to(nameRef.current, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.8,
-        delay: 0.25,
-        ease: "power3.out",
+      
+      tl.to(lines, {
+        yPercent: 0,
+        duration: 1,
+        stagger: 0.1,
+        ease: "power4.out",
+        delay: 0.2,
       }).to(
         [talkButtonRef.current, menuButtonRef.current],
         {
           autoAlpha: 1,
           y: 0,
           duration: 0.8,
-          stagger: 0.08,
+          stagger: 0.1,
           ease: "power3.out",
+          onComplete: () => {
+            // Dispatch event when header is fully animated
+            window.dispatchEvent(new CustomEvent("header-entrance-complete"));
+          }
         },
-        "-=0.35",
+        "-=0.4" // Starts closer to the end of the text animation
       );
 
       entranceTimelineRef.current = tl;
@@ -129,6 +144,7 @@ const Header: React.FC = () => {
         window.removeEventListener("initial-loader-complete", playEntrance);
         window.removeEventListener("page-transition-complete", playEntrance);
         clearTimeout(safetyTimeout);
+        splits.forEach(s => s.revert());
       };
     });
 
@@ -274,10 +290,10 @@ const Header: React.FC = () => {
           onClick={handleLogoClick}
           className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1c1d1e] leading-[1.0] pt-1 opacity-0"
         >
-          <span className="text-lg md:text-xl lg:text-2xl uppercase font-medium tracking-tight">
+          <span className="text-lg md:text-xl lg:text-2xl uppercase font-medium tracking-tight overflow-hidden inline-block">
             <span className="italic">A</span>lexander
           </span>
-          <span className="text-lg md:text-xl lg:text-2xl uppercase font-medium tracking-tight">
+          <span className="text-lg md:text-xl lg:text-2xl uppercase font-medium tracking-tight overflow-hidden inline-block">
             <span className="italic">F</span>risdahl
           </span>
         </Link>
@@ -313,7 +329,7 @@ const Header: React.FC = () => {
                   ? "bg-[#fefeff]"
                   : isPastHero
                     ? "bg-white/30 backdrop-blur-2xl"
-                    : "bg-[#e4e6ef]"
+                    : "bg-[#ececec]"
               }`}
             >
               <div className="relative h-10 sm:h-12 flex-grow overflow-hidden pointer-events-none">
