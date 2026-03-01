@@ -10,6 +10,7 @@ import Header from "./Header";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import lenis from "../utils/lenis";
+import InitialLoader from "./InitialLoader";
 
 const Footer = lazy(() => import("./Footer"));
 
@@ -73,6 +74,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div ref={layoutRef} className="flex flex-col min-h-screen">
+      <InitialLoader />
       <Header />
 
       <main className="relative z-20 flex-grow bg-[var(--background)]">

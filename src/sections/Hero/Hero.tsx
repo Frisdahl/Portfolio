@@ -215,7 +215,7 @@ const Hero: React.FC = () => {
               style={{ width: "9.4%" }}
             >
               <div
-                className="rounded-full bg-[#1c1d1e] mb-[1.8%] overflow-hidden"
+                className="rounded-full bg-[#f1efed] mb-[1.8%] overflow-hidden"
                 style={{ width: "100%", aspectRatio: "1/1" }}
               >
                 <img

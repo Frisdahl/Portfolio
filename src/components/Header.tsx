@@ -78,10 +78,10 @@ const Header: React.FC = () => {
       // 1. Setup SplitType for the name
       const nameSpans = nameRef.current.querySelectorAll("span.uppercase");
       const splits = Array.from(nameSpans).map(
-        (span) => new SplitType(span as HTMLElement, { types: "lines" })
+        (span) => new SplitType(span as HTMLElement, { types: "lines" }),
       );
-      
-      const lines = splits.flatMap(s => s.lines);
+
+      const lines = splits.flatMap((s) => s.lines);
 
       // 2. Initial State
       gsap.set(lines, { yPercent: 100 });
@@ -90,30 +90,33 @@ const Header: React.FC = () => {
         y: 20,
       });
       // Show the main container but the text is hidden by yPercent + overflow
-      gsap.set(nameRef.current, { autoAlpha: 1 }); 
+      gsap.set(nameRef.current, { autoAlpha: 1 });
 
-      const tl = gsap.timeline({ paused: true });
-      
+      const tl = gsap.timeline({ 
+        paused: true,
+        defaults: { ease: "none" } // Force all children to be linear by default
+      });
+
       tl.to(lines, {
         yPercent: 0,
         duration: 1,
         stagger: 0.1,
         ease: "power4.out",
         delay: 0.2,
-      }).to(
+      }, 0).to(
         [talkButtonRef.current, menuButtonRef.current],
         {
           autoAlpha: 1,
           y: 0,
           duration: 0.8,
           stagger: 0.1,
-          ease: "power3.out",
+          ease: "none", // Strict linear fashion
           onComplete: () => {
             // Dispatch event when header is fully animated
             window.dispatchEvent(new CustomEvent("header-entrance-complete"));
           }
         },
-        "-=0.4" // Starts closer to the end of the text animation
+        0 
       );
 
       entranceTimelineRef.current = tl;
@@ -144,7 +147,7 @@ const Header: React.FC = () => {
         window.removeEventListener("initial-loader-complete", playEntrance);
         window.removeEventListener("page-transition-complete", playEntrance);
         clearTimeout(safetyTimeout);
-        splits.forEach(s => s.revert());
+        splits.forEach((s) => s.revert());
       };
     });
 
