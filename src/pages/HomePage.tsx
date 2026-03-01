@@ -87,9 +87,8 @@ function HomePage() {
   return (
     <div className="HomePage">
       {/* Hero Section */}
-      <div className="mb-12">
-        <Hero />
-      </div>
+
+      <Hero />
 
       {/* Video Showcase (Commented out) */}
       {/* <div className="mb-32 md:mb-48 lg:mb-64">

@@ -104,13 +104,15 @@ const Manifesto: React.FC = () => {
       ref={sectionRef}
       className="w-full px-4 md:px-10 lg:px-12 xl:px-16 font-aeonik"
     >
-      <div className="w-full mb-24 overflow-hidden">
+      <div className="w-full mb-24 overflow-hidden items-center justify-center flex flex-col">
+        <p className="uppercase font-aeonik text-lg md:text-md font-medium text-[#1c1d1e] leading-tight mb-6">
+          About me
+        </p>
         <h2
           ref={headingRef}
-          className="text-4xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-7xl text-[#1c1d1e] font-aeonik font-medium leading-[1.2] tracking-tight text-center"
+          className="text-4xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-8xl text-[#1c1d1e] max-w-8xl font-aeonik font-medium leading-[1.2] tracking-tight text-center"
         >
-          I design and build digital experiences for ambitious brands — blending
-          structure, clarity, and purposeful motion.
+          I design and build purposeful digital experiences.
         </h2>
       </div>
     </section>

@@ -1,63 +1,96 @@
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DesignIcon from "../../assets/icons/heroSection/Design.svg";
 import EngineerIcon from "../../assets/icons/heroSection/Engineer.svg";
 
-const Hero: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const videoWrapperRef = useRef<HTMLDivElement>(null);
-  const videoContentRef = useRef<HTMLDivElement>(null);
+gsap.registerPlugin(ScrollTrigger);
 
-  useEffect(() => {
+const Hero: React.FC = () => {
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoContentRef = useRef<HTMLDivElement>(null);
+  const videoWrapperRef = useRef<HTMLDivElement>(null);
+  const textWrapperRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
     if (
+      !sceneRef.current ||
       !containerRef.current ||
-      !videoWrapperRef.current ||
-      !videoContentRef.current
+      !videoContentRef.current ||
+      !textWrapperRef.current ||
+      !videoWrapperRef.current
     )
       return;
 
-    // Use GSAP quickTo for performance and buttery smoothness
-    const xTo = gsap.quickTo(videoWrapperRef.current, "x", {
-      duration: 0.8,
-      ease: "power3.out",
+    // Anchor expansion strictly at the top center
+    gsap.set(videoContentRef.current, { transformOrigin: "top center" });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sceneRef.current,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true,
+        pin: containerRef.current,
+        pinSpacing: true,
+      },
     });
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current || !videoContentRef.current) return;
+    // Expansion Animation
+    tl.to(
+      videoContentRef.current,
+      {
+        scale: () => {
+          const containerW = videoWrapperRef.current!.clientWidth;
+          const containerH = window.innerHeight;
+          const videoW = videoContentRef.current!.offsetWidth;
+          const videoH = videoContentRef.current!.offsetHeight;
 
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const videoRect = videoContentRef.current.getBoundingClientRect();
+          const scaleToWidth = containerW / videoW;
+          const scaleToHeight = (containerH - 120) / videoH;
 
-      const mouseX = e.clientX - containerRect.left;
-      const mousePercent = Math.max(
-        0,
-        Math.min(mouseX / containerRect.width, 1),
-      );
+          return Math.min(scaleToWidth, scaleToHeight);
+        },
+        borderRadius: "2rem", // Stronger border radius at the end (32px)
+        ease: "none",
+      },
+      0
+    ).to(
+      textWrapperRef.current,
+      {
+        y: 200,
+        autoAlpha: 0,
+        duration: 0.4,
+        ease: "power2.out",
+      },
+      0
+    );
 
-      const travelDistance = containerRect.width - videoRect.width;
-      const xPos = (mousePercent - 0.5) * travelDistance;
-
-      xTo(xPos);
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
     };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   return (
+    /* sceneRef height defines the scroll duration. 
+       Added responsive margin-bottom to create spacing before the Manifesto section. */
     <div
-      id="hero"
-      className="relative w-full h-[100vh] flex flex-col justify-end px-4 md:px-10 lg:px-4 xl:px-6 pb-8 md:pb-12 overflow-hidden"
+      ref={sceneRef}
+      className="relative w-full h-[350vh] bg-[#f4f4f5] mb-32 md:mb-48 lg:mb-64"
     >
-      <div ref={containerRef} className="w-full flex flex-col items-center">
-        {/* Video Section - Faster horizontal cursor follow */}
+      <div
+        ref={containerRef}
+        className="w-full h-screen flex flex-col items-center justify-start pt-24 md:pt-32 lg:pt-40 overflow-hidden bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
+      >
+        {/* Video Section - Anchored top */}
         <div
           ref={videoWrapperRef}
-          className="mb-4 md:mb-6 w-full flex justify-center will-change-transform"
+          className="relative z-20 w-full flex justify-center"
         >
           <div
             ref={videoContentRef}
-            className="w-full max-w-[320px] md:max-w-[600px] lg:max-w-[800px] aspect-video overflow-hidden bg-black rounded-[4px] md:rounded-[8px]"
+            className="w-full max-w-[320px] md:max-w-[600px] lg:max-w-[800px] aspect-video overflow-hidden bg-black rounded-lg shadow-xl will-change-transform"
           >
             <video
               autoPlay
@@ -79,51 +112,50 @@ const Hero: React.FC = () => {
           </div>
         </div>
 
-        {/* Triple Paragraph Labels - 12 Column Grid */}
-        <div className="w-full grid grid-cols-12 gap-0 mb-0.5 md:mb-1 px-[0.05em] overflow-visible">
-          <div className="col-span-5 text-left">
-            <p className="text-xs md:text-base lg:text-lg font-aeonik font-medium text-[#1c1d1e] uppercase tracking-widest">
+        {/* Text Section - Below Video */}
+        <div
+          ref={textWrapperRef}
+          className="mt-8 md:mt-12 w-full flex flex-col items-center z-10"
+        >
+          {/* Labels Row */}
+          <div className="w-full grid grid-cols-12 gap-0 mb-2 overflow-visible">
+            <div className="col-span-5 text-left font-aeonik uppercase tracking-widest text-xs md:text-base lg:text-lg text-[#1c1d1e]">
               A
-            </p>
-          </div>
-          <div className="col-span-2" />
-          <div className="col-span-5 flex justify-end overflow-visible">
-            <div
-              className="flex justify-between"
-              style={{ width: "124%", minWidth: "124%" }}
-            >
-              <p className="text-xs md:text-base lg:text-lg font-aeonik font-medium text-[#1c1d1e] uppercase tracking-widest">
-                Seriously
-              </p>
-              <p className="text-xs md:text-base lg:text-lg font-aeonik font-medium text-[#1c1d1e] uppercase tracking-widest">
-                Good
-              </p>
+            </div>
+            <div className="col-span-2" />
+            <div className="col-span-5 flex justify-end overflow-visible">
+              <div
+                className="flex justify-between w-[124%] min-w-[124%] font-aeonik uppercase tracking-widest text-xs md:text-base lg:text-lg text-[#1c1d1e]"
+              >
+                <span>Seriously</span>
+                <span>Good</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* SVG Heading (Bottom) - Scaling both down slightly while keeping height matched */}
-        <div className="w-full grid grid-cols-12 items-end gap-0 overflow-visible">
-          <div className="col-span-5 flex items-end justify-start">
-            <img
-              src={DesignIcon}
-              alt="Design"
-              className="h-auto object-contain block"
-              style={{ width: "90%", aspectRatio: "500 / 131" }}
-            />
-          </div>
-          <div className="col-span-2" aria-hidden="true" />
-          <div className="col-span-5 flex items-end justify-end">
-            <img
-              src={EngineerIcon}
-              alt="Engineer"
-              className="max-w-none h-auto object-contain block"
-              style={{
-                width: "124%", // 137.8% * 0.9 = 124.02%
-                minWidth: "124%",
-                aspectRatio: "689 / 131",
-              }}
-            />
+          {/* SVG Heading Row */}
+          <div className="w-full grid grid-cols-12 items-end gap-0 overflow-visible">
+            <div className="col-span-5 flex items-end justify-start">
+              <img
+                src={DesignIcon}
+                alt="Design"
+                className="h-auto block"
+                style={{ width: "90%", aspectRatio: "500/131" }}
+              />
+            </div>
+            <div className="col-span-2" />
+            <div className="col-span-5 flex items-end justify-end">
+              <img
+                src={EngineerIcon}
+                alt="Engineer"
+                className="max-w-none h-auto block"
+                style={{
+                  width: "124%",
+                  minWidth: "124%",
+                  aspectRatio: "689/131",
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
