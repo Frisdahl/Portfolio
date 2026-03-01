@@ -37,19 +37,24 @@ const Hero: React.FC = () => {
       },
     });
 
-    // Expansion Animation
+    // Expansion Animation: Perfectly frame within width and available height
     tl.to(
       videoContentRef.current,
       {
         scale: () => {
           const containerW = videoWrapperRef.current!.clientWidth;
-          const containerH = window.innerHeight;
+          const viewportH = window.innerHeight;
           const videoW = videoContentRef.current!.offsetWidth;
           const videoH = videoContentRef.current!.offsetHeight;
 
-          const scaleToWidth = containerW / videoW;
-          const scaleToHeight = (containerH - 120) / videoH;
+          // Calculate available vertical space from the video's top position
+          const rect = videoWrapperRef.current!.getBoundingClientRect();
+          const availableH = viewportH - rect.top - 64; // 64px buffer for bottom breathing room
 
+          const scaleToWidth = containerW / videoW;
+          const scaleToHeight = availableH / videoH;
+
+          // Use the smaller scale to ensure full visibility and 16:9 ratio
           return Math.min(scaleToWidth, scaleToHeight);
         },
         borderRadius: "2rem", // Stronger border radius at the end (32px)
@@ -64,7 +69,7 @@ const Hero: React.FC = () => {
         duration: 0.4,
         ease: "power2.out",
       },
-      0
+      0,
     );
 
     return () => {
@@ -115,45 +120,63 @@ const Hero: React.FC = () => {
         {/* Text Section - Below Video */}
         <div
           ref={textWrapperRef}
-          className="mt-8 md:mt-12 w-full flex flex-col items-center z-10"
+          className="mt-8 md:mt-12 w-full flex flex-col items-center z-10 px-4 md:px-10 lg:px-4 xl:px-6"
         >
-          {/* Labels Row */}
-          <div className="w-full grid grid-cols-12 gap-0 mb-2 overflow-visible">
-            <div className="col-span-5 text-left font-aeonik uppercase tracking-widest text-xs md:text-base lg:text-lg text-[#1c1d1e]">
-              A
+          {/* Labels Row - Distributed Flex for perfect spacing */}
+          <div className="w-full flex items-end justify-between mb-2">
+            <div style={{ width: "36%" }}>
+              <p className="text-left font-aeonik uppercase tracking-widest text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
+                A
+              </p>
             </div>
-            <div className="col-span-2" />
-            <div className="col-span-5 flex justify-end overflow-visible">
-              <div
-                className="flex justify-between w-[124%] min-w-[124%] font-aeonik uppercase tracking-widest text-xs md:text-base lg:text-lg text-[#1c1d1e]"
-              >
-                <span>Seriously</span>
-                <span>Good</span>
-              </div>
+            {/* Spacer for circle alignment */}
+            <div style={{ width: "9.4%" }} />
+            <div className="flex justify-between" style={{ width: "49.6%" }}>
+              <p className="font-aeonik uppercase tracking-widest text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
+                Seriously
+              </p>
+              <p className="font-aeonik uppercase tracking-widest text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
+                Good
+              </p>
             </div>
           </div>
 
-          {/* SVG Heading Row */}
-          <div className="w-full grid grid-cols-12 items-end gap-0 overflow-visible">
-            <div className="col-span-5 flex items-end justify-start">
+          {/* SVG Heading Row - Distributed Flex for perfect centering */}
+          <div className="w-full flex items-end justify-between overflow-visible">
+            <div className="flex justify-start" style={{ width: "36%" }}>
               <img
                 src={DesignIcon}
                 alt="Design"
-                className="h-auto block"
-                style={{ width: "90%", aspectRatio: "500/131" }}
+                className="w-full h-auto block object-contain"
+                style={{ aspectRatio: "500/131" }}
               />
             </div>
-            <div className="col-span-2" />
-            <div className="col-span-5 flex items-end justify-end">
+
+            <div
+              className="flex justify-center items-end"
+              style={{ width: "9.4%" }}
+            >
+              <div
+                className="rounded-full bg-[#1c1d1e] mb-[1.8%] overflow-hidden"
+                style={{
+                  width: "100%",
+                  aspectRatio: "1/1",
+                }}
+              >
+                <img
+                  src="/images/portræt.png"
+                  alt="Portrait"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end" style={{ width: "49.6%" }}>
               <img
                 src={EngineerIcon}
                 alt="Engineer"
-                className="max-w-none h-auto block"
-                style={{
-                  width: "124%",
-                  minWidth: "124%",
-                  aspectRatio: "689/131",
-                }}
+                className="w-full h-auto block object-contain"
+                style={{ aspectRatio: "689/131" }}
               />
             </div>
           </div>
