@@ -69,10 +69,10 @@ const InitialLoader: React.FC = () => {
       ref={containerRef}
       className="initial-loader-wrap fixed inset-0 z-[300] bg-[#f4f4f5] flex items-center justify-center overflow-hidden"
     >
-      <div className="overflow-hidden h-fit">
+      <div className="overflow-hidden h-[1.2em] flex items-center">
         <div 
           ref={counterRef}
-          className="font-aeonik text-sm md:text-base lg:text-lg font-medium text-[#1c1d1e] tabular-nums leading-none"
+          className="font-aeonik text-base md:text-lg lg:text-xl font-medium text-[#1c1d1e] tabular-nums leading-[1.2em]"
         >
           {percentage}%
         </div>

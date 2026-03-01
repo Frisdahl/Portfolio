@@ -208,7 +208,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#1c1d1e] to-transparent z-10 pointer-events-none" />
 
           <Marquee
-            text={`${project.categories.join(' <span class="inline-block scale-[2.2] mx-3 text-white">•</span> ')} <span class="inline-block scale-[2.2] mx-3 text-white">•</span> `}
+            text={`${project.categories.join(' <span class="inline-block scale-[1.2] mx-3 text-white">•</span> ')} <span class="inline-block scale-[1.2] mx-3 text-white">•</span> `}
             speed={0.3}
             repeat={12}
             paddingRight={0}
