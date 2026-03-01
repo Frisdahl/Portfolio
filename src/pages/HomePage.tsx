@@ -87,7 +87,7 @@ function HomePage() {
   return (
     <div className="HomePage">
       {/* Hero Section */}
-      <div className="mb-32 md:mb-48 lg:mb-32">
+      <div className="mb-12">
         <Hero />
       </div>
 

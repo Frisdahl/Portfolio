@@ -1,204 +1,132 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import SplitType from "split-type";
+import DesignIcon from "../../assets/icons/heroSection/Design.svg";
+import EngineerIcon from "../../assets/icons/heroSection/Engineer.svg";
 
 const Hero: React.FC = () => {
-  const heroRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const videoContainerRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const videoWrapperRef = useRef<HTMLDivElement>(null);
+  const videoContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (
-      !heroRef.current ||
       !containerRef.current ||
-      !videoContainerRef.current ||
-      !videoRef.current ||
-      !headlineRef.current
-    ) {
+      !videoWrapperRef.current ||
+      !videoContentRef.current
+    )
       return;
-    }
 
-    const tl = gsap.timeline({
-      paused: true,
-      defaults: { ease: "power3.out" },
-    });
-    let splitHeadline: SplitType | null = null;
-    const videoElement = videoRef.current;
-    const videoContainerElement = videoContainerRef.current;
-
-    const startEntranceAnimation = () => {
-      sessionStorage.removeItem("isNavigating");
-      tl.play();
-    };
-
-    const initialCenterMask =
-      "inset(calc(50% - 50px) calc(50% - 100px) calc(50% - 50px) calc(50% - 100px) round 0.5rem)";
-
-    splitHeadline = new SplitType(headlineRef.current, {
-      types: "lines",
-      lineClass: "hero-headline-line",
-    });
-
-    // Initial state (centered 200x100 mask)
-    gsap.set(videoContainerElement, {
-      autoAlpha: 0,
-      clipPath: initialCenterMask,
-      willChange: "clip-path, opacity",
-    });
-    gsap.set(videoElement, {
-      scale: 1.08,
-      transformOrigin: "50% 50%",
-      force3D: true,
-      willChange: "transform",
-    });
-    gsap.set(splitHeadline.lines, {
-      autoAlpha: 0,
-      yPercent: 100,
-      display: "block",
-      overflow: "hidden",
-      paddingBottom: "0.08em",
-      marginBottom: "-0.08em",
-    });
-
-    // Headline line reveal first, then video mask reveal with tight timing
-    tl.to(splitHeadline.lines, {
-      autoAlpha: 1,
-      yPercent: 0,
-      duration: 0.75,
-      stagger: 0.08,
+    // Use GSAP quickTo for performance and buttery smoothness
+    const xTo = gsap.quickTo(videoWrapperRef.current, "x", {
+      duration: 0.8,
       ease: "power3.out",
-      onComplete: () => {
-        gsap.set(splitHeadline?.lines || [], {
-          overflow: "visible",
-          clearProps: "paddingBottom,marginBottom",
-        });
-      },
-    })
-      .to(
-        videoContainerElement,
-        {
-          autoAlpha: 1,
-          duration: 0.01,
-        },
-        "-=0.08",
-      )
-      .to(
-        videoContainerElement,
-        {
-          clipPath: "inset(0% 0% 0% 0% round 1.5rem)",
-          duration: 1.1,
-          ease: "expo.inOut",
-        },
-        "<",
-      )
-      .to(
-        videoElement,
-        {
-          scale: 1,
-          duration: 1.1,
-          ease: "expo.inOut",
-        },
-        "<",
+    });
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current || !videoContentRef.current) return;
+
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const videoRect = videoContentRef.current.getBoundingClientRect();
+
+      const mouseX = e.clientX - containerRect.left;
+      const mousePercent = Math.max(
+        0,
+        Math.min(mouseX / containerRect.width, 1),
       );
 
-    // Trigger Logic
-    const handleLoaderComplete = () => startEntranceAnimation();
-    window.addEventListener("initial-loader-complete", handleLoaderComplete);
-    window.addEventListener("page-transition-complete", handleLoaderComplete);
+      const travelDistance = containerRect.width - videoRect.width;
+      const xPos = (mousePercent - 0.5) * travelDistance;
 
-    const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
-    const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
-    const isNavigating = sessionStorage.getItem("isNavigating") === "true";
-
-    if (hasSeenLoader && !isLoaderActive && !isNavigating) {
-      startEntranceAnimation();
-    }
-
-    const safetyTimeout = setTimeout(
-      () => {
-        if (tl.progress() === 0) startEntranceAnimation();
-      },
-      isLoaderActive ? 6000 : 100,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "initial-loader-complete",
-        handleLoaderComplete,
-      );
-      window.removeEventListener(
-        "page-transition-complete",
-        handleLoaderComplete,
-      );
-      clearTimeout(safetyTimeout);
-      gsap.set(videoContainerElement, { clearProps: "willChange" });
-      gsap.set(videoElement, { clearProps: "willChange" });
-      if (splitHeadline) splitHeadline.revert();
+      xTo(xPos);
     };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   return (
     <div
-      ref={containerRef}
       id="hero"
-      className="hero-container relative w-full h-screen bg-[var(--background)] overflow-hidden"
+      className="relative w-full h-[100vh] flex flex-col justify-end px-4 md:px-10 lg:px-4 xl:px-6 pb-8 md:pb-12 overflow-hidden"
     >
-      <section
-        ref={heroRef}
-        className="relative h-full w-full flex flex-col pt-16 md:pt-10 px-4 md:px-10 lg:px-4 xl:px-6"
-      >
-        {/* Top Layout Header */}
-        <div className="order-2 md:order-1 flex items-start w-full mt-8 md:mt-0 mb-0 md:mb-8 shrink-0">
+      <div ref={containerRef} className="w-full flex flex-col items-center">
+        {/* Video Section - Faster horizontal cursor follow */}
+        <div
+          ref={videoWrapperRef}
+          className="mb-4 md:mb-6 w-full flex justify-center will-change-transform"
+        >
           <div
-            className="hidden md:block w-10 sm:w-12 md:w-14 shrink-0 opacity-0 pointer-events-none"
-            aria-hidden="true"
-          />
-          <div className="hidden md:block w-20 md:w-40 lg:w-60 shrink-0" />
-          <h1
-            ref={headlineRef}
-            className="w-full md:w-auto text-2xl md:text-4xl lg:text-5xl font-aeonik font-normal text-[#1c1d1e] tracking-tight text-left leading-[1.05]"
+            ref={videoContentRef}
+            className="w-full max-w-[320px] md:max-w-[600px] lg:max-w-[800px] aspect-video overflow-hidden bg-black rounded-[4px] md:rounded-[8px]"
           >
-            I help brands create digital <br />
-            experiences that connect with <br />
-            their audience.
-          </h1>
-          <div className="hidden md:block flex-grow" />
-          <div
-            className="hidden md:block w-40 md:w-48 lg:w-56 shrink-0 opacity-0 pointer-events-none"
-            aria-hidden="true"
-          />
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover"
+            >
+              <source
+                src="/projectVideos/videoshowcase/promo_vp9.webm"
+                type="video/webm"
+              />
+              <source
+                src="/projectVideos/videoshowcase/promo_h264.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
         </div>
 
-        {/* Middle Content: Video Container */}
-        <div
-          ref={videoContainerRef}
-          className="order-1 md:order-2 relative w-full overflow-hidden flex-grow mb-0 md:mb-8 bg-black shadow-2xl"
-          style={{
-            borderRadius: "clamp(1rem, 2vw, 1.5rem)",
-          }}
-        >
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            className="w-full h-full object-cover"
-          >
-            <source
-              src="/projectVideos/videoshowcase/promo_vp9.webm"
-              type="video/webm"
-            />
-            <source
-              src="/projectVideos/videoshowcase/promo_h264.mp4"
-              type="video/mp4"
-            />
-          </video>
+        {/* Triple Paragraph Labels - 12 Column Grid */}
+        <div className="w-full grid grid-cols-12 gap-0 mb-0.5 md:mb-1 px-[0.05em] overflow-visible">
+          <div className="col-span-5 text-left">
+            <p className="text-xs md:text-base lg:text-lg font-aeonik font-medium text-[#1c1d1e] uppercase tracking-widest">
+              A
+            </p>
+          </div>
+          <div className="col-span-2" />
+          <div className="col-span-5 flex justify-end overflow-visible">
+            <div
+              className="flex justify-between"
+              style={{ width: "124%", minWidth: "124%" }}
+            >
+              <p className="text-xs md:text-base lg:text-lg font-aeonik font-medium text-[#1c1d1e] uppercase tracking-widest">
+                Seriously
+              </p>
+              <p className="text-xs md:text-base lg:text-lg font-aeonik font-medium text-[#1c1d1e] uppercase tracking-widest">
+                Good
+              </p>
+            </div>
+          </div>
         </div>
-      </section>
+
+        {/* SVG Heading (Bottom) - Scaling both down slightly while keeping height matched */}
+        <div className="w-full grid grid-cols-12 items-end gap-0 overflow-visible">
+          <div className="col-span-5 flex items-end justify-start">
+            <img
+              src={DesignIcon}
+              alt="Design"
+              className="h-auto object-contain block"
+              style={{ width: "90%", aspectRatio: "500 / 131" }}
+            />
+          </div>
+          <div className="col-span-2" aria-hidden="true" />
+          <div className="col-span-5 flex items-end justify-end">
+            <img
+              src={EngineerIcon}
+              alt="Engineer"
+              className="max-w-none h-auto object-contain block"
+              style={{
+                width: "124%", // 137.8% * 0.9 = 124.02%
+                minWidth: "124%",
+                aspectRatio: "689 / 131",
+              }}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

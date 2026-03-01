@@ -107,7 +107,7 @@ const Manifesto: React.FC = () => {
       <div className="w-full mb-24 overflow-hidden">
         <h2
           ref={headingRef}
-          className="text-4xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-8xl text-[#1c1d1e] font-aeonik font-bold leading-[1.2] tracking-tight text-center"
+          className="text-4xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-7xl text-[#1c1d1e] font-aeonik font-medium leading-[1.2] tracking-tight text-center"
         >
           I design and build digital experiences for ambitious brands — blending
           structure, clarity, and purposeful motion.

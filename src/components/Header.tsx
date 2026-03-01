@@ -346,7 +346,7 @@ const Header: React.FC = () => {
           <div
             ref={dropdownRef}
             aria-hidden={!isMenuOpen}
-            className="pointer-events-auto absolute top-full right-0 mt-2 w-full min-w-[320px] bg-[#fefeff] rounded-[1.5rem] shadow-2xl border border-[#1c1d1e]/5 overflow-hidden flex flex-col p-3 invisible opacity-0"
+            className="pointer-events-auto absolute top-full right-0 mt-2 w-full min-w-[320px] bg-[#fefeff] rounded-[1.5rem] overflow-hidden flex flex-col p-3 invisible opacity-0"
           >
             {menuItems.map((item) => {
               const isActive = item.section
