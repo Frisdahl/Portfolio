@@ -37,8 +37,12 @@ if (typeof window !== "undefined") {
 
 gsap.registerPlugin(ScrollTrigger, Observer);
 
-createRoot(document.getElementById("root")!).render(
+const appElement = import.meta.env.DEV ? (
+  <App />
+) : (
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 );
+
+createRoot(document.getElementById("root")!).render(appElement);
