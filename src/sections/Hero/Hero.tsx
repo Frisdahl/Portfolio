@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,6 +22,7 @@ const Hero: React.FC = () => {
   const portraitWrapRef = useRef<HTMLSpanElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
   const entrancePlayedRef = useRef(false);
+  const isSplitAnimatingRef = useRef(false);
 
   // 1. Scroll expansion animation
   useLayoutEffect(() => {
@@ -35,8 +37,8 @@ const Hero: React.FC = () => {
           const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
           if (isMobile) {
-            containerRef.current.style.paddingTop = `${headerHeight + 12}px`;
-            containerRef.current.style.paddingBottom = "1.25rem";
+            containerRef.current.style.paddingTop = `${headerHeight + 4}px`;
+            containerRef.current.style.paddingBottom = "1rem";
             return;
           }
 
@@ -58,6 +60,10 @@ const Hero: React.FC = () => {
         const portrait = portraitRef.current;
 
         if (!designWrap || !engineerWrap || !designText || !engineerText) {
+          return;
+        }
+
+        if (isSplitAnimatingRef.current) {
           return;
         }
 
@@ -285,11 +291,54 @@ const Hero: React.FC = () => {
         if (entrancePlayedRef.current) return;
         if (gsap.isTweening(textWrapperRef.current)) return;
         entrancePlayedRef.current = true;
+        isSplitAnimatingRef.current = true;
+
+        const designHeading = designTextRef.current;
+        const engineerHeading = engineerTextRef.current;
+        if (designHeading) {
+          const designWidth = designHeading.getBoundingClientRect().width;
+          if (designWidth > 0) {
+            designHeading.style.width = `${designWidth}px`;
+          }
+        }
+        if (engineerHeading) {
+          const engineerWidth = engineerHeading.getBoundingClientRect().width;
+          if (engineerWidth > 0) {
+            engineerHeading.style.width = `${engineerWidth}px`;
+          }
+        }
 
         const tl = gsap.timeline();
+        const headingSplits: SplitType[] = [];
+        if (designTextRef.current) {
+          headingSplits.push(
+            new SplitType(designTextRef.current as HTMLElement, {
+              types: "chars",
+            }),
+          );
+        }
+        if (engineerTextRef.current) {
+          headingSplits.push(
+            new SplitType(engineerTextRef.current as HTMLElement, {
+              types: "chars",
+            }),
+          );
+        }
         const labelParagraphs = labelsRowRef.current
           ? gsap.utils.toArray<HTMLParagraphElement>("p", labelsRowRef.current)
           : [];
+        const headingChars = headingSplits.flatMap(
+          (split) => split.chars ?? [],
+        );
+        const portraitTargets = [
+          portraitRef.current,
+          mobilePortraitRef.current,
+        ].filter((el): el is HTMLDivElement => Boolean(el));
+
+        if (headingChars.length) {
+          gsap.set(iconsRowRef.current, { autoAlpha: 1, yPercent: 0 });
+          gsap.set(headingChars, { autoAlpha: 0, yPercent: 100 });
+        }
 
         tl.fromTo(
           videoContentRef.current,
@@ -320,7 +369,7 @@ const Hero: React.FC = () => {
             "-=0.2",
           )
           .fromTo(
-            iconsRowRef.current,
+            headingChars.length ? headingChars : iconsRowRef.current,
             {
               autoAlpha: 0,
               yPercent: 100,
@@ -328,24 +377,40 @@ const Hero: React.FC = () => {
             {
               yPercent: 0,
               autoAlpha: 1,
-              duration: 0.4,
+              duration: 0.42,
+              stagger: 0.02,
               ease: "power3.out",
             },
             "-=0.1",
-          )
-          .fromTo(
-            portraitRef.current,
+          );
+
+        if (portraitTargets.length) {
+          tl.fromTo(
+            portraitTargets,
             {
               scale: 0,
               transformOrigin: "center center",
             },
             {
               scale: 1,
-              duration: 0.3,
+              duration: 0.28,
               ease: "ease.out",
             },
-            "-=0.01",
+            "-=0.14",
           );
+        }
+
+        tl.eventCallback("onComplete", () => {
+          headingSplits.forEach((split) => split.revert());
+          if (designHeading) {
+            designHeading.style.width = "";
+          }
+          if (engineerHeading) {
+            engineerHeading.style.width = "";
+          }
+          isSplitAnimatingRef.current = false;
+          fitHeroWords();
+        });
       };
 
       // Entrance Triggers
@@ -362,6 +427,7 @@ const Hero: React.FC = () => {
       gsap.set(videoWrapperRef.current, { y: 0 });
       gsap.set(labelParagraphs, { autoAlpha: 0, yPercent: -100 });
       gsap.set(iconsRowRef.current, { autoAlpha: 0, yPercent: 100 });
+      gsap.set([portraitRef.current, mobilePortraitRef.current], { scale: 0 });
       gsap.set(videoContentRef.current, { autoAlpha: 0, yPercent: -100 });
 
       // Create scroll trigger immediately so pin layout is stable even if user scrolls early
@@ -393,6 +459,13 @@ const Hero: React.FC = () => {
         window.removeEventListener("resize", handleResize);
         textFitResizeObserver?.disconnect();
         clearTimeout(safetyTimeout);
+        if (designTextRef.current) {
+          designTextRef.current.style.width = "";
+        }
+        if (engineerTextRef.current) {
+          engineerTextRef.current.style.width = "";
+        }
+        isSplitAnimatingRef.current = false;
       };
     }, sceneRef);
 
@@ -415,7 +488,7 @@ const Hero: React.FC = () => {
         >
           <div
             ref={videoMaskRef}
-            className="overflow-hidden rounded-none md:rounded-lg w-full md:max-w-[600px] lg:max-w-[800px] aspect-video bg-transparent"
+            className="overflow-hidden rounded-none md:rounded-lg w-full md:max-w-[600px] lg:max-w-[800px] aspect-[4/3] md:aspect-video bg-transparent"
           >
             <div
               ref={videoContentRef}
@@ -445,7 +518,7 @@ const Hero: React.FC = () => {
         {/* Text Section */}
         <div
           ref={textWrapperRef}
-          className="mt-auto md:mt-16 w-full flex flex-col items-center z-10"
+          className="mt-0 md:mt-16 w-full flex flex-col items-center z-10"
         >
           {/* Labels Row (hidden on mobile) */}
           <div
@@ -479,11 +552,11 @@ const Hero: React.FC = () => {
             >
               <div
                 ref={designTextWrapRef}
-                className="w-full md:min-w-0 md:col-start-1 md:col-span-5 flex items-end justify-start overflow-visible"
+                className="w-full md:min-w-0 md:col-start-1 md:col-span-5 flex items-end justify-start overflow-hidden"
               >
                 <span
                   ref={designTextRef}
-                  className="block w-max -mx-[0.06em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
+                  className="block w-max whitespace-nowrap -ml-[0.06em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
                 >
                   Design
                 </span>
@@ -522,11 +595,11 @@ const Hero: React.FC = () => {
 
               <div
                 ref={engineerTextWrapRef}
-                className="w-full md:min-w-0 md:col-start-7 md:col-span-6 flex justify-start overflow-visible"
+                className="w-full md:min-w-0 md:col-start-7 md:col-span-6 flex justify-start overflow-hidden"
               >
                 <span
                   ref={engineerTextRef}
-                  className="block w-max -mx-[0.06em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
+                  className="block w-max whitespace-nowrap -ml-[0.06em] pr-[0.03em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
                 >
                   Engineer
                 </span>

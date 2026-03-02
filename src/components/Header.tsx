@@ -301,10 +301,10 @@ const Header: React.FC = () => {
           onClick={handleLogoClick}
           className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1c1d1e] leading-[1.0] pt-1 opacity-0"
         >
-          <span className="text-lg md:text-xl lg:text-2xl uppercase font-medium tracking-tight overflow-hidden inline-block">
+          <span className="text-base md:text-xl lg:text-2xl uppercase font-medium tracking-tight overflow-hidden inline-block">
             <span className="italic">A</span>lexander
           </span>
-          <span className="text-lg md:text-xl lg:text-2xl uppercase font-medium tracking-tight overflow-hidden inline-block">
+          <span className="text-base md:text-xl lg:text-2xl uppercase font-medium tracking-tight overflow-hidden inline-block">
             <span className="italic">F</span>risdahl
           </span>
         </Link>
@@ -335,7 +335,7 @@ const Header: React.FC = () => {
               ref={menuButtonRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-expanded={isMenuOpen}
-              className={`group/menu h-10 sm:h-12 px-10 min-w-[160px] rounded-full text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:brightness-110 cursor-pointer flex items-center justify-between gap-4 overflow-hidden opacity-0 ${
+              className={`group/menu h-10 sm:h-12 px-6 md:px-10 min-w-[140px] md:min-w-[160px] rounded-full text-base md:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:brightness-110 cursor-pointer flex items-center justify-between gap-3 md:gap-4 overflow-hidden opacity-0 ${
                 isMenuOpen
                   ? "bg-[#fefeff]"
                   : isPastHero
@@ -385,7 +385,7 @@ const Header: React.FC = () => {
                   key={item.label}
                   href={item.to}
                   onClick={(e) => handleLinkClick(e, item.to, item.section)}
-                  className={`menu-item-anim group/item flex items-center justify-between px-8 py-5 rounded-full transition-colors duration-300 text-[#1c1d1e] uppercase font-medium text-xl md:text-2xl tracking-tight overflow-hidden ${
+                  className={`menu-item-anim group/item flex items-center justify-between px-8 py-5 rounded-full transition-colors duration-300 text-[#1c1d1e] uppercase font-medium text-lg md:text-2xl tracking-tight overflow-hidden ${
                     isActive ? "cursor-default" : "hover:bg-[#1c1d1e]/5"
                   }`}
                 >
