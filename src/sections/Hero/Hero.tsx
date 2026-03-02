@@ -220,11 +220,11 @@ const Hero: React.FC = () => {
   return (
     <div
       ref={sceneRef}
-      className="relative w-full h-[350vh] bg-[#f4f4f5] mb-32 md:mb-48 lg:mb-64"
+      className="relative w-full h-[280vh] sm:h-[310vh] md:h-[350vh] bg-[#f4f4f5] mb-24 sm:mb-28 md:mb-48 lg:mb-64"
     >
       <div
         ref={containerRef}
-        className="w-full h-screen flex flex-col items-center justify-start pt-24 md:pt-32 lg:pt-40 overflow-visible bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
+        className="w-full h-[92svh] md:h-screen flex flex-col items-center justify-start pt-16 sm:pt-20 md:pt-32 lg:pt-40 overflow-visible bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
       >
         {/* Video Section */}
         <div
