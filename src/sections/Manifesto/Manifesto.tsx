@@ -64,7 +64,7 @@ const Manifesto: React.FC = () => {
         </p>
         <h2
           ref={headingRef}
-          className="text-4xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-8xl text-[#1c1d1e] max-w-8xl font-aeonik font-medium leading-[1.2] tracking-tight text-center"
+          className="text-4xl md:text-6xl lg:text-5xl xl:text-6xl 2xl:text-8xl text-[#1c1d1e] md:max-w-6xl 2xl:max-w-7xl font-aeonik font-medium leading-[1.2] tracking-tight text-center"
         >
           I design and build purposeful digital experiences.
         </h2>
