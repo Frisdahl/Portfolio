@@ -318,7 +318,7 @@ const Header: React.FC = () => {
             <button
               ref={talkButtonRef}
               onClick={(e) => handleLinkClick(e, "/contact")}
-              className="group/talk h-10 sm:h-12 px-10 rounded-full bg-[#1c1d1e] text-[#fefffe] text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:opacity-90 cursor-pointer flex items-center justify-center overflow-hidden relative min-w-[160px] opacity-0"
+              className="group/talk hidden md:flex h-10 sm:h-12 px-10 rounded-full bg-[#1c1d1e] text-[#fefffe] text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative min-w-[160px] opacity-0"
             >
               <span className="whitespace-nowrap transition-transform duration-500 group-hover/talk:translate-x-3 font-medium">
                 Let's talk

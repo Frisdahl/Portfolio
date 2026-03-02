@@ -35,13 +35,19 @@
   font-style: normal;
 }
 
-html, body, #root, .App, .HomePage, main {
+html,
+body,
+#root,
+.App,
+.HomePage,
+main {
   background-color: var(--background) !important;
   color: var(--foreground);
   font-family: "Aeonik", sans-serif;
 }
 
-html, body {
+html,
+body {
   overflow-x: hidden;
   width: 100%;
 }
@@ -166,6 +172,69 @@ html, body {
 }
 
 @layer components {
+  .container-fill-text {
+    --container-fill-text-captured-length: initial;
+    --container-fill-text-min-font-size: 2.75rem;
+    --container-fill-text-max-font-size: 10rem;
+
+    display: flex;
+    container-type: inline-size;
+    max-width: unset;
+    line-height: 0.9;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 768px) {
+    .container-fill-text {
+      --container-fill-text-min-font-size: 4.5rem;
+      --container-fill-text-max-font-size: 18rem;
+    }
+  }
+
+  .container-fill-text__reference {
+    visibility: hidden;
+  }
+
+  .container-fill-text__container {
+    --container-fill-text-captured-length: 100cqi;
+    --container-fill-text-available-space: var(
+      --container-fill-text-captured-length
+    );
+
+    flex-grow: 1;
+    min-inline-size: 0;
+    container-type: inline-size;
+  }
+
+  .container-fill-text__display {
+    --container-fill-text-captured-length: 100cqi;
+    --container-fill-text-ratio: tan(
+      atan2(
+        var(--container-fill-text-available-space),
+        var(--container-fill-text-available-space) -
+          var(--container-fill-text-captured-length)
+      )
+    );
+
+    display: block;
+    inline-size: var(--container-fill-text-available-space);
+    font-size: var(--container-fill-text-min-font-size);
+    font-size: clamp(
+      var(--container-fill-text-min-font-size),
+      1em * var(--container-fill-text-ratio),
+      var(--container-fill-text-max-font-size)
+    );
+  }
+
+  @property --container-fill-text-captured-length {
+    syntax: "<length>";
+    initial-value: 0px;
+    inherits: true;
+  }
+
   .link-underline-effect {
     position: relative;
     display: inline-block;

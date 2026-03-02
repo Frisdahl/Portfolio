@@ -1,8 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import DesignIcon from "../../assets/icons/heroSection/Design.svg";
-import EngineerIcon from "../../assets/icons/heroSection/Engineer.svg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,36 +13,203 @@ const Hero: React.FC = () => {
   const textWrapperRef = useRef<HTMLDivElement>(null);
   const labelsRowRef = useRef<HTMLDivElement>(null);
   const iconsRowRef = useRef<HTMLDivElement>(null);
+  const designTextWrapRef = useRef<HTMLDivElement>(null);
+  const engineerTextWrapRef = useRef<HTMLDivElement>(null);
+  const designTextRef = useRef<HTMLSpanElement>(null);
+  const engineerTextRef = useRef<HTMLSpanElement>(null);
+  const mobilePortraitRef = useRef<HTMLDivElement>(null);
+  const portraitWrapRef = useRef<HTMLSpanElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
   const entrancePlayedRef = useRef(false);
 
   // 1. Scroll expansion animation
   useLayoutEffect(() => {
+    entrancePlayedRef.current = false;
+
     const ctx = gsap.context(() => {
       // Set container padding-top based on header height + 8px
       const setContainerPadding = () => {
         const headerElement = document.querySelector("header");
         if (headerElement && containerRef.current) {
           const headerHeight = headerElement.offsetHeight;
+          const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
+          if (isMobile) {
+            containerRef.current.style.paddingTop = `${headerHeight + 12}px`;
+            containerRef.current.style.paddingBottom = "1.25rem";
+            return;
+          }
+
           containerRef.current.style.paddingTop = `${headerHeight + 8}px`;
+          containerRef.current.style.paddingBottom = "0px";
         }
       };
 
       // Initial calculation
       setContainerPadding();
 
+      const fitHeroWords = () => {
+        const designWrap = designTextWrapRef.current;
+        const engineerWrap = engineerTextWrapRef.current;
+        const designText = designTextRef.current;
+        const engineerText = engineerTextRef.current;
+        const mobilePortrait = mobilePortraitRef.current;
+        const portraitWrap = portraitWrapRef.current;
+        const portrait = portraitRef.current;
+
+        if (!designWrap || !engineerWrap || !designText || !engineerText) {
+          return;
+        }
+
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+        const minFontSize = isMobile ? 42 : 72;
+        const maxFontSize = isMobile ? 150 : 620;
+
+        designText.style.fontSize = `${maxFontSize}px`;
+        engineerText.style.fontSize = `${maxFontSize}px`;
+
+        const designMeasured = designText.getBoundingClientRect().width;
+        const engineerMeasured = engineerText.getBoundingClientRect().width;
+
+        if (!designMeasured || !engineerMeasured) return;
+
+        let sharedSize = minFontSize;
+
+        if (isMobile) {
+          const engineerTarget = engineerWrap.clientWidth;
+          if (!engineerTarget) return;
+
+          const engineerSize =
+            (engineerTarget / engineerMeasured) * maxFontSize;
+
+          const initialDesignTarget = Math.max(designWrap.clientWidth - 56, 0);
+          if (!initialDesignTarget) return;
+          const initialDesignSize =
+            (initialDesignTarget / designMeasured) * maxFontSize;
+
+          sharedSize = gsap.utils.clamp(
+            minFontSize,
+            maxFontSize,
+            Math.min(initialDesignSize, engineerSize),
+          );
+
+          const portraitSize = gsap.utils.clamp(
+            minFontSize,
+            maxFontSize,
+            sharedSize,
+          );
+          const finalDesignTarget = Math.max(
+            designWrap.clientWidth - portraitSize - 4,
+            0,
+          );
+          if (!finalDesignTarget) return;
+          const finalDesignSize =
+            (finalDesignTarget / designMeasured) * maxFontSize;
+
+          sharedSize = gsap.utils.clamp(
+            minFontSize,
+            maxFontSize,
+            Math.min(finalDesignSize, engineerSize) * 1.03,
+          );
+        } else {
+          const designTarget = designWrap.clientWidth;
+          const engineerTarget = engineerWrap.clientWidth;
+          if (!designTarget || !engineerTarget) return;
+
+          const designSize = (designTarget / designMeasured) * maxFontSize;
+          const engineerSize =
+            (engineerTarget / engineerMeasured) * maxFontSize;
+
+          sharedSize = gsap.utils.clamp(
+            minFontSize,
+            maxFontSize,
+            Math.min(designSize, engineerSize) * 1.02,
+          );
+        }
+
+        designText.style.fontSize = `${sharedSize}px`;
+        engineerText.style.fontSize = `${sharedSize}px`;
+
+        if (portrait) {
+          if (isMobile) {
+            if (mobilePortrait) {
+              const mobileSize = gsap.utils.clamp(
+                minFontSize,
+                maxFontSize,
+                sharedSize,
+              );
+              mobilePortrait.style.width = `${mobileSize}px`;
+              mobilePortrait.style.height = `${mobileSize}px`;
+            }
+            portrait.style.width = "0px";
+            portrait.style.height = "0px";
+            if (portraitWrap) {
+              portraitWrap.style.left = "";
+            }
+          } else {
+            const portraitSize = gsap.utils.clamp(100, 210, sharedSize * 1.0);
+            portrait.style.width = `${portraitSize}px`;
+            portrait.style.height = `${portraitSize}px`;
+
+            if (portraitWrap && iconsRowRef.current) {
+              const designRect = designText.getBoundingClientRect();
+              const engineerRect = engineerText.getBoundingClientRect();
+              const iconsRowRect = iconsRowRef.current.getBoundingClientRect();
+              const midpoint =
+                (designRect.right + engineerRect.left) / 2 - iconsRowRect.left;
+
+              portraitWrap.style.left = `${midpoint}px`;
+            }
+          }
+        }
+      };
+
+      fitHeroWords();
+
+      const textFitResizeObserver =
+        typeof ResizeObserver !== "undefined"
+          ? new ResizeObserver(() => fitHeroWords())
+          : null;
+
+      if (iconsRowRef.current) {
+        textFitResizeObserver?.observe(iconsRowRef.current);
+      }
+      if (designTextWrapRef.current) {
+        textFitResizeObserver?.observe(designTextWrapRef.current);
+      }
+      if (engineerTextWrapRef.current) {
+        textFitResizeObserver?.observe(engineerTextWrapRef.current);
+      }
+
       // Recalculate on window resize
-      window.addEventListener("resize", setContainerPadding);
+      const handleResize = () => {
+        setContainerPadding();
+        fitHeroWords();
+        ScrollTrigger.refresh();
+      };
+      window.addEventListener("resize", handleResize);
 
       // Anchor expansion at the mask's top center
       gsap.set(videoMaskRef.current, { transformOrigin: "top center" });
 
       const initScrollAnimation = () => {
-        if (ScrollTrigger.getById("heroScroll")) return;
+        const existingTrigger = ScrollTrigger.getById("heroScroll");
+        if (existingTrigger) {
+          existingTrigger.kill();
+        }
+
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+        if (isMobile) {
+          gsap.set(videoMaskRef.current, { scale: 1, clearProps: "transform" });
+          gsap.set(videoWrapperRef.current, { y: 0, clearProps: "transform" });
+          gsap.set(containerRef.current, { y: 0, clearProps: "transform" });
+          return;
+        }
 
         const getVideoTravelY = () => {
           const viewportH = window.innerHeight;
           const textHeight = textWrapperRef.current?.offsetHeight ?? 0;
+
           return viewportH + textHeight * 0.35;
         };
 
@@ -225,7 +390,8 @@ const Hero: React.FC = () => {
           "header-entrance-complete",
           handleHeaderComplete,
         );
-        window.removeEventListener("resize", setContainerPadding);
+        window.removeEventListener("resize", handleResize);
+        textFitResizeObserver?.disconnect();
         clearTimeout(safetyTimeout);
       };
     }, sceneRef);
@@ -236,20 +402,20 @@ const Hero: React.FC = () => {
   return (
     <div
       ref={sceneRef}
-      className="relative w-full h-[280vh] sm:h-[310vh] md:h-[350vh] bg-[#f4f4f5] mb-24 sm:mb-28 md:mb-48 lg:mb-64"
+      className="relative w-full min-h-[100svh] md:h-[350vh] bg-[#f4f4f5] mb-24 sm:mb-28 md:mb-48 lg:mb-64"
     >
       <div
         ref={containerRef}
-        className="w-full h-screen flex flex-col items-center justify-start overflow-visible bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
+        className="w-full min-h-[100svh] md:h-screen flex flex-col items-center justify-start overflow-visible bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
       >
         {/* Video Section */}
         <div
           ref={videoWrapperRef}
-          className="relative z-20 w-full flex justify-center"
+          className="relative z-20 w-full flex-1 md:flex-none flex items-center justify-center -mx-4 md:mx-0"
         >
           <div
             ref={videoMaskRef}
-            className="overflow-hidden rounded-lg w-full max-w-[320px] md:max-w-[600px] lg:max-w-[800px] aspect-video bg-transparent "
+            className="overflow-hidden rounded-none md:rounded-lg w-full md:max-w-[600px] lg:max-w-[800px] aspect-video bg-transparent"
           >
             <div
               ref={videoContentRef}
@@ -279,20 +445,19 @@ const Hero: React.FC = () => {
         {/* Text Section */}
         <div
           ref={textWrapperRef}
-          className="mt-8 md:mt-12 w-full flex flex-col items-center z-10 px-4 md:px-10 lg:px-4 xl:px-6"
+          className="mt-auto md:mt-16 w-full flex flex-col items-center z-10"
         >
-          {/* Labels Row */}
+          {/* Labels Row (hidden on mobile) */}
           <div
             ref={labelsRowRef}
-            className="w-full flex items-end justify-between mb-2"
+            className="hidden md:grid w-full md:grid-cols-12 items-end mb-2"
           >
-            <div className="overflow-hidden" style={{ width: "36%" }}>
+            <div className="overflow-hidden md:col-start-1 md:col-span-4">
               <p className="text-left font-aeonik uppercase font-medium tracking-widest text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
                 A
               </p>
             </div>
-            <div style={{ width: "9.4%" }} />
-            <div className="flex justify-between" style={{ width: "49.6%" }}>
+            <div className="md:col-start-7 md:col-span-6 flex items-end justify-between">
               <div className="overflow-hidden">
                 <p className="font-aeonik uppercase tracking-widest text-base font-medium md:text-xl lg:text-2xl text-[#1c1d1e]">
                   Seriously
@@ -307,23 +472,40 @@ const Hero: React.FC = () => {
           </div>
 
           {/* Icons Row */}
-          <div className="w-full overflow-hidden">
+          <div className="w-full overflow-visible">
             <div
               ref={iconsRowRef}
-              className="w-full flex items-end justify-between overflow-visible"
+              className="w-full flex flex-col md:grid md:grid-cols-12 md:relative items-start md:items-end justify-start gap-4 md:gap-0 overflow-visible"
             >
-              <div className="flex justify-start" style={{ width: "36%" }}>
-                <img
-                  src={DesignIcon}
-                  alt="Design"
-                  className="w-full h-auto block object-contain"
-                  style={{ aspectRatio: "500/131" }}
-                />
+              <div
+                ref={designTextWrapRef}
+                className="w-full md:min-w-0 md:col-start-1 md:col-span-5 flex items-end justify-start overflow-visible"
+              >
+                <span
+                  ref={designTextRef}
+                  className="block w-max -mx-[0.06em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
+                >
+                  Design
+                </span>
+
+                <span className="md:hidden ml-1 flex items-end">
+                  <div
+                    ref={mobilePortraitRef}
+                    className="rounded-full bg-[#f1efed] overflow-hidden"
+                    style={{ width: "0px", height: "0px" }}
+                  >
+                    <img
+                      src="/images/portræt.png"
+                      alt="Portrait"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </span>
               </div>
 
-              <div
-                className="flex justify-center items-end"
-                style={{ width: "9.4%" }}
+              <span
+                ref={portraitWrapRef}
+                className="hidden md:flex absolute bottom-0 -translate-x-1/2 justify-center items-end"
               >
                 <div
                   ref={portraitRef}
@@ -336,15 +518,18 @@ const Hero: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-              </div>
+              </span>
 
-              <div className="flex justify-end" style={{ width: "49.6%" }}>
-                <img
-                  src={EngineerIcon}
-                  alt="Engineer"
-                  className="w-full h-auto block object-contain"
-                  style={{ aspectRatio: "689/131" }}
-                />
+              <div
+                ref={engineerTextWrapRef}
+                className="w-full md:min-w-0 md:col-start-7 md:col-span-6 flex justify-start overflow-visible"
+              >
+                <span
+                  ref={engineerTextRef}
+                  className="block w-max -mx-[0.06em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
+                >
+                  Engineer
+                </span>
               </div>
             </div>
           </div>

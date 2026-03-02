@@ -190,7 +190,7 @@ const TechStack: React.FC = () => {
       <div className="mb-16 md:mb-24">
         <h2
           ref={headingRef}
-          className="text-7xl md:text-7xl lg:text-8xl xl:text-[10rem] font-bold uppercase tracking-tight text-[#1c1d1e] leading-[0.8] mb-12"
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[10rem] font-bold uppercase tracking-tight text-[#1c1d1e] leading-[0.8] mb-12"
         >
           <span className="inline-block whitespace-nowrap">
             {headingData[0].map((item, i) => (

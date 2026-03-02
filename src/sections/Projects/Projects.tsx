@@ -140,11 +140,11 @@ const Projects: React.FC = () => {
     <section className="w-full" ref={containerRef}>
       <div id="projects" className="w-full px-4 md:px-10 lg:px-4 xl:px-6">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-8 md:mb-8 overflow-hidden sm-flex">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-12 mb-8 md:mb-8 overflow-hidden sm-flex">
           <div className="overflow-hidden flex-shrink-0">
             <h2
               ref={headingRef}
-              className="project-header-text  text-7xl md:text-7xl lg:text-8xl xl:text-[10rem] w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
+              className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[10rem] w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
             >
               Work
             </h2>
