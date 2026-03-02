@@ -409,7 +409,6 @@ const Hero: React.FC = () => {
             engineerHeading.style.width = "";
           }
           isSplitAnimatingRef.current = false;
-          fitHeroWords();
         });
       };
 
@@ -564,7 +563,7 @@ const Hero: React.FC = () => {
                 <span className="md:hidden ml-1 flex items-end">
                   <div
                     ref={mobilePortraitRef}
-                    className="rounded-full bg-[#f1efed] overflow-hidden"
+                    className="rounded-full bg-[#1c1d1e] overflow-hidden"
                     style={{ width: "0px", height: "0px" }}
                   >
                     <img
@@ -582,7 +581,7 @@ const Hero: React.FC = () => {
               >
                 <div
                   ref={portraitRef}
-                  className="rounded-full bg-[#f1efed] mb-[1.8%] overflow-hidden"
+                  className="rounded-full bg-[#1c1d1e] mb-[1.8%] overflow-hidden"
                   style={{ width: "100%", aspectRatio: "1/1" }}
                 >
                   <img
