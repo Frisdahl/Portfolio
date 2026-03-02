@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
@@ -8,96 +8,50 @@ gsap.registerPlugin(ScrollTrigger);
 const Manifesto: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const splitRef = useRef<SplitType | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!headingRef.current || !sectionRef.current) return;
 
-    let hasInitialized = false;
-    let removeResizeListener: (() => void) | null = null;
-    let breakpointKey = "";
+    const split = new SplitType(headingRef.current, {
+      types: "lines",
+      lineClass: "manifesto-line",
+    });
 
-    const getBreakpointKey = () => {
-      const width = window.innerWidth;
-      if (width >= 1280) return "xl";
-      if (width >= 1024) return "lg";
-      if (width >= 768) return "md";
-      return "sm";
-    };
+    if (!split.lines?.length) {
+      return () => {
+        split.revert();
+      };
+    }
 
-    const runSplit = () => {
-      if (splitRef.current) splitRef.current.revert();
+    split.lines.forEach((line) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "manifesto-line-wrapper";
+      wrapper.style.overflow = "hidden";
+      line.parentNode?.insertBefore(wrapper, line);
+      wrapper.appendChild(line);
+    });
 
-      // Create new split for lines
-      splitRef.current = new SplitType(headingRef.current!, {
-        types: "lines",
-        lineClass: "manifesto-line",
-      });
-
-      // Wrap each line in an overflow-hidden container for the reveal
-      splitRef.current.lines?.forEach((line) => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "manifesto-line-wrapper";
-        wrapper.style.overflow = "hidden";
-        line.parentNode?.insertBefore(wrapper, line);
-        wrapper.appendChild(line);
-      });
-
-      // Entrance Reveal
-      gsap.fromTo(
-        splitRef.current.lines,
-        { yPercent: 100 },
-        {
-          yPercent: 0,
-          duration: 1.2,
-          stagger: 0.1,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: "top 85%",
-            once: true,
-          },
+    const tween = gsap.fromTo(
+      split.lines,
+      { yPercent: 100 },
+      {
+        yPercent: 0,
+        duration: 1.2,
+        stagger: 0.2,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: headingRef.current,
+          toggleActions: "play none none none",
+          start: "top 60%",
         },
-      );
-    };
-
-    const initAnimations = () => {
-      if (hasInitialized) return;
-      hasInitialized = true;
-      breakpointKey = getBreakpointKey();
-
-      runSplit();
-
-      const handleResize = () => {
-        const nextKey = getBreakpointKey();
-        if (nextKey === breakpointKey) return;
-        breakpointKey = nextKey;
-        runSplit();
-      };
-      window.addEventListener("resize", handleResize);
-      removeResizeListener = () => {
-        window.removeEventListener("resize", handleResize);
-      };
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          initAnimations();
-          observer.disconnect();
-        }
       },
-      { rootMargin: "250px 0px" },
     );
 
-    observer.observe(sectionRef.current);
-
     return () => {
-      observer.disconnect();
-      removeResizeListener?.();
-      if (splitRef.current) splitRef.current.revert();
+      tween.kill();
+      split.revert();
     };
-  }, []);
+  });
 
   return (
     <section

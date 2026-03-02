@@ -13,6 +13,10 @@ const Hero: React.FC = () => {
   const videoContentRef = useRef<HTMLDivElement>(null);
   const videoWrapperRef = useRef<HTMLDivElement>(null);
   const textWrapperRef = useRef<HTMLDivElement>(null);
+  const labelsRowRef = useRef<HTMLDivElement>(null);
+  const iconsRowRef = useRef<HTMLDivElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
+  const entrancePlayedRef = useRef(false);
 
   // 1. Scroll expansion animation
   useLayoutEffect(() => {
@@ -23,6 +27,25 @@ const Hero: React.FC = () => {
       const initScrollAnimation = () => {
         if (ScrollTrigger.getById("heroScroll")) return;
 
+        const getVideoTravelY = () => {
+          const viewportH = window.innerHeight;
+          const textHeight = textWrapperRef.current?.offsetHeight ?? 0;
+          return viewportH + textHeight * 0.35;
+        };
+
+        const getContainerFollowY = () => {
+          if (!videoWrapperRef.current || !videoMaskRef.current) return 0;
+
+          const viewportH = window.innerHeight;
+          const videoH = videoMaskRef.current.offsetHeight;
+          const finalScale = viewportH / videoH;
+          const wrapperRect = videoWrapperRef.current.getBoundingClientRect();
+          const finalCenterOffset =
+            viewportH / 2 - (wrapperRect.top + (videoH * finalScale) / 2);
+
+          return -(getVideoTravelY() - finalCenterOffset);
+        };
+
         const tl = gsap.timeline({
           scrollTrigger: {
             id: "heroScroll",
@@ -32,6 +55,7 @@ const Hero: React.FC = () => {
             scrub: true,
             pin: containerRef.current,
             pinSpacing: true,
+            anticipatePin: 1,
             invalidateOnRefresh: true,
           },
         });
@@ -42,64 +66,102 @@ const Hero: React.FC = () => {
           { scale: 1, borderRadius: "0.5rem" },
           {
             scale: () => {
-              const containerW = videoWrapperRef.current!.clientWidth;
               const viewportH = window.innerHeight;
-              const videoW = videoMaskRef.current!.offsetWidth;
               const videoH = videoMaskRef.current!.offsetHeight;
 
-              const rect = videoMaskRef.current!.getBoundingClientRect();
-              const availableH = viewportH - rect.top - 64;
-
-              const scaleToWidth = containerW / videoW;
-              const scaleToHeight = availableH / videoH;
-
-              return Math.min(scaleToWidth, scaleToHeight);
+              return viewportH / videoH;
             },
             borderRadius: "2rem",
             ease: "none",
             immediateRender: false,
           },
           0,
-        ).fromTo(
-          textWrapperRef.current,
-          { autoAlpha: 1, y: 0 },
-          {
-            y: 100,
-            autoAlpha: 0,
-            duration: 0.4,
-            ease: "power2.out",
-            immediateRender: false,
-          },
-          0,
-        );
+        )
+          .to(
+            videoWrapperRef.current,
+            {
+              y: getVideoTravelY,
+              ease: "none",
+              immediateRender: false,
+            },
+            0,
+          )
+          .to(
+            containerRef.current,
+            {
+              y: getContainerFollowY,
+              ease: "none",
+              immediateRender: false,
+            },
+            0,
+          );
       };
 
       const playHeroEntrance = () => {
+        if (entrancePlayedRef.current) return;
         if (gsap.isTweening(textWrapperRef.current)) return;
+        entrancePlayedRef.current = true;
 
-        const tl = gsap.timeline({
-          onComplete: () => {
-            initScrollAnimation();
-            ScrollTrigger.refresh();
-          },
-        });
+        const tl = gsap.timeline();
+        const labelParagraphs = labelsRowRef.current
+          ? gsap.utils.toArray<HTMLParagraphElement>("p", labelsRowRef.current)
+          : [];
 
-        tl.to(textWrapperRef.current, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 1,
-          ease: "power3.out",
-          delay: 0.2,
-        }).to(
+        tl.fromTo(
           videoContentRef.current,
+          {
+            autoAlpha: 0,
+            yPercent: -100,
+          },
           {
             autoAlpha: 1,
             yPercent: 0,
-            duration: 1.4,
-            ease: "expo.out",
+            duration: 0.7,
+            ease: "ease.out",
           },
-          "-=0.6",
-        );
+        )
+          .fromTo(
+            labelParagraphs,
+            {
+              autoAlpha: 0,
+              yPercent: -100,
+            },
+            {
+              yPercent: 0,
+              autoAlpha: 1,
+              duration: 0.45,
+              stagger: 0.06,
+              ease: "power3.out",
+            },
+            "-=0.2",
+          )
+          .fromTo(
+            iconsRowRef.current,
+            {
+              autoAlpha: 0,
+              yPercent: 100,
+            },
+            {
+              yPercent: 0,
+              autoAlpha: 1,
+              duration: 0.4,
+              ease: "power3.out",
+            },
+            "-=0.1",
+          )
+          .fromTo(
+            portraitRef.current,
+            {
+              scale: 0,
+              transformOrigin: "center center",
+            },
+            {
+              scale: 1,
+              duration: 0.3,
+              ease: "ease.out",
+            },
+            "-=0.05",
+          );
       };
 
       // Entrance Triggers
@@ -107,14 +169,25 @@ const Hero: React.FC = () => {
       window.addEventListener("header-entrance-complete", handleHeaderComplete);
 
       // Initial States
-      gsap.set(textWrapperRef.current, { autoAlpha: 0, y: 20 });
+      const labelParagraphs = labelsRowRef.current
+        ? gsap.utils.toArray<HTMLParagraphElement>("p", labelsRowRef.current)
+        : [];
+
+      gsap.set(textWrapperRef.current, { autoAlpha: 1, yPercent: 0 });
+      gsap.set(containerRef.current, { y: 0 });
+      gsap.set(videoWrapperRef.current, { y: 0 });
+      gsap.set(labelParagraphs, { autoAlpha: 0, yPercent: -100 });
+      gsap.set(iconsRowRef.current, { autoAlpha: 0, yPercent: 100 });
       gsap.set(videoContentRef.current, { autoAlpha: 0, yPercent: -100 });
+
+      // Create scroll trigger immediately so pin layout is stable even if user scrolls early
+      initScrollAnimation();
 
       // Fallback
       const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
       const safetyTimeout = setTimeout(
         () => {
-          if (gsap.getProperty(textWrapperRef.current, "opacity") === 0) {
+          if (!entrancePlayedRef.current) {
             playHeroEntrance();
           }
         },
@@ -140,7 +213,7 @@ const Hero: React.FC = () => {
     >
       <div
         ref={containerRef}
-        className="w-full h-screen flex flex-col items-center justify-start pt-24 md:pt-32 lg:pt-40 overflow-hidden bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
+        className="w-full h-screen flex flex-col items-center justify-start pt-24 md:pt-32 lg:pt-40 overflow-visible bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
       >
         {/* Video Section */}
         <div
@@ -182,57 +255,70 @@ const Hero: React.FC = () => {
           className="mt-8 md:mt-12 w-full flex flex-col items-center z-10 px-4 md:px-10 lg:px-4 xl:px-6"
         >
           {/* Labels Row */}
-          <div className="w-full flex items-end justify-between mb-2">
-            <div style={{ width: "36%" }}>
-              <p className="text-left font-aeonik uppercase tracking-widest text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
+          <div
+            ref={labelsRowRef}
+            className="w-full flex items-end justify-between mb-2"
+          >
+            <div className="overflow-hidden" style={{ width: "36%" }}>
+              <p className="text-left font-aeonik uppercase font-medium tracking-widest text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
                 A
               </p>
             </div>
             <div style={{ width: "9.4%" }} />
             <div className="flex justify-between" style={{ width: "49.6%" }}>
-              <p className="font-aeonik uppercase tracking-widest text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
-                Seriously
-              </p>
-              <p className="font-aeonik uppercase tracking-widest text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
-                Good
-              </p>
+              <div className="overflow-hidden">
+                <p className="font-aeonik uppercase tracking-widest text-base font-medium md:text-xl lg:text-2xl text-[#1c1d1e]">
+                  Seriously
+                </p>
+              </div>
+              <div className="overflow-hidden">
+                <p className="font-aeonik uppercase tracking-widest font-medium text-base md:text-xl lg:text-2xl text-[#1c1d1e]">
+                  Good
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Icons Row */}
-          <div className="w-full flex items-end justify-between overflow-visible">
-            <div className="flex justify-start" style={{ width: "36%" }}>
-              <img
-                src={DesignIcon}
-                alt="Design"
-                className="w-full h-auto block object-contain"
-                style={{ aspectRatio: "500/131" }}
-              />
-            </div>
-
+          <div className="w-full overflow-hidden">
             <div
-              className="flex justify-center items-end"
-              style={{ width: "9.4%" }}
+              ref={iconsRowRef}
+              className="w-full flex items-end justify-between overflow-visible"
             >
-              <div
-                className="rounded-full bg-[#f1efed] mb-[1.8%] overflow-hidden"
-                style={{ width: "100%", aspectRatio: "1/1" }}
-              >
+              <div className="flex justify-start" style={{ width: "36%" }}>
                 <img
-                  src="/images/portræt.png"
-                  alt="Portrait"
-                  className="w-full h-full object-cover"
+                  src={DesignIcon}
+                  alt="Design"
+                  className="w-full h-auto block object-contain"
+                  style={{ aspectRatio: "500/131" }}
                 />
               </div>
-            </div>
 
-            <div className="flex justify-end" style={{ width: "49.6%" }}>
-              <img
-                src={EngineerIcon}
-                alt="Engineer"
-                className="w-full h-auto block object-contain"
-                style={{ aspectRatio: "689/131" }}
-              />
+              <div
+                className="flex justify-center items-end"
+                style={{ width: "9.4%" }}
+              >
+                <div
+                  ref={portraitRef}
+                  className="rounded-full bg-[#f1efed] mb-[1.8%] overflow-hidden"
+                  style={{ width: "100%", aspectRatio: "1/1" }}
+                >
+                  <img
+                    src="/images/portræt.png"
+                    alt="Portrait"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end" style={{ width: "49.6%" }}>
+                <img
+                  src={EngineerIcon}
+                  alt="Engineer"
+                  className="w-full h-auto block object-contain"
+                  style={{ aspectRatio: "689/131" }}
+                />
+              </div>
             </div>
           </div>
         </div>

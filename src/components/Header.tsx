@@ -92,31 +92,35 @@ const Header: React.FC = () => {
       // Show the main container but the text is hidden by yPercent + overflow
       gsap.set(nameRef.current, { autoAlpha: 1 });
 
-      const tl = gsap.timeline({ 
+      const tl = gsap.timeline({
         paused: true,
-        defaults: { ease: "none" } // Force all children to be linear by default
+        defaults: { ease: "power2.out" },
       });
 
-      tl.to(lines, {
-        yPercent: 0,
-        duration: 1,
-        stagger: 0.1,
-        ease: "power4.out",
-        delay: 0.2,
-      }, 0).to(
+      tl.to(
+        lines,
+        {
+          yPercent: 0,
+          duration: 0.65,
+          stagger: 0.06,
+          ease: "power4.out",
+          delay: 0.05,
+        },
+        0,
+      ).to(
         [talkButtonRef.current, menuButtonRef.current],
         {
           autoAlpha: 1,
           y: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "none", // Strict linear fashion
+          duration: 0.5,
+          stagger: 0.06,
+          ease: "power2.out",
           onComplete: () => {
             // Dispatch event when header is fully animated
             window.dispatchEvent(new CustomEvent("header-entrance-complete"));
-          }
+          },
         },
-        0 
+        0.05,
       );
 
       entranceTimelineRef.current = tl;

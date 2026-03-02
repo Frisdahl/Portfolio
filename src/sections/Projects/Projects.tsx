@@ -1,37 +1,9 @@
 import React, { useLayoutEffect, useRef } from "react";
 import ProjectItem from "./ProjectItem";
 import { initGridAnimations } from "./Projects.anim";
-import { gsap } from "gsap";
-
-const workHeadingData = [
-  { char: "W", order: 1 },
-  { char: "o", order: -1 },
-  { char: "r", order: 2 },
-  { char: "k", order: 3 },
-];
-
-const AnimatedLetter = ({ char, order }: { char: string; order: number }) => {
-  if (order < 0) {
-    return <span className="inline-block">{char}</span>;
-  }
-  return (
-    <span className="relative inline-block overflow-hidden align-bottom h-[1em]">
-      <span
-        className="project-letter-inner block relative will-change-transform"
-        data-order={order}
-      >
-        <span
-          className="absolute bottom-full left-0 right-0 text-center pointer-events-none select-none opacity-0 transition-opacity duration-300"
-          style={{ opacity: "var(--letter-opacity, 0)" }}
-          aria-hidden="true"
-        >
-          {char}
-        </span>
-        <span className="block leading-none">{char}</span>
-      </span>
-    </span>
-  );
-};
+import gsap from "gsap";
+import SplitType from "split-type";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const projects = [
   {
@@ -94,47 +66,69 @@ const projects = [
 
 const Projects: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const workHeadingRef = useRef<HTMLHeadingElement>(null);
-
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const subText = useRef<HTMLParagraphElement>(null);
   useLayoutEffect(() => {
-    if (!containerRef.current) return;
+    if (!headingRef.current || !containerRef.current || !subText.current)
+      return;
     const ctx = initGridAnimations(containerRef.current);
 
-    // Scroll Animation for "Work" text
-    if (workHeadingRef.current) {
-      const animatedLetters = Array.from(
-        workHeadingRef.current.querySelectorAll(".project-letter-inner"),
-      ) as HTMLElement[];
+    gsap.registerPlugin(ScrollTrigger);
 
-      animatedLetters.sort((a, b) => {
-        return (
-          parseInt(a.dataset.order || "0") - parseInt(b.dataset.order || "0")
-        );
-      });
+    const subTextReveal = new SplitType(subText.current, {
+      types: "lines",
+      lineClass: "subtext-line",
+    });
 
-      gsap.to(animatedLetters, {
-        yPercent: 100,
-        stagger: 0.15,
-        ease: "none",
-        scrollTrigger: {
-          trigger: workHeadingRef.current,
-          start: "top 95%",
-          end: "bottom 30%",
-          scrub: 1.5,
-          onUpdate: (self) => {
-            // Set opacity based on progress so they don't show at the very top
-            const opacity = self.progress > 0.01 ? 1 : 0;
-            document.documentElement.style.setProperty(
-              "--letter-opacity",
-              opacity.toString(),
-            );
-          },
-        },
-      });
+    if (!subTextReveal.lines?.length) {
+      return () => {
+        subTextReveal.revert();
+        ctx.revert();
+      };
     }
 
-    return () => ctx.revert();
-  }, []);
+    subTextReveal.lines.forEach((line) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "overflow-hidden";
+      line.parentNode?.insertBefore(wrapper, line);
+      wrapper.appendChild(line);
+    });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: headingRef.current,
+        start: "top 80%",
+        end: "bottom 60%",
+        toggleActions: "play none none none",
+        markers: false,
+      },
+    });
+
+    tl.fromTo(
+      headingRef.current,
+      { yPercent: 100 },
+      {
+        yPercent: 0,
+        ease: "power4.out",
+        duration: 1.2,
+      },
+    ).fromTo(
+      subTextReveal.lines,
+      { yPercent: 100 },
+      {
+        yPercent: 0,
+        ease: "power4.out",
+        duration: 1.2,
+        stagger: 0.1,
+      },
+      "-=1",
+    );
+
+    return () => {
+      tl.kill();
+      ctx.revert();
+    };
+  });
 
   // Helper to chunk projects into rows of 2
   const projectRows = [];
@@ -149,16 +143,17 @@ const Projects: React.FC = () => {
         <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-8 md:mb-8 overflow-hidden sm-flex">
           <div className="overflow-hidden flex-shrink-0">
             <h2
-              ref={workHeadingRef}
-              className="project-header-text text-7xl md:text-7xl lg:text-8xl xl:text-[10rem] w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
+              ref={headingRef}
+              className="project-header-text  text-7xl md:text-7xl lg:text-8xl xl:text-[10rem] w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
             >
-              {workHeadingData.map((item, i) => (
-                <AnimatedLetter key={i} char={item.char} order={item.order} />
-              ))}
+              Work
             </h2>
           </div>
           <div className="max-w-sm text-left overflow-hidden">
-            <p className="project-header-subtext uppercase font-aeonik text-lg md:text-md font-medium text-[#1c1d1e] leading-tight">
+            <p
+              ref={subText}
+              className="project-header-subtext uppercase font-aeonik text-lg md:text-md font-medium text-[#1c1d1e] leading-tight"
+            >
               a selection of my most passionately crafted works with
               forward-thinking clients and friends over the years.
             </p>
