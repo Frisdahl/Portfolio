@@ -340,7 +340,7 @@ const Header: React.FC = () => {
                   ? "bg-[#fefeff]"
                   : isPastHero
                     ? "bg-white/30 backdrop-blur-2xl"
-                    : "bg-[#ececec]"
+                    : "bg-[#f1efed]"
               }`}
             >
               <div className="relative h-10 sm:h-12 flex-grow overflow-hidden pointer-events-none">
