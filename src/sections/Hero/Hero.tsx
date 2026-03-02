@@ -38,12 +38,16 @@ const Hero: React.FC = () => {
 
           const viewportH = window.innerHeight;
           const videoH = videoMaskRef.current.offsetHeight;
-          const finalScale = viewportH / videoH;
+          const travelY = getVideoTravelY();
+          const finalScale = (viewportH * 0.8) / videoH;
           const wrapperRect = videoWrapperRef.current.getBoundingClientRect();
           const finalCenterOffset =
             viewportH / 2 - (wrapperRect.top + (videoH * finalScale) / 2);
 
-          return -(getVideoTravelY() - finalCenterOffset);
+          const followY = -(travelY - finalCenterOffset);
+
+          // Prevent overshoot at the end of scrub that can push video out of view
+          return gsap.utils.clamp(-travelY, 0, followY);
         };
 
         const tl = gsap.timeline({
@@ -69,7 +73,7 @@ const Hero: React.FC = () => {
               const viewportH = window.innerHeight;
               const videoH = videoMaskRef.current!.offsetHeight;
 
-              return viewportH / videoH;
+              return (viewportH * 0.8) / videoH;
             },
             borderRadius: "2rem",
             ease: "none",
@@ -160,7 +164,7 @@ const Hero: React.FC = () => {
               duration: 0.3,
               ease: "ease.out",
             },
-            "-=0.05",
+            "-=0.01",
           );
       };
 
