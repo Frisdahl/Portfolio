@@ -10,7 +10,6 @@ import Header from "./Header";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import lenis from "../utils/lenis";
-import InitialLoader from "./InitialLoader";
 
 const Footer = lazy(() => import("./Footer"));
 

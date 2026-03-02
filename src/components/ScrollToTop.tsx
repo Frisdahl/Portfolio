@@ -7,12 +7,18 @@ export default function ScrollToTop() {
 
   useLayoutEffect(() => {
     const hasPendingSectionTarget = !!sessionStorage.getItem("targetSection");
-    const isPendingHomeNav = sessionStorage.getItem("isHomeNav") === "true";
     const hasHash = Boolean(window.location.hash);
+    const isHomePath = pathname === "/";
+    const shouldPreserveSectionScroll =
+      hasHash || (isHomePath && hasPendingSectionTarget);
 
-    if (hasPendingSectionTarget || isPendingHomeNav || hasHash) {
+    if (shouldPreserveSectionScroll) {
       return;
     }
+
+    // Clear stale intent flags so future navigations reset correctly
+    sessionStorage.removeItem("targetSection");
+    sessionStorage.removeItem("isHomeNav");
 
     if (lenis) {
       lenis.scrollTo(0, { immediate: true });

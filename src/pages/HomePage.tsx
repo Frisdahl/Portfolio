@@ -79,6 +79,7 @@ function HomePage() {
       if (element) {
         setTimeout(() => {
           element.scrollIntoView({ behavior: "smooth" });
+          sessionStorage.removeItem("targetSection");
         }, 100);
       }
     }

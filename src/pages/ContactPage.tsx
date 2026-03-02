@@ -1,16 +1,21 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplitType from "split-type";
 import AnimatedButton from "../components/AnimatedButton";
 import ValueBtn from "../components/valueBtn";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const ContactPage: React.FC = () => {
+  const CONTACT_FORM_STORAGE_KEY = "contactFormData";
+  const CONTACT_BUDGET_STORAGE_KEY = "contactBudget";
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const headingLineOneRef = useRef<HTMLSpanElement>(null);
+  const headingLineTwoRef = useRef<HTMLSpanElement>(null);
+  const circleRef = useRef<HTMLSpanElement>(null);
+  const shakaIconRef = useRef<HTMLSpanElement>(null);
+  const shakaShakeTweenRef = useRef<gsap.core.Tween | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const animationTriggeredRef = useRef(false);
 
@@ -22,49 +27,103 @@ const ContactPage: React.FC = () => {
     inquiry: "",
   });
 
+  useEffect(() => {
+    const storedFormData = localStorage.getItem(CONTACT_FORM_STORAGE_KEY);
+    const storedBudget = localStorage.getItem(CONTACT_BUDGET_STORAGE_KEY);
+
+    if (storedFormData) {
+      try {
+        const parsed = JSON.parse(storedFormData) as {
+          name?: string;
+          email?: string;
+          company?: string;
+          phone?: string;
+          inquiry?: string;
+        };
+
+        setFormData({
+          name: parsed.name ?? "",
+          email: parsed.email ?? "",
+          company: parsed.company ?? "",
+          phone: parsed.phone ?? "",
+          inquiry: parsed.inquiry ?? "",
+        });
+      } catch {
+        localStorage.removeItem(CONTACT_FORM_STORAGE_KEY);
+      }
+    }
+
+    if (storedBudget) {
+      setSelectedBudget(storedBudget);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(CONTACT_FORM_STORAGE_KEY, JSON.stringify(formData));
+
+    if (selectedBudget) {
+      localStorage.setItem(CONTACT_BUDGET_STORAGE_KEY, selectedBudget);
+      return;
+    }
+
+    localStorage.removeItem(CONTACT_BUDGET_STORAGE_KEY);
+  }, [formData, selectedBudget]);
+
   useLayoutEffect(() => {
     if (!containerRef.current) return;
 
-    // Initial state: Hidden
-    gsap.set([headingRef.current], {
+    gsap.set([headingLineOneRef.current, headingLineTwoRef.current], {
       autoAlpha: 0,
+      yPercent: 120,
+    });
+    gsap.set(circleRef.current, {
+      scale: 0,
+      transformOrigin: "center center",
     });
 
     const ctx = gsap.context(() => {
-      // 1. Create the entrance timeline (initially paused)
+      const shakeTween = gsap.to(shakaIconRef.current, {
+        keyframes: [
+          { rotation: -14, duration: 0.08 },
+          { rotation: 14, duration: 0.08 },
+          { rotation: -10, duration: 0.07 },
+          { rotation: 10, duration: 0.07 },
+          { rotation: 0, duration: 0.1 },
+        ],
+        transformOrigin: "50% 60%",
+        repeat: -1,
+        repeatDelay: 3.6,
+        paused: true,
+      });
+      shakaShakeTweenRef.current = shakeTween;
+
       const entranceTl = gsap.timeline({
         paused: true,
-        delay: 0.4,
         onStart: () => {
           animationTriggeredRef.current = true;
-          // Ensure heading is visible when animation starts
-          gsap.set([headingRef.current], {
-            autoAlpha: 1,
-          });
         },
       });
 
-      // Heading staggered text reveal
-      if (headingRef.current) {
-        const split = new SplitType(headingRef.current, {
-          types: "lines,words",
+      entranceTl
+        .to([headingLineOneRef.current, headingLineTwoRef.current], {
+          autoAlpha: 1,
+          yPercent: 0,
+          duration: 0.9,
+          stagger: 0.08,
+          ease: "power4.out",
+        })
+        .to(
+          circleRef.current,
+          {
+            scale: 1,
+            duration: 0.35,
+            ease: "back.out(1.7)",
+          },
+          "+=0.05",
+        )
+        .call(() => {
+          shakeTween.play();
         });
-        gsap.set(split.lines, { overflow: "hidden" });
-        entranceTl.fromTo(
-          split.words,
-          {
-            yPercent: 100,
-            opacity: 0,
-          },
-          {
-            opacity: 1,
-            yPercent: 0,
-            duration: 1.2,
-            stagger: 0.05,
-            ease: "power4.out",
-          },
-        );
-      }
 
       const startEntranceAnimation = () => {
         if (animationTriggeredRef.current) return;
@@ -86,15 +145,21 @@ const ContactPage: React.FC = () => {
       const isInitialLoaderDone =
         sessionStorage.getItem("hasSeenInitialLoader") === "true";
       const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
-      const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
-      if (!isNavigating && isInitialLoaderDone && !isLoaderActive) {
-        startEntranceAnimation();
+      if (
+        isInitialLoaderDone &&
+        !isLoaderActive &&
+        !animationTriggeredRef.current
+      ) {
+        requestAnimationFrame(() => startEntranceAnimation());
       }
 
-      const safetyTimeout = setTimeout(() => {
-        if (!animationTriggeredRef.current) startEntranceAnimation();
-      }, 1500);
+      const safetyTimeout = setTimeout(
+        () => {
+          if (!animationTriggeredRef.current) startEntranceAnimation();
+        },
+        isLoaderActive ? 8000 : 250,
+      );
 
       return () => {
         window.removeEventListener(
@@ -107,6 +172,8 @@ const ContactPage: React.FC = () => {
         );
         clearTimeout(safetyTimeout);
         entranceTl.kill();
+        shakeTween.kill();
+        shakaShakeTweenRef.current = null;
       };
     }, containerRef);
 
@@ -181,12 +248,34 @@ const ContactPage: React.FC = () => {
       className="relative w-full min-h-screen pt-48 bg-[var(--background)] flex flex-col"
     >
       <div className="w-full px-6 md:px-10 lg:px-12 xl:px-48 flex flex-col items-start text-left flex-grow">
-        <h2
-          ref={headingRef}
-          className="project-header-text text-7xl md:text-7xl lg:text-8xl w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-[1.15] tracking-tight whitespace-nowrap pb-16"
-        >
-          Let’s Work <br />
-          Together
+        <h2 className="project-header-text text-7xl md:text-7xl lg:text-8xl w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-[1.15] tracking-tight whitespace-nowrap pb-16">
+          <span className="block overflow-hidden">
+            <span ref={headingLineOneRef} className="inline-block">
+              Let’s Work
+            </span>
+          </span>
+          <span className="inline-flex items-end">
+            <span className="inline-block overflow-hidden">
+              <span ref={headingLineTwoRef} className="inline-block">
+                Together
+              </span>
+            </span>
+            <span className="inline-flex items-center align-bottom ml-6 md:ml-8 lg:ml-10">
+              <span
+                ref={circleRef}
+                onMouseEnter={() => shakaShakeTweenRef.current?.restart(true)}
+                className="relative inline-flex h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 items-center justify-center rounded-full bg-[#1c1d1e] text-3xl md:text-4xl lg:text-5xl leading-none align-middle"
+                aria-label="shaka hand"
+              >
+                <span
+                  ref={shakaIconRef}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 leading-none"
+                >
+                  🤙🏼
+                </span>
+              </span>
+            </span>
+          </span>
         </h2>
 
         <form
@@ -285,7 +374,7 @@ const ContactPage: React.FC = () => {
                 baseBgColor="bg-[#1c1d1e]"
                 baseTextColor="text-[#ffffff]"
                 hoverTextColor="group-hover/btn:text-[#1c1d1e]"
-                hoverBgColor="bg-[#ffffff]"
+                hoverBgColor="bg-[#f4f4f5]"
                 hoverBorderColor="border-[#1c1d1e]"
                 fontSize="text-xl"
               />

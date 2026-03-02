@@ -17,7 +17,7 @@ const services: ServiceItem[] = [
     name: "Digital Strategy",
     smallTitle: "Clear direction blueprint",
     description:
-      "We define the digital path for your brand, ensuring every interaction serves a purpose. From market analysis to brand positioning, we build the foundation for your digital growth.",
+      "I define a clear digital direction before anything is designed or built. Through research and positioning, I create purposeful foundations that support long-term growth.",
     image: "/images/serviceImages/Digital-strategy.webp",
     tags: [
       "Research & Insights",
@@ -33,7 +33,7 @@ const services: ServiceItem[] = [
     name: "UX/UI Design",
     smallTitle: "Design with intent",
     description:
-      "Designing with clarity and creative ambition. We create immersive interfaces that balance aesthetic beauty with functional simplicity, making digital navigation a seamless experience.",
+      "I craft immersive interfaces with both aesthetics and usability in mind. Every detail is designed to feel intuitive, responsive, and effortless to navigate.",
     image: "/images/serviceImages/Ui-design.webp",
     tags: [
       "Identity Design",
@@ -49,7 +49,7 @@ const services: ServiceItem[] = [
     name: "Web Development",
     smallTitle: "Code that holds up over time",
     description:
-      "Turning designs into high-end digital experiences. We focus on performance, clean code, and interactive excellence to bring your vision to life on the modern web.",
+      "I bring designs to life through performance-focused, detail-driven code. Combining clean structure with interactive precision to create high-end web experiences.",
     image: "/images/serviceImages/Development.webp",
     tags: [
       "Frontend Development",
