@@ -95,6 +95,9 @@ const Header: React.FC = () => {
       const tl = gsap.timeline({
         paused: true,
         defaults: { ease: "power2.out" },
+        onComplete: () => {
+          window.dispatchEvent(new CustomEvent("header-entrance-complete"));
+        },
       });
 
       tl.to(
@@ -104,7 +107,6 @@ const Header: React.FC = () => {
           duration: 0.65,
           stagger: 0.06,
           ease: "power4.out",
-          delay: 0.05,
         },
         0,
       ).to(
@@ -115,20 +117,22 @@ const Header: React.FC = () => {
           duration: 0.5,
           stagger: 0.06,
           ease: "power2.out",
-          onComplete: () => {
-            // Dispatch event when header is fully animated
-            window.dispatchEvent(new CustomEvent("header-entrance-complete"));
-          },
         },
-        0.05,
+        0,
       );
 
       entranceTimelineRef.current = tl;
 
       const playEntrance = () => {
-        if (entranceTimelineRef.current?.progress() === 0) {
-          entranceTimelineRef.current.play();
+        const entranceTimeline = entranceTimelineRef.current;
+        if (!entranceTimeline) return;
+
+        if (entranceTimeline.progress() === 0) {
+          entranceTimeline.play();
+          return;
         }
+
+        window.dispatchEvent(new CustomEvent("header-entrance-complete"));
       };
 
       window.addEventListener("initial-loader-complete", playEntrance);

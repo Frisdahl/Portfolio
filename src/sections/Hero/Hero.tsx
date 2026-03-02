@@ -187,15 +187,22 @@ const Hero: React.FC = () => {
       // Create scroll trigger immediately so pin layout is stable even if user scrolls early
       initScrollAnimation();
 
-      // Fallback
       const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
+      const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
+
+      // On page switches/home returns where loader isn't active, start immediately
+      if (!isLoaderActive && hasSeenLoader && !entrancePlayedRef.current) {
+        requestAnimationFrame(() => playHeroEntrance());
+      }
+
+      // Fallback
       const safetyTimeout = setTimeout(
         () => {
           if (!entrancePlayedRef.current) {
             playHeroEntrance();
           }
         },
-        isLoaderActive ? 8000 : 1500,
+        isLoaderActive ? 8000 : 250,
       );
 
       return () => {
