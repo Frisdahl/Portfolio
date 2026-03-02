@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const RESEND_FROM =
@@ -18,6 +20,25 @@ const MAX_LENGTHS = {
 } as const;
 
 const requestLogByIp = new Map<string, number[]>();
+const hasUpstashConfig =
+  Boolean(process.env.UPSTASH_REDIS_REST_URL) &&
+  Boolean(process.env.UPSTASH_REDIS_REST_TOKEN);
+
+const redis = hasUpstashConfig
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL as string,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN as string,
+    })
+  : null;
+
+const distributedRateLimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(RATE_LIMIT_MAX_REQUESTS, "10 m"),
+      prefix: "ratelimit:contact-form",
+      analytics: true,
+    })
+  : null;
 
 const escapeHtml = (value: string) =>
   value
@@ -108,7 +129,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const clientIp = getClientIp(req);
-  if (isRateLimited(clientIp)) {
+  if (distributedRateLimit) {
+    try {
+      const identifier = `contact:${clientIp}`;
+      const result = await distributedRateLimit.limit(identifier);
+
+      res.setHeader("X-RateLimit-Limit", String(result.limit));
+      res.setHeader("X-RateLimit-Remaining", String(result.remaining));
+      res.setHeader("X-RateLimit-Reset", String(result.reset));
+
+      if (!result.success) {
+        const retryAfterSeconds = Math.max(
+          1,
+          Math.ceil((result.reset - Date.now()) / 1000),
+        );
+        res.setHeader("Retry-After", String(retryAfterSeconds));
+
+        console.warn("[send-email] Distributed rate limit exceeded", {
+          clientIp,
+          retryAfterSeconds,
+        });
+        return res
+          .status(429)
+          .json({ error: "Too many requests, try again later" });
+      }
+    } catch (rateLimitError) {
+      console.error(
+        "[send-email] Upstash rate limiter failed, using fallback",
+        {
+          rateLimitError,
+        },
+      );
+      if (isRateLimited(clientIp)) {
+        console.warn("[send-email] Fallback rate limit exceeded", { clientIp });
+        return res
+          .status(429)
+          .json({ error: "Too many requests, try again later" });
+      }
+    }
+  } else if (isRateLimited(clientIp)) {
     console.warn("[send-email] Rate limit exceeded", { clientIp });
     return res
       .status(429)
