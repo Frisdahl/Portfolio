@@ -9,6 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 const ContactPage: React.FC = () => {
   const CONTACT_FORM_STORAGE_KEY = "contactFormData";
   const CONTACT_BUDGET_STORAGE_KEY = "contactBudget";
+  const SUBMIT_COOLDOWN_MS = 15000;
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const headingLineOneRef = useRef<HTMLSpanElement>(null);
@@ -17,6 +18,7 @@ const ContactPage: React.FC = () => {
   const shakaIconRef = useRef<HTMLSpanElement>(null);
   const shakaShakeTweenRef = useRef<gsap.core.Tween | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const formStartedAtRef = useRef<number>(Date.now());
   const animationTriggeredRef = useRef(false);
 
   const [formData, setFormData] = useState({
@@ -26,6 +28,7 @@ const ContactPage: React.FC = () => {
     phone: "",
     inquiry: "",
   });
+  const [website, setWebsite] = useState("");
 
   useEffect(() => {
     const storedFormData = localStorage.getItem(CONTACT_FORM_STORAGE_KEY);
@@ -186,6 +189,22 @@ const ContactPage: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
+  const [submitCooldownUntil, setSubmitCooldownUntil] = useState(0);
+  const [cooldownNow, setCooldownNow] = useState(Date.now());
+
+  const cooldownRemainingMs = Math.max(0, submitCooldownUntil - cooldownNow);
+  const cooldownRemainingSeconds = Math.ceil(cooldownRemainingMs / 1000);
+  const isSubmitBlockedByCooldown = cooldownRemainingMs > 0;
+
+  useEffect(() => {
+    if (!isSubmitBlockedByCooldown) return;
+
+    const intervalId = setInterval(() => {
+      setCooldownNow(Date.now());
+    }, 250);
+
+    return () => clearInterval(intervalId);
+  }, [isSubmitBlockedByCooldown]);
 
   // Auto-dismiss status toast after 5 seconds
   useLayoutEffect(() => {
@@ -205,6 +224,11 @@ const ContactPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitBlockedByCooldown) {
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
@@ -214,7 +238,12 @@ const ContactPage: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formData, budget: selectedBudget }),
+        body: JSON.stringify({
+          ...formData,
+          budget: selectedBudget,
+          website,
+          formStartedAt: formStartedAtRef.current,
+        }),
       });
 
       if (response.ok) {
@@ -226,13 +255,19 @@ const ContactPage: React.FC = () => {
           phone: "",
           inquiry: "",
         });
+        setWebsite("");
         setSelectedBudget(null);
+        formStartedAtRef.current = Date.now();
       } else {
         setSubmitStatus("error");
+        setSubmitCooldownUntil(Date.now() + SUBMIT_COOLDOWN_MS);
+        setCooldownNow(Date.now());
       }
     } catch (err) {
       console.error("Submission error:", err);
       setSubmitStatus("error");
+      setSubmitCooldownUntil(Date.now() + SUBMIT_COOLDOWN_MS);
+      setCooldownNow(Date.now());
     } finally {
       setIsSubmitting(false);
     }
@@ -283,6 +318,19 @@ const ContactPage: React.FC = () => {
           onSubmit={handleSubmit}
           className="w-full space-y-12"
         >
+          <div className="hidden" aria-hidden="true">
+            <label htmlFor="website">Website</label>
+            <input
+              id="website"
+              type="text"
+              name="website"
+              autoComplete="off"
+              tabIndex={-1}
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+            />
+          </div>
+
           <div className="form-field-row grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="w-full">
               <input
@@ -291,6 +339,8 @@ const ContactPage: React.FC = () => {
                 placeholder="Name"
                 value={formData.name}
                 onChange={handleChange}
+                required
+                maxLength={100}
                 className={inputClasses}
               />
             </div>
@@ -301,6 +351,8 @@ const ContactPage: React.FC = () => {
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
+                required
+                maxLength={254}
                 className={inputClasses}
               />
             </div>
@@ -314,6 +366,7 @@ const ContactPage: React.FC = () => {
                 placeholder="Company"
                 value={formData.company}
                 onChange={handleChange}
+                maxLength={120}
                 className={inputClasses}
               />
             </div>
@@ -324,6 +377,7 @@ const ContactPage: React.FC = () => {
                 placeholder="Phone"
                 value={formData.phone}
                 onChange={handleChange}
+                maxLength={50}
                 className={inputClasses}
               />
             </div>
@@ -336,6 +390,8 @@ const ContactPage: React.FC = () => {
               placeholder="Inquiry*"
               value={formData.inquiry}
               onChange={handleChange}
+              required
+              maxLength={3000}
               className={inputClasses}
             />
           </div>
@@ -366,9 +422,15 @@ const ContactPage: React.FC = () => {
 
             <div className="submit-area w-full md:w-auto">
               <AnimatedButton
-                text={isSubmitting ? "Sending..." : "Send request"}
+                text={
+                  isSubmitting
+                    ? "Sending..."
+                    : isSubmitBlockedByCooldown
+                      ? `Wait ${cooldownRemainingSeconds}s`
+                      : "Send request"
+                }
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isSubmitBlockedByCooldown}
                 padding="px-16 py-8"
                 baseBorderColor="border-[#1c1d1e]"
                 baseBgColor="bg-[#1c1d1e]"

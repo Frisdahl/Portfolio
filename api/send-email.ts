@@ -5,6 +5,19 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const RESEND_FROM =
   process.env.RESEND_FROM_EMAIL || "Portfolio Contact <onboarding@resend.dev>";
 const RESEND_TO = process.env.RESEND_TO_EMAIL || "frisdahlmarketing@gmail.com";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_SUBMIT_TIME_MS = 2500;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
+const MAX_LENGTHS = {
+  name: 100,
+  email: 254,
+  company: 120,
+  phone: 50,
+  inquiry: 3000,
+} as const;
+
+const requestLogByIp = new Map<string, number[]>();
 
 const escapeHtml = (value: string) =>
   value
@@ -13,6 +26,58 @@ const escapeHtml = (value: string) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+
+const toTrimmedString = (value: unknown) =>
+  typeof value === "string" ? value.trim() : "";
+
+const isTooLong = (value: string, maxLength: number) =>
+  value.length > maxLength;
+
+const getClientIp = (req: VercelRequest) => {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string") {
+    return forwarded.split(",")[0].trim();
+  }
+
+  if (Array.isArray(forwarded) && forwarded.length > 0) {
+    return forwarded[0].split(",")[0].trim();
+  }
+
+  return req.socket.remoteAddress || "unknown";
+};
+
+const isRateLimited = (ip: string) => {
+  const now = Date.now();
+  const timestamps = requestLogByIp.get(ip) || [];
+  const validTimestamps = timestamps.filter(
+    (timestamp) => now - timestamp <= RATE_LIMIT_WINDOW_MS,
+  );
+
+  if (validTimestamps.length >= RATE_LIMIT_MAX_REQUESTS) {
+    requestLogByIp.set(ip, validTimestamps);
+    return true;
+  }
+
+  validTimestamps.push(now);
+  requestLogByIp.set(ip, validTimestamps);
+  return false;
+};
+
+const isSameOriginRequest = (req: VercelRequest) => {
+  const originHeader = req.headers.origin;
+  const hostHeader = req.headers.host;
+
+  if (!originHeader || !hostHeader) {
+    return true;
+  }
+
+  try {
+    const originHost = new URL(originHeader).host;
+    return originHost === hostHeader;
+  } catch {
+    return false;
+  }
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -29,27 +94,107 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  try {
-    const { name, email, company, phone, inquiry, budget } = req.body;
+  const contentType = req.headers["content-type"];
+  if (!contentType || !contentType.includes("application/json")) {
+    return res.status(415).json({ error: "Unsupported content type" });
+  }
 
-    if (!name || !email || !inquiry) {
+  if (!isSameOriginRequest(req)) {
+    console.warn("[send-email] Blocked cross-origin request", {
+      origin: req.headers.origin,
+      host: req.headers.host,
+    });
+    return res.status(403).json({ error: "Invalid request origin" });
+  }
+
+  const clientIp = getClientIp(req);
+  if (isRateLimited(clientIp)) {
+    console.warn("[send-email] Rate limit exceeded", { clientIp });
+    return res
+      .status(429)
+      .json({ error: "Too many requests, try again later" });
+  }
+
+  try {
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    const {
+      name,
+      email,
+      company,
+      phone,
+      inquiry,
+      budget,
+      website,
+      formStartedAt,
+    } = body as {
+      name?: unknown;
+      email?: unknown;
+      company?: unknown;
+      phone?: unknown;
+      inquiry?: unknown;
+      budget?: unknown;
+      website?: unknown;
+      formStartedAt?: unknown;
+    };
+
+    const honeypot = toTrimmedString(website);
+    if (honeypot.length > 0) {
+      console.warn("[send-email] Honeypot triggered", { clientIp });
+      return res.status(200).json({ ok: true });
+    }
+
+    const startedAt = Number(formStartedAt);
+    if (
+      !Number.isFinite(startedAt) ||
+      Date.now() - startedAt < MIN_SUBMIT_TIME_MS
+    ) {
+      console.warn("[send-email] Submission blocked by timing check", {
+        clientIp,
+      });
+      return res.status(200).json({ ok: true });
+    }
+
+    const normalizedName = toTrimmedString(name);
+    const userEmail = toTrimmedString(email).toLowerCase();
+    const normalizedCompany = toTrimmedString(company);
+    const normalizedPhone = toTrimmedString(phone);
+    const normalizedInquiry = toTrimmedString(inquiry);
+
+    if (!normalizedName || !userEmail || !normalizedInquiry) {
       console.warn("[send-email] Validation failed", {
-        hasName: Boolean(name),
-        hasEmail: Boolean(email),
-        hasInquiry: Boolean(inquiry),
+        hasName: Boolean(normalizedName),
+        hasEmail: Boolean(userEmail),
+        hasInquiry: Boolean(normalizedInquiry),
       });
       return res.status(400).json({
         error: "Missing required fields: name, email, and inquiry are required",
       });
     }
 
-    const userEmail = String(email).trim();
-    const safeName = escapeHtml(String(name));
+    if (!EMAIL_REGEX.test(userEmail)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    if (
+      isTooLong(normalizedName, MAX_LENGTHS.name) ||
+      isTooLong(userEmail, MAX_LENGTHS.email) ||
+      isTooLong(normalizedCompany, MAX_LENGTHS.company) ||
+      isTooLong(normalizedPhone, MAX_LENGTHS.phone) ||
+      isTooLong(normalizedInquiry, MAX_LENGTHS.inquiry)
+    ) {
+      return res.status(400).json({ error: "One or more fields are too long" });
+    }
+
+    const safeName = escapeHtml(normalizedName);
     const safeEmail = escapeHtml(userEmail);
-    const safeCompany = escapeHtml(company ? String(company) : "N/A");
-    const safePhone = escapeHtml(phone ? String(phone) : "N/A");
-    const safeBudget = escapeHtml(budget ? String(budget) : "Not specified");
-    const safeInquiry = escapeHtml(String(inquiry));
+    const safeCompany = escapeHtml(normalizedCompany || "N/A");
+    const safePhone = escapeHtml(normalizedPhone || "N/A");
+    const safeBudget = escapeHtml(
+      typeof budget === "string" && budget.trim().length > 0
+        ? budget.trim()
+        : "Not specified",
+    );
+    const safeInquiry = escapeHtml(normalizedInquiry);
     const safeInquiryHtml = safeInquiry.replace(/\n/g, "<br/>");
 
     const { data, error } = await resend.emails.send({
