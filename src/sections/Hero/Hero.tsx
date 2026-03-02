@@ -21,6 +21,21 @@ const Hero: React.FC = () => {
   // 1. Scroll expansion animation
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
+      // Set container padding-top based on header height + 8px
+      const setContainerPadding = () => {
+        const headerElement = document.querySelector("header");
+        if (headerElement && containerRef.current) {
+          const headerHeight = headerElement.offsetHeight;
+          containerRef.current.style.paddingTop = `${headerHeight + 8}px`;
+        }
+      };
+
+      // Initial calculation
+      setContainerPadding();
+
+      // Recalculate on window resize
+      window.addEventListener("resize", setContainerPadding);
+
       // Anchor expansion at the mask's top center
       gsap.set(videoMaskRef.current, { transformOrigin: "top center" });
 
@@ -210,6 +225,7 @@ const Hero: React.FC = () => {
           "header-entrance-complete",
           handleHeaderComplete,
         );
+        window.removeEventListener("resize", setContainerPadding);
         clearTimeout(safetyTimeout);
       };
     }, sceneRef);
@@ -224,7 +240,7 @@ const Hero: React.FC = () => {
     >
       <div
         ref={containerRef}
-        className="w-full h-[92svh] md:h-screen flex flex-col items-center justify-start pt-16 sm:pt-20 md:pt-32 lg:pt-40 overflow-visible bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
+        className="w-full h-screen flex flex-col items-center justify-start overflow-visible bg-[#f4f4f5] px-4 md:px-10 lg:px-4 xl:px-6"
       >
         {/* Video Section */}
         <div
