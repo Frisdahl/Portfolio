@@ -13,10 +13,6 @@ import SplitType from "split-type";
  *    - Narrow on right: slides from right (+24px).
  */
 export const initGridAnimations = (container: HTMLElement) => {
-  const isReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-
   const ctx = gsap.context(() => {
     let didSetup = false;
 
@@ -30,14 +26,11 @@ export const initGridAnimations = (container: HTMLElement) => {
       container.querySelectorAll(".project-card"),
     ) as HTMLElement[];
 
-    // Hide immediately to avoid flash before transition-sync setup runs.
-    gsap.set([headerTextEl, subTextEl, ...allCards], { opacity: 0 });
+    gsap.set(allCards, { opacity: 1, clearProps: "transform" });
 
     const setupAnimations = () => {
       if (didSetup) return;
       didSetup = true;
-
-      const imageBaseDelay = 0.2;
 
       // 1. Header Entrance Animation
       const headerText = headerTextEl as HTMLElement;
@@ -65,98 +58,7 @@ export const initGridAnimations = (container: HTMLElement) => {
         );
       }
 
-      const rows = container.querySelectorAll(".project-row");
-
-      rows.forEach((row) => {
-        const cards = Array.from(
-          row.querySelectorAll(".project-card"),
-        ) as HTMLElement[];
-        const largeItem = row.querySelector(".project-large") as HTMLElement;
-
-        // --- 1. Horizontal Video Rows / Large Items ---
-        if (
-          largeItem ||
-          (cards.length === 1 && row.classList.contains("project-row--large"))
-        ) {
-          const target = largeItem || cards[0];
-
-          gsap.fromTo(
-            target,
-            {
-              opacity: 0,
-              scale: isReducedMotion ? 1 : 0.98,
-              y: isReducedMotion ? 0 : 20,
-            },
-            {
-              opacity: 1,
-              scale: 1,
-              y: 0,
-              duration: 1.6,
-              delay: imageBaseDelay,
-              ease: "power4.out",
-              scrollTrigger: {
-                trigger: row,
-                start: "top 80%",
-                once: true,
-              },
-            },
-          );
-          return;
-        }
-
-        // --- 2. Grid Rows with Two Cards ---
-        if (cards.length === 2) {
-          cards.forEach((card, idx) => {
-            const isLeft = idx === 0;
-
-            let xOffset = 0;
-            if (!isReducedMotion) {
-              xOffset = isLeft ? -18 : 18;
-            }
-
-            gsap.fromTo(
-              card,
-              {
-                opacity: 0,
-                x: xOffset,
-                y: isReducedMotion ? 0 : 10,
-              },
-              {
-                opacity: 1,
-                x: 0,
-                y: 0,
-                duration: 1.35,
-                ease: "power4.out",
-                delay: imageBaseDelay + idx * 0.12,
-                scrollTrigger: {
-                  trigger: row,
-                  start: "top 80%",
-                  once: true,
-                },
-              },
-            );
-          });
-        } else if (cards.length > 0) {
-          // Fallback for single cards or other layouts
-          gsap.fromTo(
-            cards,
-            { opacity: 0, y: isReducedMotion ? 0 : 24 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1.3,
-              delay: imageBaseDelay,
-              stagger: 0.12,
-              ease: "power4.out",
-              scrollTrigger: {
-                trigger: row,
-                start: "top 80%",
-                once: true,
-              },
-            },
-          );
-        }
-      });
+      gsap.set(allCards, { opacity: 1, clearProps: "transform" });
 
       ScrollTrigger.refresh();
     };

@@ -17,12 +17,6 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
         <h3 className="text-3xl md:text-3xl font-aeonik font-bold text-[#1c1d1e] uppercase">
           {title}
         </h3>
-        <span
-          className="px-3 py-1 text-[10px] md:text-xs font-aeonik font-bold tracking-widest uppercase rounded-full"
-          style={{ backgroundColor: "#ececed", color: "#7d7d7d" }}
-        >
-          PRO
-        </span>
       </div>
       <p className="text-lg md:text-xl font-aeonik text-[#1c1d1e]/70 leading-relaxed max-w-2xl">
         {description}

@@ -6,18 +6,24 @@ export const scrollTo = (
   offset: number = 0,
   immediate: boolean = false,
 ) => {
+  const resolveTargetTop = () => {
+    if (typeof target === "string") {
+      const el = document.querySelector(target);
+      if (!el) return null;
+      const rect = el.getBoundingClientRect();
+      return rect.top + window.scrollY + offset;
+    }
+
+    return target + offset;
+  };
+
   if (immediate) {
     // If immediate, use native window.scrollTo for absolute reliability
-    if (typeof target === 'string') {
-      const el = document.querySelector(target);
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        const top = rect.top + window.scrollY + offset;
-        window.scrollTo(0, top);
-      }
-    } else {
-      window.scrollTo(0, target + offset);
+    const top = resolveTargetTop();
+    if (top !== null) {
+      window.scrollTo(0, top);
     }
+
     // Sync lenis state immediately
     if (lenis) {
       lenis.scrollTo(window.scrollY, { immediate: true });
@@ -26,10 +32,16 @@ export const scrollTo = (
   }
 
   if (lenis) {
-    lenis.scrollTo(target, { 
-      duration, 
+    lenis.scrollTo(target, {
+      duration,
       offset,
-      immediate 
+      immediate,
     });
+    return;
+  }
+
+  const top = resolveTargetTop();
+  if (top !== null) {
+    window.scrollTo({ top, behavior: "smooth" });
   }
 };

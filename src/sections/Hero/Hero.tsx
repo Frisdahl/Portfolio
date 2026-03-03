@@ -27,6 +27,8 @@ const Hero: React.FC = () => {
   // 1. Scroll expansion animation
   useLayoutEffect(() => {
     entrancePlayedRef.current = false;
+    const forceHomeEntrance =
+      sessionStorage.getItem("forceHomeEntrance") === "true";
 
     const ctx = gsap.context(() => {
       // Set container padding-top based on header height + 8px
@@ -293,6 +295,11 @@ const Hero: React.FC = () => {
         entrancePlayedRef.current = true;
         isSplitAnimatingRef.current = true;
 
+        if (forceHomeEntrance) {
+          gsap.set(sceneRef.current, { autoAlpha: 1 });
+          sessionStorage.removeItem("forceHomeEntrance");
+        }
+
         const designHeading = designTextRef.current;
         const engineerHeading = engineerTextRef.current;
         if (designHeading) {
@@ -412,22 +419,43 @@ const Hero: React.FC = () => {
         });
       };
 
+      const resetEntranceState = () => {
+        const labelParagraphs = labelsRowRef.current
+          ? gsap.utils.toArray<HTMLParagraphElement>("p", labelsRowRef.current)
+          : [];
+
+        gsap.set(textWrapperRef.current, { autoAlpha: 1, yPercent: 0 });
+        gsap.set(containerRef.current, { y: 0 });
+        gsap.set(videoWrapperRef.current, { y: 0 });
+        gsap.set(labelParagraphs, { autoAlpha: 0, yPercent: -100 });
+        gsap.set(iconsRowRef.current, { autoAlpha: 0, yPercent: 100 });
+        gsap.set([portraitRef.current, mobilePortraitRef.current], {
+          scale: 0,
+        });
+        gsap.set(videoContentRef.current, { autoAlpha: 0, yPercent: -100 });
+      };
+
+      const handleReplayEntrance = () => {
+        entrancePlayedRef.current = false;
+        isSplitAnimatingRef.current = false;
+        resetEntranceState();
+
+        requestAnimationFrame(() => {
+          playHeroEntrance();
+        });
+      };
+
       // Entrance Triggers
       const handleHeaderComplete = () => playHeroEntrance();
       window.addEventListener("header-entrance-complete", handleHeaderComplete);
+      window.addEventListener("replay-hero-entrance", handleReplayEntrance);
 
       // Initial States
-      const labelParagraphs = labelsRowRef.current
-        ? gsap.utils.toArray<HTMLParagraphElement>("p", labelsRowRef.current)
-        : [];
+      resetEntranceState();
 
-      gsap.set(textWrapperRef.current, { autoAlpha: 1, yPercent: 0 });
-      gsap.set(containerRef.current, { y: 0 });
-      gsap.set(videoWrapperRef.current, { y: 0 });
-      gsap.set(labelParagraphs, { autoAlpha: 0, yPercent: -100 });
-      gsap.set(iconsRowRef.current, { autoAlpha: 0, yPercent: 100 });
-      gsap.set([portraitRef.current, mobilePortraitRef.current], { scale: 0 });
-      gsap.set(videoContentRef.current, { autoAlpha: 0, yPercent: -100 });
+      if (forceHomeEntrance) {
+        gsap.set(sceneRef.current, { autoAlpha: 0 });
+      }
 
       // Create scroll trigger immediately so pin layout is stable even if user scrolls early
       initScrollAnimation();
@@ -455,9 +483,16 @@ const Hero: React.FC = () => {
           "header-entrance-complete",
           handleHeaderComplete,
         );
+        window.removeEventListener(
+          "replay-hero-entrance",
+          handleReplayEntrance,
+        );
         window.removeEventListener("resize", handleResize);
         textFitResizeObserver?.disconnect();
         clearTimeout(safetyTimeout);
+        if (forceHomeEntrance && !entrancePlayedRef.current) {
+          sessionStorage.removeItem("forceHomeEntrance");
+        }
         if (designTextRef.current) {
           designTextRef.current.style.width = "";
         }
@@ -563,7 +598,7 @@ const Hero: React.FC = () => {
                 <span className="md:hidden ml-1 flex items-end">
                   <div
                     ref={mobilePortraitRef}
-                    className="rounded-full bg-[#1c1d1e] overflow-hidden"
+                    className="rounded-full bg-[#161618] overflow-hidden"
                     style={{ width: "0px", height: "0px" }}
                   >
                     <img

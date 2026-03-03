@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplitType from "split-type";
 import AnimatedButton from "../components/AnimatedButton";
 import ServiceItem from "../components/ServiceItem";
 import ExperienceItem from "../components/ExperienceItem";
@@ -10,16 +9,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 const AboutPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const animationTriggeredRef = useRef(false);
 
   useLayoutEffect(() => {
     if (!containerRef.current) return;
-
-    // Synchronously hide elements that will be animated in
-    gsap.set([headingRef.current, ".about-item"], {
-      autoAlpha: 0,
-    });
 
     const ctx = gsap.context(() => {
       // 1. Create the entrance timeline (initially paused)
@@ -28,49 +21,27 @@ const AboutPage: React.FC = () => {
         delay: 0.08,
         onStart: () => {
           animationTriggeredRef.current = true;
-          // Ensure elements are visible when animation starts
-          gsap.set([headingRef.current, ".about-item"], { autoAlpha: 1 });
         },
       });
 
-      // Heading animation
-      if (headingRef.current) {
-        const split = new SplitType(headingRef.current, {
-          types: "lines,words",
-        });
-        gsap.set(split.lines, { overflow: "hidden" });
+      const entranceTargets = gsap.utils.toArray<HTMLElement>(".about-item");
+
+      if (entranceTargets.length) {
         entranceTl.fromTo(
-          split.words,
+          entranceTargets,
           {
-            yPercent: 100,
+            y: 30,
             opacity: 0,
           },
           {
-            yPercent: 0,
+            y: 0,
             opacity: 1,
-            duration: 1.2,
-            stagger: 0.03,
-            ease: "power4.out",
+            duration: 1.0,
+            stagger: 0.1,
+            ease: "power3.out",
           },
         );
       }
-
-      // Content elements reveal
-      entranceTl.fromTo(
-        ".about-item",
-        {
-          y: 30,
-          opacity: 0,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.0,
-          stagger: 0.1,
-          ease: "power3.out",
-        },
-        "-=0.8",
-      );
 
       const animatedItems = gsap.utils.toArray<HTMLElement>(
         ".about-animate-item",
@@ -142,54 +113,57 @@ const AboutPage: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full min-h-screen pt-48 flex flex-col items-center bg-transparent overflow-x-hidden"
+      className="w-full min-h-screen pt-28 flex flex-col items-center bg-transparent overflow-x-hidden"
     >
       <div className="w-full flex flex-col items-center pb-64">
-        {/* Top Section: Hero-ish Centered Single Column */}
-        <div className="w-full flex flex-col items-center text-center gap-16 md:gap-24 mb-48 px-6 md:px-10 lg:px-12 xl:px-16">
-          <h1
-            ref={headingRef}
-            className="text-6xl md:text-8xl lg:text-9xl font-aeonik font-bold text-[#1c1d1e] uppercase tracking-tight leading-none invisible"
-          >
-            who am i?
+        {/* Top Section */}
+        <div className="w-full mb-48 px-6 md:px-10 lg:px-12 xl:px-48">
+          <h1 className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-medium text-[#1c1d1e] leading-[1.25] tracking-tight whitespace-normal md:whitespace-nowrap mb-10">
+            About Me
           </h1>
 
-          <div className="about-item w-full max-w-lg aspect-[3/4] rounded-[2rem] md:rounded-full overflow-hidden border border-[#1c1d1e]/10 bg-[#1c1d1e]/5 invisible">
-            <img
-              src="https://placehold.co/800x1066/fefffe/1c1d1e?text=Portrait"
-              alt="Alexander - Product Designer"
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 ease-in-out scale-105 hover:scale-100"
-            />
-          </div>
-
-          <div className="about-item w-full flex justify-center text-center invisible">
-            <p className="text-2xl md:text-3xl lg:text-4xl font-aeonik max-w-6xl mx-auto text-[#1c1d1e] leading-tight font-light text-center">
-              Based in{" "}
+          <div className=" grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-14 lg:gap-16 items-start lg:items-stretch">
+            <div className="w-full max-w-lg lg:max-w-none aspect-[3/4] lg:aspect-auto lg:h-full overflow-hidden rounded-[2rem] border border-[#1c1d1e]/10 bg-[#1c1d1e]/5">
               <img
-                src="/images/danish-flag.svg"
-                alt="Danish Flag"
-                className="inline-block h-[0.7em] md:h-[0.8em] align-middle ml-1 mb-[0.15em] rounded-full"
+                src="/images/portrait-about.webp"
+                alt="Alexander - Product Designer"
+                className="w-full h-full object-cover"
               />
-              , Copenhagen, I’m a product designer with a serious obsession for
-              User Experience design. I specialize in ideation, visual design,
-              and interactions—basically, turning your ideas into something you
-              can actually use without needing a manual the size of a
-              dictionary.
-            </p>
-          </div>
+            </div>
 
-          <div className="about-item invisible">
-            <AnimatedButton
-              text="download resume"
-              padding="px-12 py-7"
-              fontSize="text-lg md:text-xl"
-              baseBgColor="bg-[#1c1d1e]"
-              baseTextColor="text-white"
-              hoverBgColor="bg-[#fffefe]"
-              hoverTextColor="text-[#1c1d1e]"
-              baseBorderColor="border-[#1c1d1e]"
-              hoverBorderColor="border-[#1c1d1e]"
-            />
+            <div className="w-full flex flex-col items-start text-left">
+              <p className="font-aeonik text-sm md:text-base uppercase tracking-[0.2em] text-[#1c1d1e]/70">
+                my story
+              </p>
+
+              <p className="mt-4 text-2xl md:text-3xl lg:text-5xl font-aeonik text-[#1c1d1e] leading-tight font-regular">
+                Based in Copenhagen{" "}
+                <img
+                  src="/images/danish-flag.svg"
+                  alt="Danish Flag"
+                  className="inline-block h-[0.7em] md:h-[0.8em] align-middle ml-1 mb-[0.15em] rounded-full"
+                />
+                , I’m a frontend-focused developer with a passion for motion and
+                performance.
+                <br></br> <br></br> I specialize in React, TypeScript and GSAP —
+                building immersive, high-end digital experiences that feel as
+                refined as they look.
+              </p>
+
+              <div className="mt-8">
+                <AnimatedButton
+                  text="download resume"
+                  padding="px-12 py-7"
+                  fontSize="text-lg md:text-xl"
+                  baseBgColor="bg-[#1c1d1e]"
+                  baseTextColor="text-white"
+                  hoverBgColor="bg-[#f4f4f5]"
+                  hoverTextColor="text-[#1c1d1e]"
+                  baseBorderColor="border-[#1c1d1e]"
+                  hoverBorderColor="border-[#1c1d1e]"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -205,17 +179,17 @@ const AboutPage: React.FC = () => {
           {/* Right Column: Service List */}
           <div className="w-full md:w-2/3 md:pl-12 lg:pl-24">
             <ServiceItem
-              title="web design"
-              description="Creating visually stunning and highly functional websites that prioritize user experience and simplicity. By focusing on clean, minimal designs, I ensure that every interaction is seamless and intuitive."
+              title="Frontend Engineering"
+              description="Building performant, scalable user interfaces with React and TypeScript. I focus on clean architecture, maintainable code, and thoughtful UX."
             />
             <ServiceItem
-              title="branding & graphic design"
-              description="Designing visual identities that make your brand the Beyoncé of your industry. From logos to marketing stuff, I make sure you’re not just seen, but remembered."
+              title="Motion & Interaction"
+              description="Crafting immersive interactions using GSAP and modern animation techniques. Motion isn’t decoration — it’s communication."
               showDivider={true}
             />
             <ServiceItem
-              title="football"
-              description="hobby? naaah im going pro next week, you can catch me on the field ;)"
+              title="Backend Fundamentals"
+              description="Understanding APIs, databases and server-side logic to build complete digital products. I enjoy working with Node, Express and relational databases — and I’m continuously expanding my backend knowledge."
               showDivider={true}
             />
           </div>
@@ -242,7 +216,7 @@ const AboutPage: React.FC = () => {
               title="internship DemensAI"
               subtitle="Fullstack developer"
               dates="2025 - 2025"
-              description="Designed and developed their official website as part of my bachelor's project. Focused on creating a high-performance, accessible digital presence that effectively communicates their mission in the healthcare technology space."
+              description="Led the design and development of DemensAI’s official website as part of my bachelor project, focusing on performance, accessibility and scalable architecture. Focused on creating a high-performance, accessible digital presence that effectively communicates their mission in the healthcare technology space."
               showDivider={true}
             />
             <ExperienceItem

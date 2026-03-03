@@ -4,7 +4,26 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const useSmoothScroll = () => {
   useEffect(() => {
-    if (!lenis) return;
+    const isTouchDevice = window.matchMedia(
+      "(hover: none) and (pointer: coarse)",
+    ).matches;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    // On touch devices native scrolling is usually smoother than virtual scroll.
+    if (!lenis || isTouchDevice || prefersReducedMotion) {
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+
+      const onResize = () => ScrollTrigger.refresh();
+      window.addEventListener("resize", onResize);
+
+      return () => {
+        window.removeEventListener("resize", onResize);
+      };
+    }
 
     // Start Lenis
     lenis.start();

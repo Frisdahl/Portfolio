@@ -1,66 +1,49 @@
 import React, { useLayoutEffect, useRef } from "react";
 import ProjectItem from "./ProjectItem";
+import type { Project } from "./ProjectItem";
 import { initGridAnimations } from "./Projects.anim";
 import gsap from "gsap";
 import SplitType from "split-type";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const projects = [
+const projects: Project[] = [
   {
     id: 1,
     title: "NordWear",
-    categories: [
-      "Tone",
-      "voice",
-      "Tailwind CSS",
-      "Lenis",
-      "UI",
-      "UX",
-      "Next.js",
-      "gsap",
-      "motion",
-    ],
+    projectType: "Website",
     image: "/images/Bang&Olufsen.webp",
     video: "/projectVideos/NordWear/NordWear-trailer-web.mp4",
     link: "https://nordwear-shop.dk/",
-    year: "2024",
-    tags: ["Portfolio", "Project", "Design"],
+    year: "2025",
+    tags: ["React", "Typescript", "Next.js", "Gsap"],
   },
   {
     id: 2,
     title: "Visuel Atelier",
-    categories: ["UI", "UX", "gsap", "motion", "Tailwind CSS", "Lenis"],
+    projectType: "Prototype",
     image: "/images/Visuel-Atelier.webp",
     link: "",
     year: "2023",
-    tags: ["Portfolio", "Project", "Design"],
+    tags: ["React", "Typescript", "Vite", "Gsap"],
   },
   {
     id: 3,
     title: "Bang & Olufsen",
-    categories: [
-      "Next.js",
-      "gsap",
-      "motion",
-      "Tailwind CSS",
-      "Lenis",
-      "UI",
-      "UX",
-    ],
+    projectType: "Mobile Application",
     image: "/images/Bang&Olufsen.webp",
     video: "/projectVideos/bang-olufsen-iphone-trailer.mp4",
     link: "#",
     year: "2024",
-    tags: ["Portfolio", "Project", "Design"],
+    tags: ["React", "Typescript", "Express", "Gsap"],
   },
   {
     id: 4,
     title: "Project Four",
-    categories: ["Tone & voice", "UI", "UX", "Next.js", "gsap", "motion"],
+    projectType: "Website",
     image: "https://placehold.co/1200x800",
     link: "#",
     year: "2023",
-    tags: ["Portfolio", "Project", "Design"],
+    tags: ["React", "Typescript", "Express", "Vite"],
   },
 ];
 
@@ -144,7 +127,7 @@ const Projects: React.FC = () => {
           <div className="overflow-hidden flex-shrink-0">
             <h2
               ref={headingRef}
-              className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[10rem] w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
+              className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
             >
               Work
             </h2>

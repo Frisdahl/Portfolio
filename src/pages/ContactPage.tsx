@@ -280,10 +280,10 @@ const ContactPage: React.FC = () => {
     <div
       ref={containerRef}
       id="contact"
-      className="relative w-full min-h-screen py-28 md:py-48 bg-[var(--background)] flex flex-col"
+      className="relative w-full min-h-screen py-28 bg-[var(--background)] flex flex-col"
     >
       <div className="w-full px-6 md:px-10 lg:px-12 xl:px-48 flex flex-col items-start text-left flex-grow">
-        <h2 className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-8xl w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-[1.15] tracking-tight whitespace-normal md:whitespace-nowrap pb-10 md:pb-16">
+        <h2 className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-medium text-[#1c1d1e] leading-[1.25] tracking-tight whitespace-normal md:whitespace-nowrap mb-10">
           <span className="block overflow-hidden">
             <span ref={headingLineOneRef} className="inline-block">
               Let’s Work
@@ -299,7 +299,7 @@ const ContactPage: React.FC = () => {
               <span
                 ref={circleRef}
                 onMouseEnter={() => shakaShakeTweenRef.current?.restart(true)}
-                className="relative inline-flex cursor-default h-14 w-14 md:h-20 md:w-20 lg:h-24 lg:w-24 items-center justify-center rounded-full bg-[#1c1d1e] text-2xl md:text-4xl lg:text-5xl leading-none align-middle"
+                className="relative inline-flex cursor-default h-14 w-14 md:h-20 md:w-20 lg:h-24 lg:w-24 items-center justify-center rounded-full bg-[#161618] text-2xl md:text-4xl lg:text-5xl leading-none align-middle"
                 aria-label="shaka hand"
               >
                 <span

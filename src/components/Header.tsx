@@ -12,6 +12,7 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [isPastHero, setIsPastHero] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isInProjectsSection, setIsInProjectsSection] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const talkButtonRef = useRef<HTMLButtonElement>(null);
@@ -20,6 +21,8 @@ const Header: React.FC = () => {
   const nameRef = useRef<HTMLAnchorElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const entranceTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const activeDotRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const previousActiveItemRef = useRef<string | null>(null);
 
   const isHomePage = location.pathname === "/";
 
@@ -222,6 +225,71 @@ const Header: React.FC = () => {
     }
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    if (!isHomePage) {
+      setIsInProjectsSection(false);
+      return;
+    }
+
+    let sectionObserver: IntersectionObserver | null = null;
+    let domObserver: MutationObserver | null = null;
+
+    const disconnectSectionObserver = () => {
+      if (sectionObserver) {
+        sectionObserver.disconnect();
+        sectionObserver = null;
+      }
+    };
+
+    const observeProjectsSection = () => {
+      const projectsSection = document.getElementById("projects");
+      if (!projectsSection) return false;
+
+      disconnectSectionObserver();
+
+      const headerElement = document.querySelector("header");
+      const headerHeight = headerElement?.getBoundingClientRect().height ?? 0;
+      const topOffset = Math.round(headerHeight + 8);
+
+      sectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          setIsInProjectsSection(entry.isIntersecting);
+        },
+        {
+          root: null,
+          threshold: 0,
+          rootMargin: `-${topOffset}px 0px -55% 0px`,
+        },
+      );
+
+      sectionObserver.observe(projectsSection);
+      return true;
+    };
+
+    if (!observeProjectsSection()) {
+      domObserver = new MutationObserver(() => {
+        if (observeProjectsSection()) {
+          domObserver?.disconnect();
+          domObserver = null;
+        }
+      });
+
+      domObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    const handleResize = () => {
+      observeProjectsSection();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      disconnectSectionObserver();
+      domObserver?.disconnect();
+    };
+  }, [isHomePage, location.pathname]);
+
   // 4. Utility Effects
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -252,11 +320,14 @@ const Header: React.FC = () => {
   const handleLogoClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     setIsMenuOpen(false);
+    sessionStorage.removeItem("targetSection");
+
     if (!isHomePage) {
-      sessionStorage.setItem("isNavigating", "true");
-      await triggerPageTransition(() => navigate("/"));
+      sessionStorage.setItem("forceHomeEntrance", "true");
+      sessionStorage.removeItem("isNavigating");
+      navigate("/");
     } else {
-      scrollTo(0, 1.5, 0, false);
+      scrollTo(0, 0, 0, true);
     }
   };
 
@@ -269,12 +340,14 @@ const Header: React.FC = () => {
     setIsMenuOpen(false);
 
     if (section) {
+      const sectionRoute = to || `/${section}`;
+
       if (!isHomePage) {
-        sessionStorage.setItem("isNavigating", "true");
         sessionStorage.setItem("targetSection", section);
-        await triggerPageTransition(() => navigate(`/${section}`));
+        navigate(sectionRoute);
       } else {
-        scrollTo(section, 1.5, -120, false);
+        sessionStorage.setItem("targetSection", section);
+        navigate(sectionRoute);
       }
       return;
     }
@@ -287,9 +360,86 @@ const Header: React.FC = () => {
   const menuItems = [
     { label: "Home", to: "/", section: undefined },
     { label: "About me", to: "/about", section: undefined },
-    { label: "Projects", to: "/", section: "#projects" },
+    { label: "Projects", to: "/#projects", section: "#projects" },
     { label: "Contact", to: "/contact", section: undefined },
   ];
+
+  const isMenuItemActive = (item: (typeof menuItems)[number]) => {
+    const isProjectsItem = item.section === "#projects";
+    const isHomeItem = !item.section && item.to === "/";
+
+    if (isProjectsItem) {
+      return isHomePage && isInProjectsSection;
+    }
+
+    if (isHomeItem) {
+      return isHomePage && !isInProjectsSection;
+    }
+
+    return location.pathname === item.to && !location.hash;
+  };
+
+  const activeItemKey =
+    menuItems.find((item) => isMenuItemActive(item))?.label ?? null;
+
+  useLayoutEffect(() => {
+    const dots = menuItems
+      .map((item) => activeDotRefs.current[item.label])
+      .filter((dot): dot is HTMLDivElement => Boolean(dot));
+
+    if (!dots.length) return;
+
+    gsap.set(dots, { transformOrigin: "center center" });
+
+    if (!activeItemKey) {
+      gsap.set(dots, { scale: 0 });
+      previousActiveItemRef.current = null;
+      return;
+    }
+
+    const nextDot = activeDotRefs.current[activeItemKey];
+    if (!nextDot) return;
+
+    const previousKey = previousActiveItemRef.current;
+    if (!previousKey || previousKey === activeItemKey) {
+      dots.forEach((dot) => {
+        const isCurrent = dot === nextDot;
+        gsap.set(dot, { scale: isCurrent ? 1 : 0 });
+      });
+
+      previousActiveItemRef.current = activeItemKey;
+      return;
+    }
+
+    const previousDot = activeDotRefs.current[previousKey];
+    const timeline = gsap.timeline();
+
+    dots.forEach((dot) => {
+      if (dot !== previousDot && dot !== nextDot) {
+        gsap.set(dot, { scale: 0 });
+      }
+    });
+
+    if (previousDot) {
+      timeline.to(previousDot, {
+        scale: 0,
+        duration: 0.12,
+        ease: "power2.in",
+      });
+    }
+
+    timeline.set(nextDot, { scale: 0 }).to(nextDot, {
+      scale: 1,
+      duration: 0.18,
+      ease: "back.out(2)",
+    });
+
+    previousActiveItemRef.current = activeItemKey;
+
+    return () => {
+      timeline.kill();
+    };
+  }, [activeItemKey, isMenuOpen]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[220] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6">
@@ -299,12 +449,12 @@ const Header: React.FC = () => {
           ref={nameRef}
           to="/"
           onClick={handleLogoClick}
-          className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1c1d1e] leading-[1.0] pt-1 opacity-0"
+          className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1c1d1e] pt-1 opacity-0"
         >
-          <span className="text-base md:text-xl lg:text-2xl uppercase font-medium tracking-tight overflow-hidden inline-block">
+          <span className="text-base md:text-xl lg:text-2xl uppercase font-medium tracking-tight leading-none overflow-hidden inline-block">
             <span className="italic">A</span>lexander
           </span>
-          <span className="text-base md:text-xl lg:text-2xl uppercase font-medium tracking-tight overflow-hidden inline-block">
+          <span className=" text-base md:text-xl lg:text-2xl uppercase mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
             <span className="italic">F</span>risdahl
           </span>
         </Link>
@@ -376,9 +526,7 @@ const Header: React.FC = () => {
             className="pointer-events-auto absolute top-full right-0 mt-2 w-full min-w-[320px] bg-[#fefeff] rounded-[1.5rem] overflow-hidden flex flex-col p-3 invisible opacity-0"
           >
             {menuItems.map((item) => {
-              const isActive = item.section
-                ? location.pathname === "/" && location.hash === item.section
-                : location.pathname === item.to && !location.hash;
+              const isActive = isMenuItemActive(item);
 
               return (
                 <a
@@ -406,14 +554,22 @@ const Header: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-center w-6 h-6">
-                    {isActive ? (
-                      <div className="w-2 h-2 rounded-full bg-[#1c1d1e]" />
-                    ) : (
-                      <div className="opacity-0 -translate-x-4 transition-all duration-300 group-hover/item:opacity-100 group-hover/item:translate-x-0">
-                        <ArrowIcon className="w-5 h-5" />
-                      </div>
-                    )}
+                  <div className="relative flex items-center justify-center w-6 h-6">
+                    <div
+                      ref={(el) => {
+                        activeDotRefs.current[item.label] = el;
+                      }}
+                      className="absolute w-2 h-2 rounded-full bg-[#1c1d1e] scale-0"
+                    />
+                    <div
+                      className={`absolute opacity-0 -translate-x-4 transition-all duration-300 ${
+                        isActive
+                          ? ""
+                          : "group-hover/item:opacity-100 group-hover/item:translate-x-0"
+                      }`}
+                    >
+                      <ArrowIcon className="w-5 h-5" />
+                    </div>
                   </div>
                 </a>
               );

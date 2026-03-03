@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useLocation } from "react-router-dom";
 import Hero from "../sections/Hero/Hero";
+import { scrollTo } from "../utils/smoothScroll";
 // import VideoShowcase from "../sections/VideoShowcase/VideoShowcase";
 // import Expectations from "../sections/Expectations/Expectations";
 // import Collaboration from "../sections/Collaboration/Collaboration";
@@ -22,6 +23,7 @@ type DeferredSectionProps = {
   containIntrinsicSize: string;
   fallbackClassName: string;
   children: ReactNode;
+  forceMount?: boolean;
 };
 
 function DeferredSection({
@@ -29,11 +31,17 @@ function DeferredSection({
   containIntrinsicSize,
   fallbackClassName,
   children,
+  forceMount = false,
 }: DeferredSectionProps) {
   const [shouldMount, setShouldMount] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (forceMount) {
+      setShouldMount(true);
+      return;
+    }
+
     const element = sectionRef.current;
     if (!element || shouldMount) return;
 
@@ -50,7 +58,7 @@ function DeferredSection({
     observer.observe(element);
 
     return () => observer.disconnect();
-  }, [shouldMount]);
+  }, [shouldMount, forceMount]);
 
   return (
     <div
@@ -71,18 +79,70 @@ function DeferredSection({
 
 function HomePage() {
   const location = useLocation();
+  const [forceMountProjects, setForceMountProjects] = useState(false);
 
   useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace("#", "");
-      const element = document.getElementById(id);
-      if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: "smooth" });
-          sessionStorage.removeItem("targetSection");
-        }, 100);
-      }
+    const targetSection =
+      location.hash || sessionStorage.getItem("targetSection");
+    if (!targetSection) return;
+
+    const targetId = targetSection.replace("#", "");
+    if (targetId === "projects") {
+      setForceMountProjects(true);
     }
+
+    let rafId = 0;
+    const alignTimeoutIds: Array<ReturnType<typeof setTimeout>> = [];
+    let attempts = 0;
+    const maxAttempts = 180;
+
+    const getHeaderOffset = () => {
+      const headerElement = document.querySelector("header");
+      if (!headerElement) return 0;
+
+      const headerHeight = headerElement.getBoundingClientRect().height;
+      const extraGap = 8;
+      return -(headerHeight + extraGap);
+    };
+
+    const alignToTargetTop = () => {
+      scrollTo(targetSection, 0, getHeaderOffset(), true);
+    };
+
+    const scheduleAlignmentPasses = () => {
+      const settleDelays = [0, 80, 180, 320, 520, 820, 1200, 1800];
+
+      settleDelays.forEach((delay) => {
+        const timeoutId = setTimeout(() => {
+          alignToTargetTop();
+        }, delay);
+
+        alignTimeoutIds.push(timeoutId);
+      });
+    };
+
+    const scrollWhenReady = () => {
+      const target = document.querySelector(targetSection);
+      if (target) {
+        scheduleAlignmentPasses();
+        sessionStorage.removeItem("targetSection");
+        return;
+      }
+
+      attempts += 1;
+      if (attempts < maxAttempts) {
+        rafId = window.requestAnimationFrame(scrollWhenReady);
+      }
+    };
+
+    rafId = window.requestAnimationFrame(scrollWhenReady);
+
+    return () => {
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+      }
+      alignTimeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
+    };
   }, [location]);
 
   return (
@@ -110,6 +170,7 @@ function HomePage() {
         className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="1400px"
         fallbackClassName="w-full min-h-[1000px] md:min-h-[1400px]"
+        forceMount={forceMountProjects}
       >
         <Projects />
       </DeferredSection>
