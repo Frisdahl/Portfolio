@@ -2,6 +2,7 @@ import {
   Suspense,
   lazy,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type ReactNode,
@@ -24,6 +25,7 @@ type DeferredSectionProps = {
   fallbackClassName: string;
   children: ReactNode;
   forceMount?: boolean;
+  sectionId?: string;
 };
 
 function DeferredSection({
@@ -32,6 +34,7 @@ function DeferredSection({
   fallbackClassName,
   children,
   forceMount = false,
+  sectionId,
 }: DeferredSectionProps) {
   const [shouldMount, setShouldMount] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -62,6 +65,7 @@ function DeferredSection({
 
   return (
     <div
+      id={sectionId}
       ref={sectionRef}
       className={className}
       style={{ contentVisibility: "auto", containIntrinsicSize }}
@@ -79,71 +83,127 @@ function DeferredSection({
 
 function HomePage() {
   const location = useLocation();
-  const [forceMountProjects, setForceMountProjects] = useState(false);
-
-  useEffect(() => {
+  const [forceMountProjects, setForceMountProjects] = useState(() => {
+    if (typeof window === "undefined") return false;
     const targetSection =
-      location.hash || sessionStorage.getItem("targetSection");
+      window.location.hash || sessionStorage.getItem("targetSection");
+    return targetSection?.replace("#", "") === "projects";
+  });
+
+  useLayoutEffect(() => {
+    const targetSection =
+      location.hash ||
+      sessionStorage.getItem("targetSection") ||
+      (sessionStorage.getItem("pendingSectionScroll") === "true"
+        ? "#projects"
+        : null);
     if (!targetSection) return;
 
     const targetId = targetSection.replace("#", "");
-    if (targetId === "projects") {
+    if (targetId === "projects" && !forceMountProjects) {
       setForceMountProjects(true);
+      return;
     }
 
-    let rafId = 0;
-    const alignTimeoutIds: Array<ReturnType<typeof setTimeout>> = [];
-    let attempts = 0;
-    const maxAttempts = 180;
+    const timeoutIds: Array<ReturnType<typeof setTimeout>> = [];
+    let alignRafId = 0;
 
     const getHeaderOffset = () => {
       const headerElement = document.querySelector("header");
       if (!headerElement) return 0;
 
-      const headerHeight = headerElement.getBoundingClientRect().height;
+      // Measure only the main nav row height to avoid including dropdown if it's open/closing
+      const navRow = headerElement.querySelector("div");
+      const headerHeight = navRow
+        ? navRow.getBoundingClientRect().height
+        : headerElement.getBoundingClientRect().height;
+
+      // Responsive padding check (approximate based on Header.tsx classes)
+      const isMobile = window.innerWidth < 768;
+      const topPadding = isMobile ? 24 : 40;
+
       const extraGap = 8;
-      return -(headerHeight + extraGap);
+      return -(headerHeight + topPadding + extraGap);
     };
 
-    const alignToTargetTop = () => {
-      scrollTo(targetSection, 0, getHeaderOffset(), true);
+    const alignToTargetTop = (targetElement: Element) => {
+      const headerOffset = getHeaderOffset();
+      scrollTo(targetElement, 0, headerOffset, true);
     };
 
-    const scheduleAlignmentPasses = () => {
-      const settleDelays = [0, 80, 180, 320, 520, 820, 1200, 1800];
+    if (targetId === "projects") {
+      let attempts = 0;
+      const maxAttempts = 300;
 
-      settleDelays.forEach((delay) => {
-        const timeoutId = setTimeout(() => {
-          alignToTargetTop();
-        }, delay);
+      const alignWhenProjectsHeadingReady = () => {
+        const headingTarget = document.querySelector(
+          "#projects .project-header-text",
+        );
 
-        alignTimeoutIds.push(timeoutId);
-      });
-    };
+        if (headingTarget) {
+          // Small delay to ensure any layout shifts or initial GSAP sets have settled
+          setTimeout(() => {
+            alignToTargetTop(headingTarget);
 
-    const scrollWhenReady = () => {
+            const driftCorrectionId = setTimeout(() => {
+              const currentHeading = document.querySelector(
+                "#projects .project-header-text",
+              );
+              if (!currentHeading) return;
+
+              const headerOffset = getHeaderOffset();
+              const currentTop = currentHeading.getBoundingClientRect().top;
+              const remainingDrift = currentTop + headerOffset;
+
+              if (Math.abs(remainingDrift) > 4) {
+                alignToTargetTop(currentHeading);
+              }
+            }, 300);
+            timeoutIds.push(driftCorrectionId);
+          }, 50);
+
+          window.dispatchEvent(new CustomEvent("replay-projects-entrance"));
+          sessionStorage.removeItem("targetSection");
+          sessionStorage.removeItem("pendingSectionScroll");
+          return;
+        }
+
+        attempts += 1;
+        if (attempts < maxAttempts) {
+          alignRafId = window.requestAnimationFrame(
+            alignWhenProjectsHeadingReady,
+          );
+          return;
+        }
+
+        const projectsSection = document.querySelector("#projects");
+        if (projectsSection) {
+          alignToTargetTop(projectsSection);
+          window.dispatchEvent(new CustomEvent("replay-projects-entrance"));
+        }
+
+        sessionStorage.removeItem("targetSection");
+        sessionStorage.removeItem("pendingSectionScroll");
+      };
+
+      alignRafId = window.requestAnimationFrame(alignWhenProjectsHeadingReady);
+    } else {
       const target = document.querySelector(targetSection);
       if (target) {
-        scheduleAlignmentPasses();
-        sessionStorage.removeItem("targetSection");
-        return;
+        alignToTargetTop(target);
       }
 
-      attempts += 1;
-      if (attempts < maxAttempts) {
-        rafId = window.requestAnimationFrame(scrollWhenReady);
-      }
-    };
-
-    rafId = window.requestAnimationFrame(scrollWhenReady);
+      sessionStorage.removeItem("targetSection");
+      sessionStorage.removeItem("pendingSectionScroll");
+    }
 
     return () => {
-      if (rafId) {
-        window.cancelAnimationFrame(rafId);
+      if (alignRafId) {
+        window.cancelAnimationFrame(alignRafId);
       }
-      alignTimeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
+      timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
     };
-  }, [location]);
+  }, [location, forceMountProjects]);
 
   return (
     <div className="HomePage">
@@ -167,6 +227,7 @@ function HomePage() {
 
       {/* Projects Section */}
       <DeferredSection
+        sectionId="projects"
         className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="1400px"
         fallbackClassName="w-full min-h-[1000px] md:min-h-[1400px]"

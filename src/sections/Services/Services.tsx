@@ -189,11 +189,11 @@ const Services: React.FC = () => {
     <section
       id="services"
       ref={sectionRef}
-      className="w-full text-[#1d1d1f] text-left font-aeonik px-4 md:px-10 lg:px-4 xl:px-6"
+      className="w-full text-[#1b1b1a] text-left font-aeonik px-4 md:px-10 lg:px-4 xl:px-6"
     >
       {/* Services List Container */}
       <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen md:static md:mx-0 md:w-full">
-        <div className="bg-[#1d1d1f] text-[#f4f4f5] rounded-[2rem] md:rounded-[3rem] p-6 md:p-8">
+        <div className="bg-[#1b1b1a] text-[#f5f5f3] rounded-[2rem] md:rounded-[3rem] p-6 md:p-8">
           {/* Header Section - 12 Column Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8 px-8">
             <div className="flex flex-col mb-16 lg:col-start-2 lg:col-span-10">
@@ -219,7 +219,7 @@ const Services: React.FC = () => {
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-16 md:py-20 lg:items-stretch items-start px-8">
                     {/* lg:col-span-2: Service ID */}
                     <div className="lg:col-span-1 pt-2 service-id">
-                      <span className="service-id-text text-sm md:text-base font-aeonik text-[#f4f4f5] font-bold block">
+                      <span className="service-id-text text-sm md:text-base font-aeonik text-[#f5f5f3] font-bold block">
                         {service.id}
                       </span>
                     </div>
@@ -233,7 +233,7 @@ const Services: React.FC = () => {
 
                     {/* lg:col-span-3: Description & Tags */}
                     <div className="lg:col-span-3 flex flex-col gap-8 overflow-hidden">
-                      <p className="service-description text-md font-aeonik font-medium leading-relaxed text-left text-[#f4f4f5]">
+                      <p className="service-description text-md font-aeonik font-medium leading-relaxed text-left text-[#f5f5f3]">
                         {service.description}
                       </p>
 

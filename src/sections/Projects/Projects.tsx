@@ -2,9 +2,6 @@ import React, { useLayoutEffect, useRef } from "react";
 import ProjectItem from "./ProjectItem";
 import type { Project } from "./ProjectItem";
 import { initGridAnimations } from "./Projects.anim";
-import gsap from "gsap";
-import SplitType from "split-type";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const projects: Project[] = [
   {
@@ -49,69 +46,16 @@ const projects: Project[] = [
 
 const Projects: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const subText = useRef<HTMLParagraphElement>(null);
+
   useLayoutEffect(() => {
-    if (!headingRef.current || !containerRef.current || !subText.current)
-      return;
+    if (!containerRef.current) return;
+
     const ctx = initGridAnimations(containerRef.current);
 
-    gsap.registerPlugin(ScrollTrigger);
-
-    const subTextReveal = new SplitType(subText.current, {
-      types: "lines",
-      lineClass: "subtext-line",
-    });
-
-    if (!subTextReveal.lines?.length) {
-      return () => {
-        subTextReveal.revert();
-        ctx.revert();
-      };
-    }
-
-    subTextReveal.lines.forEach((line) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "overflow-hidden";
-      line.parentNode?.insertBefore(wrapper, line);
-      wrapper.appendChild(line);
-    });
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: headingRef.current,
-        start: "top 80%",
-        end: "bottom 60%",
-        toggleActions: "play none none none",
-        markers: false,
-      },
-    });
-
-    tl.fromTo(
-      headingRef.current,
-      { yPercent: 100 },
-      {
-        yPercent: 0,
-        ease: "power4.out",
-        duration: 1.2,
-      },
-    ).fromTo(
-      subTextReveal.lines,
-      { yPercent: 100 },
-      {
-        yPercent: 0,
-        ease: "power4.out",
-        duration: 1.2,
-        stagger: 0.1,
-      },
-      "-=1",
-    );
-
     return () => {
-      tl.kill();
       ctx.revert();
     };
-  });
+  }, []);
 
   // Helper to chunk projects into rows of 2
   const projectRows = [];
@@ -121,22 +65,16 @@ const Projects: React.FC = () => {
 
   return (
     <section className="w-full" ref={containerRef}>
-      <div id="projects" className="w-full px-4 md:px-10 lg:px-4 xl:px-6">
+      <div className="w-full px-4 md:px-10 lg:px-4 xl:px-6">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-12 mb-8 md:mb-8 overflow-hidden sm-flex">
           <div className="overflow-hidden flex-shrink-0">
-            <h2
-              ref={headingRef}
-              className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-none tracking-tight whitespace-nowrap uppercase"
-            >
+            <h2 className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-semibold text-[#1b1b1a] leading-none tracking-tight whitespace-nowrap uppercase">
               Work
             </h2>
           </div>
           <div className="max-w-sm text-left overflow-hidden">
-            <p
-              ref={subText}
-              className="project-header-subtext uppercase font-aeonik text-lg md:text-md font-medium text-[#1c1d1e] leading-tight"
-            >
+            <p className="project-header-subtext uppercase font-aeonik text-lg md:text-md font-medium text-[#1b1b1a] leading-tight">
               a selection of my most passionately crafted works with
               forward-thinking clients and friends over the years.
             </p>

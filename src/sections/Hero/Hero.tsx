@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplitType from "split-type";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,6 +22,8 @@ const Hero: React.FC = () => {
   const portraitRef = useRef<HTMLDivElement>(null);
   const entrancePlayedRef = useRef(false);
   const isSplitAnimatingRef = useRef(false);
+  const isReplayRunningRef = useRef(false);
+  const lastReplayAtRef = useRef(0);
 
   // 1. Scroll expansion animation
   useLayoutEffect(() => {
@@ -316,35 +317,21 @@ const Hero: React.FC = () => {
         }
 
         const tl = gsap.timeline();
-        const headingSplits: SplitType[] = [];
-        if (designTextRef.current) {
-          headingSplits.push(
-            new SplitType(designTextRef.current as HTMLElement, {
-              types: "chars",
-            }),
-          );
-        }
-        if (engineerTextRef.current) {
-          headingSplits.push(
-            new SplitType(engineerTextRef.current as HTMLElement, {
-              types: "chars",
-            }),
-          );
-        }
         const labelParagraphs = labelsRowRef.current
           ? gsap.utils.toArray<HTMLParagraphElement>("p", labelsRowRef.current)
           : [];
-        const headingChars = headingSplits.flatMap(
-          (split) => split.chars ?? [],
-        );
+        const headingTargets = [
+          designTextRef.current,
+          engineerTextRef.current,
+        ].filter((el): el is HTMLSpanElement => Boolean(el));
         const portraitTargets = [
           portraitRef.current,
           mobilePortraitRef.current,
         ].filter((el): el is HTMLDivElement => Boolean(el));
 
-        if (headingChars.length) {
+        if (headingTargets.length) {
           gsap.set(iconsRowRef.current, { autoAlpha: 1, yPercent: 0 });
-          gsap.set(headingChars, { autoAlpha: 0, yPercent: 100 });
+          gsap.set(headingTargets, { autoAlpha: 0, y: 120 });
         }
 
         tl.fromTo(
@@ -376,13 +363,13 @@ const Hero: React.FC = () => {
             "-=0.2",
           )
           .fromTo(
-            headingChars.length ? headingChars : iconsRowRef.current,
+            headingTargets.length ? headingTargets : iconsRowRef.current,
             {
               autoAlpha: 0,
-              yPercent: 100,
+              y: 120,
             },
             {
-              yPercent: 0,
+              y: 0,
               autoAlpha: 1,
               duration: 0.42,
               stagger: 0.02,
@@ -408,7 +395,6 @@ const Hero: React.FC = () => {
         }
 
         tl.eventCallback("onComplete", () => {
-          headingSplits.forEach((split) => split.revert());
           if (designHeading) {
             designHeading.style.width = "";
           }
@@ -436,19 +422,42 @@ const Hero: React.FC = () => {
       };
 
       const handleReplayEntrance = () => {
+        const now = Date.now();
+        if (isReplayRunningRef.current || now - lastReplayAtRef.current < 900) {
+          return;
+        }
+
+        isReplayRunningRef.current = true;
+        lastReplayAtRef.current = now;
+
         entrancePlayedRef.current = false;
         isSplitAnimatingRef.current = false;
         resetEntranceState();
 
         requestAnimationFrame(() => {
           playHeroEntrance();
+
+          window.setTimeout(() => {
+            isReplayRunningRef.current = false;
+          }, 900);
         });
       };
 
       // Entrance Triggers
       const handleHeaderComplete = () => playHeroEntrance();
+      const handleGlobalEntrance = () => {
+        // If header hasn't finished, we wait for it.
+        // But if we're on a transition where header is already visible, start hero.
+        const isHeaderVisible = gsap.getProperty("header", "opacity") as number > 0.5;
+        if (isHeaderVisible && !entrancePlayedRef.current) {
+          playHeroEntrance();
+        }
+      };
+
       window.addEventListener("header-entrance-complete", handleHeaderComplete);
       window.addEventListener("replay-hero-entrance", handleReplayEntrance);
+      window.addEventListener("initial-loader-complete", handleGlobalEntrance);
+      window.addEventListener("page-transition-complete", handleGlobalEntrance);
 
       // Initial States
       resetEntranceState();
@@ -461,11 +470,15 @@ const Hero: React.FC = () => {
       initScrollAnimation();
 
       const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
-      const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
+      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
+      const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
-      // On page switches/home returns where loader isn't active, start immediately
-      if (!isLoaderActive && hasSeenLoader && !entrancePlayedRef.current) {
-        requestAnimationFrame(() => playHeroEntrance());
+      // On page switches/home returns where loader isn't active, start immediately if header is ready
+      if (!isLoaderActive && (isInitialLoaderDone || !isNavigating) && !entrancePlayedRef.current) {
+        requestAnimationFrame(() => {
+          const isHeaderVisible = gsap.getProperty("header", "opacity") as number > 0.5;
+          if (isHeaderVisible) playHeroEntrance();
+        });
       }
 
       // Fallback
@@ -475,7 +488,7 @@ const Hero: React.FC = () => {
             playHeroEntrance();
           }
         },
-        isLoaderActive ? 8000 : 250,
+        isLoaderActive ? 8000 : 350,
       );
 
       return () => {
@@ -487,6 +500,8 @@ const Hero: React.FC = () => {
           "replay-hero-entrance",
           handleReplayEntrance,
         );
+        window.removeEventListener("initial-loader-complete", handleGlobalEntrance);
+        window.removeEventListener("page-transition-complete", handleGlobalEntrance);
         window.removeEventListener("resize", handleResize);
         textFitResizeObserver?.disconnect();
         clearTimeout(safetyTimeout);
@@ -500,6 +515,7 @@ const Hero: React.FC = () => {
           engineerTextRef.current.style.width = "";
         }
         isSplitAnimatingRef.current = false;
+        isReplayRunningRef.current = false;
       };
     }, sceneRef);
 
@@ -590,7 +606,7 @@ const Hero: React.FC = () => {
               >
                 <span
                   ref={designTextRef}
-                  className="block w-max whitespace-nowrap -ml-[0.06em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
+                  className="hero-heading-text block w-max whitespace-nowrap -ml-[0.06em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
                 >
                   Design
                 </span>
@@ -633,7 +649,7 @@ const Hero: React.FC = () => {
               >
                 <span
                   ref={engineerTextRef}
-                  className="block w-max whitespace-nowrap -ml-[0.06em] pr-[0.03em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
+                  className="hero-heading-text block w-max whitespace-nowrap -ml-[0.06em] pr-[0.03em] uppercase font-aeonik font-semibold leading-none tracking-normal text-[#1c1d1e]"
                 >
                   Engineer
                 </span>

@@ -6,6 +6,7 @@ interface ExperienceItemProps {
   dates: string;
   description: string;
   showDivider?: boolean;
+  className?: string;
 }
 
 const ExperienceItem: React.FC<ExperienceItemProps> = ({
@@ -14,27 +15,30 @@ const ExperienceItem: React.FC<ExperienceItemProps> = ({
   dates,
   description,
   showDivider = true,
+  className = "",
 }) => {
   return (
-    <div className="about-animate-item w-full py-8 md:py-10 first:pt-0 opacity-0">
-      <div className="flex flex-col gap-3 mb-4">
-        <h3 className="text-3xl md:text-3xl font-aeonik font-bold text-[#1c1d1e] uppercase">
+    <div
+      className={`about-experience-item w-full py-8 md:py-10 first:pt-0 ${className}`}
+    >
+      <div className="flex flex-col gap-3 mb-4 overflow-hidden">
+        <h3 className="about-experience-title text-3xl md:text-3xl font-aeonik font-bold text-[#1b1b1a] uppercase">
           {title}
         </h3>
-        <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4">
-          <p className="text-lg md:text-xl font-aeonik font-bold text-[#7d7d7d] uppercase tracking-wide">
+        <div className="about-experience-subtitle-wrap flex flex-col md:flex-row md:items-baseline justify-between gap-4 overflow-hidden">
+          <p className="about-experience-subtitle text-lg md:text-xl font-aeonik font-bold text-[#7d7d7d] uppercase tracking-wide">
             {subtitle}
           </p>
-          <span className="text-lg md:text-xl font-aeonik font-bold text-[#7d7d7d] md:text-right whitespace-nowrap">
+          <span className="about-experience-date text-lg md:text-xl font-aeonik font-bold text-[#7d7d7d] md:text-right whitespace-nowrap">
             {dates}
           </span>
         </div>
       </div>
-      <p className="text-lg md:text-xl font-aeonik text-[#1c1d1e]/70 leading-relaxed max-w-2xl">
+      <p className="about-experience-description text-lg md:text-xl font-aeonik text-[#1b1b1a]/70 leading-relaxed max-w-2xl">
         {description}
       </p>
       {showDivider && (
-        <hr className="mt-8 md:mt-10 border-[#1c1d1e]/10 -mr-8 md:-mr-16 lg:-mr-24" />
+        <hr className="mt-8 md:mt-10 border-[#1b1b1a]/10 -mr-8 md:-mr-16 lg:-mr-24" />
       )}
     </div>
   );

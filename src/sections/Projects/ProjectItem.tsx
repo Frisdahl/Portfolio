@@ -172,7 +172,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           {project.tags.map((tag, index) => (
             <span
               key={`${project.id}-${tag}`}
-              className={`px-3 py-1 rounded-full border border-white/70 bg-transparent text-white text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] transition-[opacity,transform,filter] duration-300 ease-out ${
+              className={`px-3 py-1 rounded-md bg-white/20 backdrop-blur-xl [backdrop-filter:saturate(150%)_blur(16px)] shadow-[0_6px_24px_rgba(0,0,0,0.22)] text-white text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] transition-[opacity,transform,filter] duration-300 ease-out ${
                 showTagPills
                   ? "opacity-100 translate-x-0 blur-0"
                   : "opacity-0 -translate-x-4 blur-sm"
@@ -185,7 +185,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         </div>
       </div>
 
-      <div className="mt-6 flex flex-col gap-1 w-full text-[#1c1d1e]">
+      <div className="mt-6 flex flex-col gap-1 w-full text-[#1b1b1a]">
         <div className="flex items-start justify-between w-full">
           <div
             className="relative cursor-pointer overflow-hidden"
@@ -194,7 +194,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             onMouseLeave={handleTitleMouseLeave}
           >
             <div className="flex flex-col items-start">
-              <h3 className="font-aeonik text-2xl md:text-2xl text-[#1c1d1e] font-medium leading-tight tracking-tight whitespace-nowrap capitalize">
+              <h3 className="font-aeonik text-2xl md:text-2xl text-[#1b1b1a] font-medium leading-tight tracking-tight whitespace-nowrap capitalize">
                 {project.title}
               </h3>
               <span className="font-aeonik text-xs md:text-sm font-thin uppercase tracking-[0.16em] text-black mt-1">
@@ -204,7 +204,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           </div>
 
           <div className="pb-1 md:pb-1.5 md:pr-4">
-            <span className="font-aeonik text-2xl md:text-2xl text-[#1c1d1e] font-medium leading-tight tracking-tight whitespace-nowrap capitalize">
+            <span className="font-aeonik text-2xl md:text-2xl text-[#1b1b1a] font-medium leading-tight tracking-tight whitespace-nowrap capitalize">
               {project.year || "2024"}
             </span>
           </div>

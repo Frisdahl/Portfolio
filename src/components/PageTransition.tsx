@@ -10,7 +10,7 @@ const PageTransition = () => {
   const isAnimatingRef = useRef(false);
   const isFirstMountRef = useRef(true);
   const ctxRef = useRef<gsap.Context | null>(null);
-  
+
   const [columnCount, setColumnCount] = useState(12);
 
   useEffect(() => {
@@ -22,14 +22,15 @@ const PageTransition = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const animate = (onCovered?: () => void, isInitial = false) => {
+  const animate = (onCovered?: () => void) => {
     return new Promise<void>((resolve) => {
-      if (isAnimatingRef.current && !isInitial) {
+      if (isAnimatingRef.current) {
         resolve();
         return;
       }
 
       isAnimatingRef.current = true;
+      sessionStorage.setItem("isNavigating", "true");
 
       // 1. Prepare DOM
       if (containerRef.current) {
@@ -43,10 +44,14 @@ const PageTransition = () => {
       // Disable scrolling
       document.body.style.overflow = "hidden";
 
+      if (ctxRef.current) ctxRef.current.revert();
+
       ctxRef.current = gsap.context(() => {
         const tl = gsap.timeline({
           onComplete: () => {
             isAnimatingRef.current = false;
+            sessionStorage.removeItem("isNavigating");
+
             if (containerRef.current) {
               gsap.set(containerRef.current, {
                 autoAlpha: 0,
@@ -55,30 +60,28 @@ const PageTransition = () => {
               });
             }
             document.body.style.overflow = "";
+
+            // Dispatch event ONLY after the screen is clear
+            window.dispatchEvent(new CustomEvent("page-transition-complete"));
           },
         });
 
         // 2. Expand Phase
-        if (!isInitial) {
-          tl.set(columnsRef.current, { scaleX: 0, transformOrigin: "right" });
-          tl.to(columnsRef.current, {
-            scaleX: 1,
-            duration: 0.6,
-            stagger: { each: 0.03, from: "end" },
-            ease: "expo.inOut",
-            force3D: true,
-            onComplete: () => {
-              // Execute navigation/jump logic while screen is covered
-              onCovered?.();
-              resolve();
-            },
-          });
-        } else {
-          tl.set(columnsRef.current, { scaleX: 1 });
-          tl.to({}, { duration: 0.1 });
-          onCovered?.();
-          resolve();
-        }
+        tl.set(columnsRef.current, { scaleX: 0, transformOrigin: "right" });
+        tl.to(columnsRef.current, {
+          scaleX: 1,
+          duration: 0.6,
+          stagger: { each: 0.03, from: "end" },
+          ease: "expo.inOut",
+          force3D: true,
+          onComplete: () => {
+            // Execute navigation/jump logic while screen is covered
+            if (onCovered) {
+              onCovered();
+            }
+            resolve();
+          },
+        });
 
         // 3. Brief pause while covered
         tl.to({}, { duration: 0.2 });
@@ -91,22 +94,24 @@ const PageTransition = () => {
           stagger: { each: 0.03, from: "start" },
           ease: "expo.inOut",
           force3D: true,
-          onComplete: () => {
-            // Dispatch event ONLY after the screen is clear
-            window.dispatchEvent(new CustomEvent("page-transition-complete"));
-          }
         });
       });
     });
   };
 
+  // Set the trigger once on mount
   useEffect(() => {
     _setTransitionTrigger((onCovered) => animate(onCovered));
-    isFirstMountRef.current = false;
   }, []);
 
+  // Handle location changes for links that don't use triggerPageTransition (e.g. back/forward)
   useEffect(() => {
-    if (!isAnimatingRef.current && !isFirstMountRef.current) {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      return;
+    }
+
+    if (!isAnimatingRef.current) {
       animate();
     }
   }, [location.pathname]);
@@ -115,7 +120,7 @@ const PageTransition = () => {
     <div
       ref={containerRef}
       className="fixed inset-0 z-[99999] pointer-events-none"
-      style={{ display: "block", opacity: 0, visibility: "hidden" }}
+      style={{ display: "none", opacity: 0, visibility: "hidden" }}
     >
       <div className="absolute inset-0 flex w-full h-full z-0 overflow-hidden">
         {[...Array(columnCount)].map((_, i) => (
@@ -128,7 +133,7 @@ const PageTransition = () => {
             style={{
               willChange: "transform",
               width: `${100 / columnCount}%`,
-              margin: "0 -0.1%"
+              margin: "0 -0.1%",
             }}
           />
         ))}

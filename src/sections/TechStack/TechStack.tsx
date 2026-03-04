@@ -190,7 +190,7 @@ const TechStack: React.FC = () => {
       <div className="mb-16 md:mb-24">
         <h2
           ref={headingRef}
-          className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-bold uppercase tracking-tight text-[#1c1d1e] leading-[0.8] mb-12"
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-bold uppercase tracking-tight text-[#1b1b1a] leading-[0.8] mb-12"
         >
           <span className="inline-block whitespace-nowrap">
             {headingData[0].map((item, i) => (
@@ -210,7 +210,7 @@ const TechStack: React.FC = () => {
         </h2>
 
         <div className="text-left">
-          <p className="uppercase font-aeonik text-lg md:text-md font-medium text-[#1c1d1e] leading-tight">
+          <p className="uppercase font-aeonik text-lg md:text-md font-medium text-[#1b1b1a] leading-tight">
             Professional At
           </p>
         </div>
@@ -225,7 +225,7 @@ const TechStack: React.FC = () => {
             rel="noopener noreferrer"
             id={`mobile-${item.id}`}
             key={`mobile-${item.id}`}
-            className={`h-32 bg-[var(--background)] border-[#1c1d1e]/10 flex items-center justify-center ${getMobileBorderClasses(index)}`}
+            className={`h-32 bg-[var(--background)] border-[#1b1b1a]/10 flex items-center justify-center ${getMobileBorderClasses(index)}`}
           >
             <img
               src={item.icon}
@@ -241,7 +241,7 @@ const TechStack: React.FC = () => {
         {/* Shared Hover Background */}
         <div
           ref={bgRef}
-          className="absolute top-0 left-0 bg-[#1c1d1e] pointer-events-none z-0"
+          className="absolute top-0 left-0 bg-[#1b1b1a] pointer-events-none z-0"
           style={{ willChange: "transform, width, height" }}
         />
 
@@ -255,7 +255,7 @@ const TechStack: React.FC = () => {
               id={item.id}
               key={item.id}
               onMouseEnter={() => setHoveredIdx(item.id)}
-              className={`col-span-4 h-64 md:h-80 lg:h-[400px] flex items-center justify-center transition-all duration-500 border-[#1c1d1e]/10 
+              className={`col-span-4 h-64 md:h-80 lg:h-[400px] flex items-center justify-center transition-all duration-500 border-[#1b1b1a]/10 
                 ${item.id !== "r1-2" ? "border-r" : ""} border-b cursor-pointer`}
             >
               <img
@@ -282,7 +282,7 @@ const TechStack: React.FC = () => {
               id={item.id}
               key={item.id}
               onMouseEnter={() => setHoveredIdx(item.id)}
-              className={`flex-1 h-32 md:h-48 flex items-center justify-center transition-all duration-500 border-[#1c1d1e]/10 
+              className={`flex-1 h-32 md:h-48 flex items-center justify-center transition-all duration-500 border-[#1b1b1a]/10 
                 ${idx < row2.length - 1 ? "border-r" : ""} cursor-pointer`}
             >
               <img

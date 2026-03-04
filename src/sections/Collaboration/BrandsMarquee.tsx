@@ -143,7 +143,7 @@ const BrandsMarquee: React.FC = () => {
         <div className=" overflow-hidden">
           <h2
             ref={headerRef}
-            className="project-header-text text-2xl md:text-3xl lg:text-5xl w-full text-left font-aeonik font-semibold text-[#1c1d1e] leading-tight"
+            className="project-header-text text-2xl md:text-3xl lg:text-5xl w-full text-left font-aeonik font-semibold text-[#1b1b1a] leading-tight"
           >
             Brands & creative teams <br className="hidden md:block" />
             I’ve collaborated with
@@ -152,7 +152,7 @@ const BrandsMarquee: React.FC = () => {
         <div className="max-w-sm md:text-right overflow-hidden">
           <p
             ref={subtextRef}
-            className="project-header-subtext font-aeonik text-base md:text-lg text-[#1c1d1e] opacity-40 leading-relaxed tracking-wider"
+            className="project-header-subtext font-aeonik text-base md:text-lg text-[#1b1b1a] opacity-40 leading-relaxed tracking-wider"
           >
             Trusted by brands & <br className="hidden md:block" /> creative
             teams worldwide
@@ -165,7 +165,7 @@ const BrandsMarquee: React.FC = () => {
           {duplicatedBrands.map((brand, idx) => (
             <div
               key={`${brand.name}-${idx}`}
-              className="group relative flex-shrink-0 w-56 h-48 md:w-72 md:h-62 flex items-center justify-center transition-all duration-500 hover:scale-[1.05] bg-[#1c1d1e]"
+              className="group relative flex-shrink-0 w-56 h-48 md:w-72 md:h-62 flex items-center justify-center transition-all duration-500 hover:scale-[1.05] bg-[#1b1b1a]"
               style={{
                 transform: `skewX(var(--tileSkew)) translateZ(0)`,
                 willChange: "transform",

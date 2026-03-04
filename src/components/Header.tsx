@@ -23,6 +23,8 @@ const Header: React.FC = () => {
   const entranceTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const activeDotRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const previousActiveItemRef = useRef<string | null>(null);
+  const logoReplayTimeoutRef = useRef<number | null>(null);
+  const lastLogoReplayAtRef = useRef(0);
 
   const isHomePage = location.pathname === "/";
 
@@ -141,17 +143,18 @@ const Header: React.FC = () => {
       window.addEventListener("initial-loader-complete", playEntrance);
       window.addEventListener("page-transition-complete", playEntrance);
 
-      const hasSeenLoader = sessionStorage.getItem("hasSeenInitialLoader");
+      const isInitialLoaderDone =
+        sessionStorage.getItem("hasSeenInitialLoader") === "true";
       const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
       const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
-      if (hasSeenLoader && !isLoaderActive && !isNavigating) {
+      if (isInitialLoaderDone && !isLoaderActive && !isNavigating) {
         playEntrance();
       }
 
       const safetyTimeout = setTimeout(
         playEntrance,
-        isLoaderActive ? 6000 : 120,
+        isLoaderActive ? 8000 : 250,
       );
 
       return () => {
@@ -327,9 +330,39 @@ const Header: React.FC = () => {
       sessionStorage.removeItem("isNavigating");
       navigate("/");
     } else {
+      if (window.location.hash) {
+        window.history.replaceState(null, "", location.pathname);
+      }
+
+      if (logoReplayTimeoutRef.current) {
+        window.clearTimeout(logoReplayTimeoutRef.current);
+        logoReplayTimeoutRef.current = null;
+      }
+
+      const shouldReplayEntrance = window.scrollY > 64;
       scrollTo(0, 0, 0, true);
+
+      if (shouldReplayEntrance) {
+        logoReplayTimeoutRef.current = window.setTimeout(() => {
+          const now = Date.now();
+          if (now - lastLogoReplayAtRef.current < 900) {
+            return;
+          }
+          lastLogoReplayAtRef.current = now;
+          window.dispatchEvent(new CustomEvent("replay-hero-entrance"));
+          logoReplayTimeoutRef.current = null;
+        }, 16);
+      }
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (logoReplayTimeoutRef.current) {
+        window.clearTimeout(logoReplayTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleLinkClick = async (
     e: React.MouseEvent | null,
@@ -340,19 +373,43 @@ const Header: React.FC = () => {
     setIsMenuOpen(false);
 
     if (section) {
-      const sectionRoute = to || `/${section}`;
+      if (isHomePage) {
+        const headerElement = document.querySelector("header");
+        const navRow = headerElement?.querySelector("div");
+        const headerHeight = navRow
+          ? navRow.getBoundingClientRect().height
+          : headerElement?.getBoundingClientRect().height ?? 0;
 
-      if (!isHomePage) {
-        sessionStorage.setItem("targetSection", section);
-        navigate(sectionRoute);
+        const isMobile = window.innerWidth < 768;
+        const topPadding = isMobile ? 24 : 40;
+        const topOffset = -(headerHeight + topPadding + 8);
+
+        if (window.location.hash) {
+          window.history.replaceState(null, "", location.pathname);
+        }
+
+        sessionStorage.setItem("pendingProjectsEntrance", "true");
+        sessionStorage.setItem("pendingSectionScroll", "true");
+        sessionStorage.removeItem("targetSection");
+        scrollTo(section, 0, topOffset, true);
+        window.setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("replay-projects-entrance"));
+        }, 16);
       } else {
+        sessionStorage.setItem("pendingProjectsEntrance", "true");
+        sessionStorage.setItem("pendingSectionScroll", "true");
         sessionStorage.setItem("targetSection", section);
-        navigate(sectionRoute);
+        navigate("/");
       }
       return;
     }
 
+    sessionStorage.removeItem("targetSection");
+    sessionStorage.removeItem("pendingSectionScroll");
+    sessionStorage.removeItem("pendingProjectsEntrance");
+
     if (location.pathname !== to) {
+      sessionStorage.setItem("isNavigating", "true");
       await triggerPageTransition(() => navigate(to));
     }
   };
@@ -449,7 +506,7 @@ const Header: React.FC = () => {
           ref={nameRef}
           to="/"
           onClick={handleLogoClick}
-          className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1c1d1e] pt-1 opacity-0"
+          className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1b1b1a] pt-1 opacity-0"
         >
           <span className="text-base md:text-xl lg:text-2xl uppercase font-medium tracking-tight leading-none overflow-hidden inline-block">
             <span className="italic">A</span>lexander
@@ -468,7 +525,7 @@ const Header: React.FC = () => {
             <button
               ref={talkButtonRef}
               onClick={(e) => handleLinkClick(e, "/contact")}
-              className="group/talk hidden md:flex h-10 sm:h-12 px-10 rounded-full bg-[#1c1d1e] text-[#fefffe] text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative min-w-[160px] opacity-0"
+              className="group/talk hidden md:flex h-10 sm:h-12 px-10 rounded-full bg-[#1b1b1a] text-[#fefffe] text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative min-w-[160px] opacity-0"
             >
               <span className="whitespace-nowrap transition-transform duration-500 group-hover/talk:translate-x-3 font-medium">
                 Let's talk
@@ -533,13 +590,15 @@ const Header: React.FC = () => {
                   key={item.label}
                   href={item.to}
                   onClick={(e) => handleLinkClick(e, item.to, item.section)}
-                  className={`menu-item-anim group/item flex items-center justify-between px-8 py-5 rounded-full transition-colors duration-300 text-[#1c1d1e] uppercase font-medium text-lg md:text-2xl tracking-tight overflow-hidden ${
-                    isActive ? "cursor-default" : "hover:bg-[#1c1d1e]/5"
+                  className={`menu-item-anim group/item flex items-center justify-between px-8 py-5 rounded-full transition-colors duration-300 text-[#1b1b1a] uppercase font-medium text-lg md:text-2xl tracking-tight overflow-hidden ${
+                    isActive
+                      ? "cursor-default opacity-80"
+                      : "hover:bg-[#1b1b1a]/5"
                   }`}
                 >
                   <div className="relative h-8 overflow-hidden flex-grow pointer-events-none">
                     <div
-                      className={`flex flex-col transition-transform duration-[600ms] ease-[cubic-bezier(0.7,0,0.3,1)] h-[200%] ${
+                      className={`flex flex-col transition-transform duration-[320ms] ease-[cubic-bezier(0.7,0,0.3,1)] h-[200%] ${
                         isActive
                           ? "translate-y-0"
                           : "group-hover/item:-translate-y-1/2"
@@ -559,7 +618,7 @@ const Header: React.FC = () => {
                       ref={(el) => {
                         activeDotRefs.current[item.label] = el;
                       }}
-                      className="absolute w-2 h-2 rounded-full bg-[#1c1d1e] scale-0"
+                      className="absolute w-2 h-2 rounded-full bg-[#1b1b1a] scale-0"
                     />
                     <div
                       className={`absolute opacity-0 -translate-x-4 transition-all duration-300 ${

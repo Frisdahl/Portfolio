@@ -39,29 +39,72 @@ export const initGridAnimations = (container: HTMLElement) => {
       if (headerText && subText) {
         gsap.set([headerText, subText], { opacity: 1 });
 
-        // Removed SplitType as it breaks the custom AnimatedLetter logic
-        gsap.fromTo(
-          [headerText, subText],
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1.15,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: headerText,
-              start: "top 85%",
-              once: true,
+        const shouldRunImmediate =
+          sessionStorage.getItem("pendingProjectsEntrance") === "true";
+        const shouldAnimateNow =
+          shouldRunImmediate ||
+          headerText.getBoundingClientRect().top <= window.innerHeight * 0.9;
+
+        if (shouldAnimateNow) {
+          gsap.fromTo(
+            [headerText, subText],
+            { y: 24, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.95,
+              stagger: 0.1,
+              ease: "power3.out",
             },
-          },
-        );
+          );
+          sessionStorage.removeItem("pendingProjectsEntrance");
+        } else {
+          gsap.fromTo(
+            [headerText, subText],
+            { y: 24, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 1.15,
+              stagger: 0.1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: headerText,
+                start: "top 85%",
+                once: true,
+              },
+            },
+          );
+        }
       }
 
       gsap.set(allCards, { opacity: 1, clearProps: "transform" });
 
       ScrollTrigger.refresh();
     };
+
+    const replayProjectsEntrance = () => {
+      const headerText = headerTextEl as HTMLElement | null;
+      const subText = subTextEl as HTMLElement | null;
+
+      if (!headerText || !subText) return;
+
+      gsap.killTweensOf([headerText, subText]);
+      gsap.set([headerText, subText], { y: 24, opacity: 0 });
+
+      gsap.to([headerText, subText], {
+        y: 0,
+        opacity: 1,
+        duration: 0.95,
+        stagger: 0.1,
+        ease: "power3.out",
+        onComplete: () => {
+          sessionStorage.removeItem("pendingProjectsEntrance");
+        },
+      });
+    };
+
+    window.addEventListener("replay-projects-entrance", replayProjectsEntrance);
 
     const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
@@ -78,10 +121,22 @@ export const initGridAnimations = (container: HTMLElement) => {
 
       // Fallback if event already fired before listener was attached.
       window.setTimeout(onTransitionDone, 1200);
-      return;
+      return () => {
+        window.removeEventListener(
+          "replay-projects-entrance",
+          replayProjectsEntrance,
+        );
+      };
     }
 
     setupAnimations();
+
+    return () => {
+      window.removeEventListener(
+        "replay-projects-entrance",
+        replayProjectsEntrance,
+      );
+    };
   }, container);
 
   return ctx;

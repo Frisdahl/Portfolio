@@ -117,7 +117,7 @@ const Footer: React.FC = () => {
 
       <footer
         ref={footerRef}
-        className="fixed bottom-0 left-0 right-0 w-full bg-[#1c1d1e] text-white overflow-hidden z-10"
+        className="fixed bottom-0 left-0 right-0 w-full bg-[#1b1b1a] text-white overflow-hidden z-10"
       >
         <div ref={contentRef} className="w-full h-full relative">
           {/* Background Video Layer */}
@@ -144,7 +144,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Neutral Dark overlay */}
-          <div className="absolute inset-0 z-[2] bg-[#1c1d1e]/45 pointer-events-none" />
+          <div className="absolute inset-0 z-[2] bg-[#1b1b1a]/45 pointer-events-none" />
 
           {/* Footer Content */}
           <div className="relative z-[10] w-full px-4 md:px-10 lg:px-12 xl:px-16 pt-24 flex flex-col md:flex-row justify-between items-start gap-12 pb-12">

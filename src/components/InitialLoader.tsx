@@ -67,12 +67,12 @@ const InitialLoader: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="initial-loader-wrap fixed inset-0 z-[300] bg-[#f4f4f5] flex items-center justify-center overflow-hidden"
+      className="initial-loader-wrap fixed inset-0 z-[300] bg-[#f5f5f3] flex items-center justify-center overflow-hidden"
     >
       <div className="overflow-hidden h-[1.2em] flex items-center">
         <div
           ref={counterRef}
-          className="font-aeonik text-base md:text-lg lg:text-xl font-medium text-[#1c1d1e] tabular-nums leading-[1.2em]"
+          className="font-aeonik text-base md:text-lg lg:text-xl font-medium text-[#1b1b1a] tabular-nums leading-[1.2em]"
         >
           {percentage}%
         </div>

@@ -274,7 +274,7 @@ const ContactPage: React.FC = () => {
   };
 
   const inputClasses =
-    "bg-transparent border-b border-[#1c1d1e] focus:outline-none py-3 w-full text-lg md:text-2xl text-[#1c1d1e] placeholder:text-[#1c1d1e]/30 transition-all duration-500 focus:border-b-2 focus:scale-[1.01] origin-left";
+    "bg-transparent border-b border-[#1b1b1a] focus:outline-none py-3 w-full text-lg md:text-2xl text-[#1b1b1a] placeholder:text-[#1b1b1a]/30 transition-all duration-500 focus:border-b-2 focus:scale-[1.01] origin-left";
 
   return (
     <div
@@ -283,7 +283,7 @@ const ContactPage: React.FC = () => {
       className="relative w-full min-h-screen py-28 bg-[var(--background)] flex flex-col"
     >
       <div className="w-full px-6 md:px-10 lg:px-12 xl:px-48 flex flex-col items-start text-left flex-grow">
-        <h2 className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-medium text-[#1c1d1e] leading-[1.25] tracking-tight whitespace-normal md:whitespace-nowrap mb-10">
+        <h2 className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-medium text-[#1b1b1a] leading-[1.25] tracking-tight whitespace-normal md:whitespace-nowrap mb-10">
           <span className="block overflow-hidden">
             <span ref={headingLineOneRef} className="inline-block">
               Let’s Work
@@ -398,7 +398,7 @@ const ContactPage: React.FC = () => {
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 md:gap-12 pt-2 md:pt-4">
             <div className="budget-area flex flex-col items-start">
-              <p className="text-[#1c1d1e] mb-6 text-sm font-medium uppercase tracking-[0.2em] opacity-40">
+              <p className="text-[#1b1b1a] mb-6 text-sm font-medium uppercase tracking-[0.2em] opacity-40">
                 Project budget
               </p>
               <div className="flex flex-wrap gap-3 justify-start">
@@ -409,11 +409,11 @@ const ContactPage: React.FC = () => {
                     isActive={selectedBudget === budget}
                     onClick={() => setSelectedBudget(budget)}
                     baseBgColor="bg-transparent"
-                    baseTextColor="text-[#1c1d1e]"
-                    borderColor="border-[#1c1d1e]"
-                    activeBgColor="bg-[#1c1d1e]"
+                    baseTextColor="text-[#1b1b1a]"
+                    borderColor="border-[#1b1b1a]"
+                    activeBgColor="bg-[#1b1b1a]"
                     activeTextColor="text-[#ffffff]"
-                    hoverBgColor="bg-[#1c1d1e]"
+                    hoverBgColor="bg-[#1b1b1a]"
                     hoverTextColor="group-hover/btn:text-[#ffffff]"
                   />
                 ))}
@@ -432,12 +432,12 @@ const ContactPage: React.FC = () => {
                 type="submit"
                 disabled={isSubmitting || isSubmitBlockedByCooldown}
                 padding="px-10 py-5 md:px-16 md:py-8"
-                baseBorderColor="border-[#1c1d1e]"
-                baseBgColor="bg-[#1c1d1e]"
+                baseBorderColor="border-[#1b1b1a]"
+                baseBgColor="bg-[#1b1b1a]"
                 baseTextColor="text-[#ffffff]"
-                hoverTextColor="group-hover/btn:text-[#1c1d1e]"
-                hoverBgColor="bg-[#f4f4f5]"
-                hoverBorderColor="border-[#1c1d1e]"
+                hoverTextColor="group-hover/btn:text-[#1b1b1a]"
+                hoverBgColor="bg-[#f5f5f3]"
+                hoverBorderColor="border-[#1b1b1a]"
                 fontSize="text-lg md:text-xl"
               />
             </div>
@@ -446,7 +446,7 @@ const ContactPage: React.FC = () => {
 
         {/* Floating Status Toast */}
         {(submitStatus === "success" || submitStatus === "error") && (
-          <div className="fixed bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] md:w-auto max-w-[640px] px-5 md:px-10 py-4 md:py-5 bg-[#1c1d1e] border border-white/5 shadow-[0_30px_60px_rgba(0,0,0,0.5)] rounded-2xl md:rounded-full flex items-center gap-4 md:gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out backdrop-blur-md">
+          <div className="fixed bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] md:w-auto max-w-[640px] px-5 md:px-10 py-4 md:py-5 bg-[#1b1b1a] border border-white/5 shadow-[0_30px_60px_rgba(0,0,0,0.5)] rounded-2xl md:rounded-full flex items-center gap-4 md:gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out backdrop-blur-md">
             <div className="flex-shrink-0 flex items-center justify-center">
               {submitStatus === "success" ? (
                 <svg

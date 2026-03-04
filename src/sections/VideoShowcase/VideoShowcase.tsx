@@ -99,7 +99,7 @@ const VideoShowcase: React.FC = () => {
             <div className="flex flex-col gap-4 md:gap-6">
               <h2
                 ref={headingRef}
-                className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-aeonik font-bold text-[#1c1d1e] tracking-tight leading-[1.1]"
+                className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-aeonik font-bold text-[#1b1b1a] tracking-tight leading-[1.1]"
               >
                 I design and
                 <br />
@@ -107,7 +107,7 @@ const VideoShowcase: React.FC = () => {
               </h2>{" "}
               <p
                 ref={longTextRef}
-                className="font-aeonik text-lg md:text-xl lg:text-2xl tracking-tight text-[#1c1d1e] max-w-xl mx-auto lg:mx-0 opacity-70"
+                className="font-aeonik text-lg md:text-xl lg:text-2xl tracking-tight text-[#1b1b1a] max-w-xl mx-auto lg:mx-0 opacity-70"
               >
                 Focused on creating digital experiences that bridge the gap
                 between visual aesthetics and technical excellence.
@@ -116,7 +116,7 @@ const VideoShowcase: React.FC = () => {
 
             <p
               ref={smallTextRef}
-              className="font-aeonik text-xs md:text-sm uppercase tracking-[0.3em] text-[#1c1d1e] opacity-40"
+              className="font-aeonik text-xs md:text-sm uppercase tracking-[0.3em] text-[#1b1b1a] opacity-40"
             >
               ( Creative Direction & Web Development )
             </p>
