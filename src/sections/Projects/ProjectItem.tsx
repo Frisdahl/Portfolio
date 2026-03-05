@@ -81,19 +81,19 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     };
   }, []);
 
+  // Helper to create a slug from the project title
+  const getSlug = (title: string) =>
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+
   const handleProjectClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (project.link && project.link !== "#" && project.link !== "") {
-      if (project.link.startsWith("http")) {
-        window.open(project.link, "_blank", "noopener,noreferrer");
-      } else {
-        navigate(project.link);
-      }
-      return;
-    }
-
-    showComingSoon();
+    // Always navigate to project page
+    const slug = getSlug(project.title);
+    navigate(`/projects/${slug}`);
   };
 
   const videoSrc = project.video?.startsWith("/")

@@ -13,6 +13,8 @@ import useSmoothScroll from "./utils/useSmoothScroll";
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
+
+const ProjectPage = lazy(() => import("./pages/ProjectPage"));
 const ComingSoon = lazy(() => import("./components/ComingSoon"));
 
 function App() {
@@ -94,8 +96,8 @@ function App() {
 
   return (
     <Router>
-      <InitialLoader />
-      <PageTransition />
+      {/* <InitialLoader />
+      <PageTransition /> */}
       {showNonCriticalUI && <SpeedInsights />}
       <ScrollToTop />
       {showNonCriticalUI && (
@@ -114,6 +116,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/projects/:slug" element={<ProjectPage />} />
           </Routes>
         </Suspense>
       </Layout>

@@ -378,7 +378,7 @@ const Header: React.FC = () => {
         const navRow = headerElement?.querySelector("div");
         const headerHeight = navRow
           ? navRow.getBoundingClientRect().height
-          : headerElement?.getBoundingClientRect().height ?? 0;
+          : (headerElement?.getBoundingClientRect().height ?? 0);
 
         const isMobile = window.innerWidth < 768;
         const topPadding = isMobile ? 24 : 40;
@@ -499,7 +499,7 @@ const Header: React.FC = () => {
   }, [activeItemKey, isMenuOpen]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[220] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6">
+    <header className="fixed top-0 left-0 right-0 z-[220] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6 h-28 min-h-28 flex items-center">
       <div className="flex items-start justify-between w-full relative">
         {/* Logo Replacement: Stylized Name */}
         <Link

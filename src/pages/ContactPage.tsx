@@ -280,7 +280,7 @@ const ContactPage: React.FC = () => {
     <div
       ref={containerRef}
       id="contact"
-      className="relative w-full min-h-screen py-28 bg-[var(--background)] flex flex-col"
+      className="relative w-full min-h-screen bg-[var(--background)] flex flex-col"
     >
       <div className="w-full px-6 md:px-10 lg:px-12 xl:px-48 flex flex-col items-start text-left flex-grow">
         <h2 className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-medium text-[#1b1b1a] leading-[1.25] tracking-tight whitespace-normal md:whitespace-nowrap mb-10">

@@ -75,18 +75,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div ref={layoutRef} className="flex flex-col min-h-screen">
-      <InitialLoader />
-      <PageTransition />
+      {/*  <InitialLoader />
+      <PageTransition /> */}
       <Header />
 
-      <main className="relative z-20 flex-grow bg-[var(--background)]">
+      <main className="relative z-20 flex-grow bg-[var(--background)] pt-28">
         {children}
       </main>
-      {shouldRenderFooter && (
+      {/*       {shouldRenderFooter && (
         <Suspense fallback={<div aria-hidden="true" style={{ height: 1 }} />}>
           <Footer />
         </Suspense>
-      )}
+      )} */}
     </div>
   );
 };

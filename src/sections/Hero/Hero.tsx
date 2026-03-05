@@ -331,7 +331,7 @@ const Hero: React.FC = () => {
 
         if (headingTargets.length) {
           gsap.set(iconsRowRef.current, { autoAlpha: 1, yPercent: 0 });
-          gsap.set(headingTargets, { autoAlpha: 0, y: 120 });
+          gsap.set(headingTargets, { autoAlpha: 0, y: -10 });
         }
 
         tl.fromTo(
@@ -448,7 +448,8 @@ const Hero: React.FC = () => {
       const handleGlobalEntrance = () => {
         // If header hasn't finished, we wait for it.
         // But if we're on a transition where header is already visible, start hero.
-        const isHeaderVisible = gsap.getProperty("header", "opacity") as number > 0.5;
+        const isHeaderVisible =
+          (gsap.getProperty("header", "opacity") as number) > 0.5;
         if (isHeaderVisible && !entrancePlayedRef.current) {
           playHeroEntrance();
         }
@@ -470,13 +471,19 @@ const Hero: React.FC = () => {
       initScrollAnimation();
 
       const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
-      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
+      const isInitialLoaderDone =
+        sessionStorage.getItem("hasSeenInitialLoader") === "true";
       const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
       // On page switches/home returns where loader isn't active, start immediately if header is ready
-      if (!isLoaderActive && (isInitialLoaderDone || !isNavigating) && !entrancePlayedRef.current) {
+      if (
+        !isLoaderActive &&
+        (isInitialLoaderDone || !isNavigating) &&
+        !entrancePlayedRef.current
+      ) {
         requestAnimationFrame(() => {
-          const isHeaderVisible = gsap.getProperty("header", "opacity") as number > 0.5;
+          const isHeaderVisible =
+            (gsap.getProperty("header", "opacity") as number) > 0.5;
           if (isHeaderVisible) playHeroEntrance();
         });
       }
@@ -500,8 +507,14 @@ const Hero: React.FC = () => {
           "replay-hero-entrance",
           handleReplayEntrance,
         );
-        window.removeEventListener("initial-loader-complete", handleGlobalEntrance);
-        window.removeEventListener("page-transition-complete", handleGlobalEntrance);
+        window.removeEventListener(
+          "initial-loader-complete",
+          handleGlobalEntrance,
+        );
+        window.removeEventListener(
+          "page-transition-complete",
+          handleGlobalEntrance,
+        );
         window.removeEventListener("resize", handleResize);
         textFitResizeObserver?.disconnect();
         clearTimeout(safetyTimeout);
