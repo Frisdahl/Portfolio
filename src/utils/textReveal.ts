@@ -1,8 +1,7 @@
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-gsap.registerPlugin(ScrollTrigger);
+import { revealYPercent } from "./animations";
+import type { ScrollTriggerConfig } from "./animations";
 
-type TextRevealOptions = {
+export type TextRevealOptions = {
   start?: string;
   end?: string;
   duration?: number;
@@ -12,6 +11,9 @@ type TextRevealOptions = {
   yPercentFrom?: number;
 };
 
+/**
+ * Text reveal (yPercent) with ScrollTrigger. Uses shared animation utilities.
+ */
 export const createTextReveal = (
   element: HTMLElement,
   options: TextRevealOptions = {},
@@ -26,24 +28,22 @@ export const createTextReveal = (
     yPercentFrom = 100,
   } = options;
 
-  const tween = gsap.fromTo(
-    element,
-    { yPercent: yPercentFrom },
-    {
-      yPercent: 0,
-      duration,
-      ease,
-      scrollTrigger: {
-        trigger: element,
-        start,
-        end,
-        toggleActions,
-        markers,
-      },
-    },
-  );
+  const scrollTrigger: ScrollTriggerConfig = {
+    start,
+    end,
+    toggleActions,
+    markers,
+  };
+
+  const tween = revealYPercent(element, {
+    from: yPercentFrom,
+    duration,
+    ease,
+    scrollTrigger,
+  });
 
   return () => {
-    tween.kill();
+    if (Array.isArray(tween)) tween.forEach((t) => t.kill());
+    else tween.kill();
   };
 };
