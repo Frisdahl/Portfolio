@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import ArrowIcon from "./ArrowIcon";
+import PlusIcon from "../assets/icons/PlusIcon";
 import AnimatedNavLink from "./AnimatedNavLink";
 import { useMagnetic } from "../utils/animations/useMagnetic";
 
@@ -463,50 +464,91 @@ const Header: React.FC = () => {
 
       {/* Floating Burger Button - fixed size, always top-right, expanding overlay for menu */}
       <div className="fixed top-0 right-0 z-[999] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6 h-28 flex items-center justify-end overflow-visible">
-        {/* Expanding Burger/Menu Button - single button, always top-right, icon always centered */}
+        {/* Expanding Burger/Menu Button - single button, always top-right, icon always stays in same spot */}
         <button
           ref={burgerRef}
           aria-label="Menu"
           className="pointer-events-auto bg-[#1b1b1a] shadow-lg fixed top-8 right-8 z-[1001] flex items-center justify-center overflow-hidden transition-all duration-400 rounded-[18px]"
           style={{
             visibility: "hidden",
-            width: isMenuOpen ? 320 : 56,
-            height: isMenuOpen ? 320 : 56,
-            transition: "width 0.4s linear, height 0.4s linear",
+            minWidth: isMenuOpen ? 700 : 56,
+            minHeight: isMenuOpen ? 500 : 56,
+            width: isMenuOpen ? "auto" : 56,
+            height: isMenuOpen ? "auto" : 56,
+            transition:
+              "min-width 0.4s linear, min-height 0.4s linear, width 0.4s linear, height 0.4s linear",
             boxShadow: "0 8px 32px 0 rgba(0,0,0,0.25)",
           }}
           onClick={() => setIsMenuOpen((open) => !open)}
         >
-          {/* Burger/X icon - always centered in button */}
-          <div className="w-full h-full flex items-center justify-center z-[1002]">
+          {/* Burger/X icon - always stays in same spot (top-right) */}
+          <div
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              width: 28,
+              height: 28,
+              zIndex: 1002,
+              pointerEvents: "none",
+            }}
+          >
             <div
               className={`relative w-7 h-7 flex flex-col items-center justify-center`}
             >
               <div
                 className={`w-7 h-[2.5px] bg-[#fefffe] rounded transition-all duration-300 ${isMenuOpen ? "rotate-45 absolute top-1/2 left-0" : ""}`}
-                style={{ transition: "all 0.3s" }}
+                style={{
+                  transition: "all 0.3s",
+                  marginBottom: isMenuOpen ? 0 : 1,
+                }}
               />
               <div
                 className={`w-7 h-[2.5px] bg-[#fefffe] rounded transition-all duration-300 ${isMenuOpen ? "-rotate-45 absolute top-1/2 left-0" : ""}`}
-                style={{ transition: "all 0.3s" }}
+                style={{
+                  transition: "all 0.3s",
+                  marginTop: isMenuOpen ? 0 : 6,
+                }}
               />
             </div>
           </div>
           {/* Menu links - only show when open */}
           {isMenuOpen && (
-            <div className="flex flex-col h-full w-full pt-20 pl-10 pr-6 pb-10 absolute inset-0 z-[1100]">
-              <nav className="flex flex-col gap-8 justify-start items-start">
+            <div
+              className="flex flex-row h-full w-full pt-20 pl-10 pr-6 pb-10 absolute inset-0 z-[1100]"
+              style={{ minWidth: 700, minHeight: 500 }}
+            >
+              {/* Menu items left */}
+              <nav className="flex flex-col gap-10 justify-start items-start w-2/3">
                 {menuItems.map((item) => (
                   <a
                     key={item.label}
                     href={item.to}
-                    className="text-2xl text-[#fefffe] font-cabinet font-medium hover:underline text-left"
+                    className="text-5xl text-[#fefffe] font-cabinet font-bold hover:underline text-left flex items-center group"
                     onClick={() => setIsMenuOpen(false)}
+                    style={{ marginBottom: "2.5rem" }} // Extra spacing between items
                   >
-                    {item.label}
+                    <span className="mr-16">{item.label}</span>
+                    <span className="ml-16">
+                      <PlusIcon className="w-10 h-10 text-[#fefffe] group-hover:text-[#b3b3b3] transition-colors duration-300" />
+                    </span>
                   </a>
                 ))}
               </nav>
+              {/* Glassobj video right */}
+              <div className="flex items-center justify-end w-1/3 h-full">
+                <video
+                  src="/glassobj.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto rounded-2xl shadow-xl"
+                  style={{ maxHeight: "320px", objectFit: "cover" }}
+                  poster="/images/projectVideos/glassobj-poster.jpg"
+                  controls
+                />
+              </div>
             </div>
           )}
         </button>

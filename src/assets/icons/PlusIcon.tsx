@@ -1,0 +1,18 @@
+import React from "react";
+
+const PlusIcon = ({ className = "", style = {} }) => (
+  <svg
+    className={className}
+    style={style}
+    width="28"
+    height="28"
+    viewBox="0 0 28 28"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect x="12" y="4" width="4" height="20" rx="2" fill="currentColor" />
+    <rect x="4" y="12" width="20" height="4" rx="2" fill="currentColor" />
+  </svg>
+);
+
+export default PlusIcon;

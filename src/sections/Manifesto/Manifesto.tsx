@@ -16,7 +16,6 @@ const Manifesto: React.FC = () => {
   const bodyRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
   const expandingContainerRef = useRef<HTMLDivElement>(null);
-  const videoWrapperRef = useRef<HTMLDivElement>(null);
 
   // Apply magnetic effect to the button container
   useMagnetic(buttonRef, { strength: 40 });
@@ -127,20 +126,6 @@ const Manifesto: React.FC = () => {
           },
         );
       }
-
-      // 5. Video Wrapper Expansion
-      if (videoWrapperRef.current) {
-        gsap.to(videoWrapperRef.current, {
-          width: "100%",
-          borderRadius: 0,
-          scrollTrigger: {
-            trigger: videoWrapperRef.current,
-            start: "top 80%",
-            end: "bottom 80%",
-            scrub: 1.5, // Even smoother for the video
-          },
-        });
-      }
     });
 
     return () => ctx.revert();
@@ -204,25 +189,6 @@ const Manifesto: React.FC = () => {
                 className="text-6xl md:text-8xl lg:text-9xl font-cabinet font-bold uppercase text-[#1b1b1a]"
                 speed={30}
               />
-            </div>
-
-            {/* Video Showcase Container - Padded */}
-            <div
-              ref={videoWrapperRef}
-              className="w-[80%] aspect-video rounded-xl overflow-hidden mx-6 md:px-[6.3rem]"
-            >
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-full object-cover"
-              >
-                <source
-                  src="/projectVideos/videoshowcase/promo_h264.mp4"
-                  type="video/mp4"
-                />
-              </video>
             </div>
           </div>
         </div>

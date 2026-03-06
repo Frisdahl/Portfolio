@@ -10,6 +10,7 @@ import {
 import { useLocation } from "react-router-dom";
 import Hero from "../sections/Hero/Hero";
 import { scrollTo } from "../utils/smoothScroll";
+import VideoShowCase from "../components/VideoShowCase";
 
 const Manifesto = lazy(() => import("../sections/Manifesto/Manifesto"));
 const Projects = lazy(() => import("../sections/Projects/Projects"));
@@ -97,11 +98,17 @@ function HomePage() {
     if (!targetSection) return;
 
     const targetId = targetSection.replace("#", "");
-    const projectsEl = typeof document !== "undefined" ? document.querySelector("#projects") : null;
+    const projectsEl =
+      typeof document !== "undefined"
+        ? document.querySelector("#projects")
+        : null;
     // #region agent log
     fetch("http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "da1222" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "da1222",
+      },
       body: JSON.stringify({
         sessionId: "da1222",
         location: "HomePage.tsx:useLayoutEffect(entry)",
@@ -162,25 +169,29 @@ function HomePage() {
         alignToTargetTop(projectsSection);
         const scrollYAfter = window.scrollY;
         // #region agent log
-        fetch("http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "da1222" },
-          body: JSON.stringify({
-            sessionId: "da1222",
-            location: "HomePage.tsx:alignToTargetTop(projects) done",
-            message: "Scrolled to #projects",
-            data: { scrollYBefore, scrollYAfter },
-            timestamp: Date.now(),
-            hypothesisId: "H-E",
-          }),
-        }).catch(() => {});
+        fetch(
+          "http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Debug-Session-Id": "da1222",
+            },
+            body: JSON.stringify({
+              sessionId: "da1222",
+              location: "HomePage.tsx:alignToTargetTop(projects) done",
+              message: "Scrolled to #projects",
+              data: { scrollYBefore, scrollYAfter },
+              timestamp: Date.now(),
+              hypothesisId: "H-E",
+            }),
+          },
+        ).catch(() => {});
         // #endregion
         sessionStorage.removeItem("targetSection");
         sessionStorage.removeItem("pendingSectionScroll");
         requestAnimationFrame(clearScrollPendingClass);
-        timeoutIds.push(
-          setTimeout(clearScrollPendingClass, 100),
-        );
+        timeoutIds.push(setTimeout(clearScrollPendingClass, 100));
 
         // Refine scroll to heading when it exists (lazy content may mount after)
         const refineToHeading = () => {
@@ -228,7 +239,9 @@ function HomePage() {
             );
           }
         };
-        alignRafId = window.requestAnimationFrame(alignWhenProjectsHeadingReady);
+        alignRafId = window.requestAnimationFrame(
+          alignWhenProjectsHeadingReady,
+        );
       }
     } else {
       const target = document.querySelector(targetSection);
@@ -253,6 +266,14 @@ function HomePage() {
   return (
     <div className="HomePage">
       <Hero />
+
+      <DeferredSection
+        className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
+        containIntrinsicSize="900px"
+        fallbackClassName="w-full min-h-[700px] md:min-h-[900px]"
+      >
+        <VideoShowCase />
+      </DeferredSection>
 
       {/* Manifesto */}
       <DeferredSection
