@@ -10,9 +10,6 @@ import {
 import { useLocation } from "react-router-dom";
 import Hero from "../sections/Hero/Hero";
 import { scrollTo } from "../utils/smoothScroll";
-// import VideoShowcase from "../sections/VideoShowcase/VideoShowcase";
-// import Expectations from "../sections/Expectations/Expectations";
-// import Collaboration from "../sections/Collaboration/Collaboration";
 
 const Manifesto = lazy(() => import("../sections/Manifesto/Manifesto"));
 const Projects = lazy(() => import("../sections/Projects/Projects"));
@@ -100,6 +97,27 @@ function HomePage() {
     if (!targetSection) return;
 
     const targetId = targetSection.replace("#", "");
+    const projectsEl = typeof document !== "undefined" ? document.querySelector("#projects") : null;
+    // #region agent log
+    fetch("http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "da1222" },
+      body: JSON.stringify({
+        sessionId: "da1222",
+        location: "HomePage.tsx:useLayoutEffect(entry)",
+        message: "HomePage scroll-to-section",
+        data: {
+          targetSection,
+          targetId,
+          forceMountProjects,
+          projectsExists: !!projectsEl,
+          scrollYBefore: typeof window !== "undefined" ? window.scrollY : 0,
+        },
+        timestamp: Date.now(),
+        hypothesisId: "H-C,H-E",
+      }),
+    }).catch(() => {});
+    // #endregion
     if (targetId === "projects" && !forceMountProjects) {
       setForceMountProjects(true);
       return;
@@ -131,68 +149,94 @@ function HomePage() {
       scrollTo(targetElement, 0, headerOffset, true);
     };
 
+    const clearScrollPendingClass = () => {
+      document.documentElement.classList.remove("scroll-to-section-pending");
+    };
+
     if (targetId === "projects") {
-      let attempts = 0;
-      const maxAttempts = 300;
-
-      const alignWhenProjectsHeadingReady = () => {
-        const headingTarget = document.querySelector(
-          "#projects .project-header-text",
-        );
-
-        if (headingTarget) {
-          // Small delay to ensure any layout shifts or initial GSAP sets have settled
-          setTimeout(() => {
-            alignToTargetTop(headingTarget);
-
-            const driftCorrectionId = setTimeout(() => {
-              const currentHeading = document.querySelector(
-                "#projects .project-header-text",
-              );
-              if (!currentHeading) return;
-
-              const headerOffset = getHeaderOffset();
-              const currentTop = currentHeading.getBoundingClientRect().top;
-              const remainingDrift = currentTop + headerOffset;
-
-              if (Math.abs(remainingDrift) > 4) {
-                alignToTargetTop(currentHeading);
-              }
-            }, 300);
-            timeoutIds.push(driftCorrectionId);
-          }, 50);
-
-          window.dispatchEvent(new CustomEvent("replay-projects-entrance"));
-          sessionStorage.removeItem("targetSection");
-          sessionStorage.removeItem("pendingSectionScroll");
-          return;
-        }
-
-        attempts += 1;
-        if (attempts < maxAttempts) {
-          alignRafId = window.requestAnimationFrame(
-            alignWhenProjectsHeadingReady,
-          );
-          return;
-        }
-
-        const projectsSection = document.querySelector("#projects");
-        if (projectsSection) {
-          alignToTargetTop(projectsSection);
-          window.dispatchEvent(new CustomEvent("replay-projects-entrance"));
-        }
-
+      document.documentElement.classList.add("scroll-to-section-pending");
+      sessionStorage.setItem("projectsFromNav", "true");
+      const projectsSection = document.querySelector("#projects");
+      if (projectsSection) {
+        const scrollYBefore = window.scrollY;
+        alignToTargetTop(projectsSection);
+        const scrollYAfter = window.scrollY;
+        // #region agent log
+        fetch("http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "da1222" },
+          body: JSON.stringify({
+            sessionId: "da1222",
+            location: "HomePage.tsx:alignToTargetTop(projects) done",
+            message: "Scrolled to #projects",
+            data: { scrollYBefore, scrollYAfter },
+            timestamp: Date.now(),
+            hypothesisId: "H-E",
+          }),
+        }).catch(() => {});
+        // #endregion
         sessionStorage.removeItem("targetSection");
         sessionStorage.removeItem("pendingSectionScroll");
-      };
+        requestAnimationFrame(clearScrollPendingClass);
+        timeoutIds.push(
+          setTimeout(clearScrollPendingClass, 100),
+        );
 
-      alignRafId = window.requestAnimationFrame(alignWhenProjectsHeadingReady);
+        // Refine scroll to heading when it exists (lazy content may mount after)
+        const refineToHeading = () => {
+          const headingTarget = document.querySelector(
+            "#projects .project-header-text",
+          );
+          if (headingTarget) {
+            setTimeout(() => {
+              alignToTargetTop(headingTarget);
+              const driftCorrectionId = setTimeout(() => {
+                const currentHeading = document.querySelector(
+                  "#projects .project-header-text",
+                );
+                if (!currentHeading) return;
+                const headerOffset = getHeaderOffset();
+                const currentTop = currentHeading.getBoundingClientRect().top;
+                const remainingDrift = currentTop + headerOffset;
+                if (Math.abs(remainingDrift) > 4) {
+                  alignToTargetTop(currentHeading);
+                }
+              }, 300);
+              timeoutIds.push(driftCorrectionId);
+            }, 50);
+          }
+        };
+        alignRafId = window.requestAnimationFrame(refineToHeading);
+      } else {
+        // Fallback: wait for section to appear (shouldn't happen with forceMount)
+        let attempts = 0;
+        const maxAttempts = 300;
+        const alignWhenProjectsHeadingReady = () => {
+          const section = document.querySelector("#projects");
+          if (section) {
+            alignToTargetTop(section);
+            sessionStorage.removeItem("targetSection");
+            sessionStorage.removeItem("pendingSectionScroll");
+            requestAnimationFrame(clearScrollPendingClass);
+            timeoutIds.push(setTimeout(clearScrollPendingClass, 100));
+            return;
+          }
+          attempts += 1;
+          if (attempts < maxAttempts) {
+            alignRafId = window.requestAnimationFrame(
+              alignWhenProjectsHeadingReady,
+            );
+          }
+        };
+        alignRafId = window.requestAnimationFrame(alignWhenProjectsHeadingReady);
+      }
     } else {
       const target = document.querySelector(targetSection);
       if (target) {
         alignToTargetTop(target);
       }
-
+      requestAnimationFrame(clearScrollPendingClass);
+      timeoutIds.push(setTimeout(clearScrollPendingClass, 100));
       sessionStorage.removeItem("targetSection");
       sessionStorage.removeItem("pendingSectionScroll");
     }
@@ -202,21 +246,15 @@ function HomePage() {
         window.cancelAnimationFrame(alignRafId);
       }
       timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
+      document.documentElement.classList.remove("scroll-to-section-pending");
     };
   }, [location, forceMountProjects]);
 
   return (
     <div className="HomePage">
-      {/* Hero Section */}
-
       <Hero />
 
-      {/* Video Showcase (Commented out) */}
-      {/* <div className="mb-32 md:mb-48 lg:mb-64">
-        <VideoShowcase />
-      </div> */}
-
-      {/* Manifesto Section */}
+      {/* Manifesto */}
       <DeferredSection
         className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="900px"
@@ -236,7 +274,7 @@ function HomePage() {
         <Projects />
       </DeferredSection>
 
-      {/* Services Section */}
+      {/* Services */}
       <DeferredSection
         className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="1200px"
@@ -253,14 +291,6 @@ function HomePage() {
       >
         <TechStack />
       </DeferredSection>
-
-      {/* Brands Marquee Section */}
-      {/*       <div className="mb-32 md:mb-48 lg:mb-64">
-        <BrandsMarquee />
-      </div> */}
-
-      {/* <Expectations />
-      <Collaboration /> */}
     </div>
   );
 }

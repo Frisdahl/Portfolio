@@ -1,0 +1,80 @@
+# Cursor Project Rules — Frisdahl Studio (React + TS + Vite + GSAP)
+
+You are coding in a React + TypeScript project (Vite). The codebase is motion/performance focused and uses GSAP heavily.
+
+## Global principles
+- Prefer clarity and maintainability over cleverness.
+- Match existing project patterns and folder structure.
+- Do not invent libraries or patterns not already used in the repo.
+- Keep changes minimal and scoped; avoid large rewrites unless asked.
+- If uncertain, inspect existing similar components and reuse that approach.
+
+## React + TypeScript
+- Use functional components only. No class components.
+- Always type props with `interface` (or `type` if repo uses it consistently).
+- Prefer explicit return types only when it adds clarity.
+- Prefer `useRef` for DOM nodes and GSAP targets.
+- Avoid putting complex logic in JSX. Extract to helpers/hooks.
+
+## Component structure
+When creating a new component:
+1) Imports
+2) Types (interfaces)
+3) Component with refs at top
+4) `useLayoutEffect` (or `useEffect` if layout timing doesn't matter)
+5) Render
+6) Export default
+
+- Keep components under ~200 lines; extract subparts into smaller components or hooks.
+- Prefer colocated small helper functions inside the component only when they are not reused elsewhere.
+- Use existing naming conventions and file organization.
+
+## GSAP rules (critical)
+- Use `gsap.context(() => { ... }, scopeRef)` to scope selectors and animations.
+- Always clean up with `return () => ctx.revert();`
+- For layout-dependent animation setup: use `useLayoutEffect`.
+- Register plugins once (central file or at module top) and avoid re-registering inside components repeatedly.
+- Prefer timelines for sequences; prefer `gsap.to/from` for simple effects.
+- Prefer `ScrollTrigger` with clear start/end values and `invalidateOnRefresh: true` when needed.
+- Avoid animating layout-thrashing properties when possible (prefer transforms/opacity).
+
+Example GSAP pattern:
+
+useLayoutEffect(() => {
+  const ctx = gsap.context(() => {
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    tl.from(".my-el", { y: 30, opacity: 0, duration: 0.8 });
+  }, scopeRef);
+
+  return () => ctx.revert();
+}, []);
+
+## ScrollTrigger patterns
+- Use `ScrollTrigger` for scroll animations; avoid manual scroll listeners unless necessary.
+- If using smooth scrolling libraries, respect existing integration patterns in the repo.
+- Use `ScrollTrigger.refresh()` only when absolutely necessary.
+- For dynamic content, prefer `invalidateOnRefresh: true`.
+- Avoid creating duplicate triggers on re-render; ensure effects run once and cleanup properly.
+
+## Performance
+- Avoid triggering React re-renders during animation. Store animation state in refs.
+- Avoid heavy work in scroll handlers.
+- Use `will-change` sparingly and only where needed.
+- Prefer CSS for static styling, GSAP for motion.
+
+## Styling conventions
+- Follow the project's existing styling solution (CSS modules / global CSS / utility classes).
+- Do not introduce new styling libraries.
+- Keep class names consistent with existing code.
+- Prefer responsive patterns already used in the project.
+
+## Error handling / robustness
+- Guard against null refs before using them.
+- If animation depends on element sizes, measure inside `useLayoutEffect`.
+- If something is missing in the codebase, ask to locate the existing pattern instead of guessing.
+
+## Output expectations
+When asked to implement:
+- Provide complete code for the component/hook and list any files that need to be created or updated.
+- If modifying existing files, show the exact diff-style changes or clearly indicate which sections to replace.
+- Keep explanations short; prioritize working code that matches the project's style.

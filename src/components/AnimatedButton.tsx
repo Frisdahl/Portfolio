@@ -1,7 +1,9 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
 interface AnimatedButtonProps {
   text: string;
+  icon?: ReactNode;
+  iconPosition?: "left" | "right";
   link?: string;
   onClick?: () => void;
   padding?: string; // e.g., 'px-6 py-2'
@@ -20,6 +22,8 @@ interface AnimatedButtonProps {
 
 const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   text,
+  icon,
+  iconPosition = "right",
   link,
   onClick,
   padding = "px-6 py-6",
@@ -37,6 +41,20 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 }) => {
   const ButtonComponent = link ? "a" : "button";
 
+  const content = (
+    <div
+      className={`inline-flex items-center gap-2 relative z-10 overflow-hidden`}
+    >
+      {icon && iconPosition === "left" && (
+        <span className="shrink-0">{icon}</span>
+      )}
+      <span className="block font-medium whitespace-nowrap">{text}</span>
+      {icon && iconPosition === "right" && (
+        <span className="shrink-0">{icon}</span>
+      )}
+    </div>
+  );
+
   return (
     <ButtonComponent
       href={link}
@@ -49,20 +67,38 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       <span
         className={`absolute inset-0 z-[1] block h-full w-full rounded-[48px] ${hoverBgColor} transform translate-y-[-101%] group-hover/btn:translate-y-0 group-hover/btn:rounded-[0] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)],border-radius duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)]`}
       ></span>
-      {/* Original text, slides down */}
-      <span className="relative z-10 block overflow-hidden">
-        <span
-          className={`block font-semibold whitespace-nowrap ${baseTextColor} ${fontSize} transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)] group-hover/btn:translate-y-[101%]`}
+
+      {/* Original content, slides down */}
+      <div className="relative z-10 block overflow-hidden">
+        <div
+          className={`inline-flex items-center gap-2 font-cabinet ${baseTextColor} ${fontSize} transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)] group-hover/btn:translate-y-[101%]`}
         >
+          {icon && iconPosition === "left" && (
+            <span className="shrink-0">{icon}</span>
+          )}
+          <span className="block font-medium font-cabinet whitespace-nowrap">
+            {text}
+          </span>
+          {icon && iconPosition === "right" && (
+            <span className="shrink-0">{icon}</span>
+          )}
+        </div>
+      </div>
+
+      {/* Sliding content */}
+      <div
+        className={`absolute inset-0 z-20 inline-flex items-center justify-center gap-2 whitespace-nowrap ${hoverTextColor.replace("hover:", "group-hover/btn:")} ${fontSize} font-medium transform translate-y-[-101%] group-hover/btn:translate-y-0 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)]`}
+      >
+        {icon && iconPosition === "left" && (
+          <span className="shrink-0">{icon}</span>
+        )}
+        <span className="block font-medium font-cabinet whitespace-nowrap">
           {text}
         </span>
-      </span>
-      {/* Sliding text */}
-      <span
-        className={`absolute inset-0 z-20 inline-flex items-center justify-center whitespace-nowrap ${hoverTextColor.replace('hover:', 'group-hover/btn:')} ${fontSize} font-semibold transform translate-y-[-101%] group-hover/btn:translate-y-0 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.4,0,0,1)]`}
-      >
-        {text}
-      </span>
+        {icon && iconPosition === "right" && (
+          <span className="shrink-0">{icon}</span>
+        )}
+      </div>
     </ButtonComponent>
   );
 };

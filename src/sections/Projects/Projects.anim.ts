@@ -37,44 +37,49 @@ export const initGridAnimations = (container: HTMLElement) => {
       const subText = subTextEl as HTMLElement;
 
       if (headerText && subText) {
-        gsap.set([headerText, subText], { opacity: 1 });
-
-        const shouldRunImmediate =
-          sessionStorage.getItem("pendingProjectsEntrance") === "true";
-        const shouldAnimateNow =
-          shouldRunImmediate ||
-          headerText.getBoundingClientRect().top <= window.innerHeight * 0.9;
-
-        if (shouldAnimateNow) {
-          gsap.fromTo(
-            [headerText, subText],
-            { y: 24, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.95,
-              stagger: 0.1,
-              ease: "power3.out",
-            },
-          );
-          sessionStorage.removeItem("pendingProjectsEntrance");
+        const fromNav = sessionStorage.getItem("projectsFromNav") === "true";
+        if (fromNav) {
+          sessionStorage.removeItem("projectsFromNav");
+          gsap.set([headerText, subText], { y: 0, opacity: 1 });
         } else {
-          gsap.fromTo(
-            [headerText, subText],
-            { y: 24, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 1.15,
-              stagger: 0.1,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: headerText,
-                start: "top 85%",
-                once: true,
+          gsap.set([headerText, subText], { opacity: 1 });
+          const shouldRunImmediate =
+            sessionStorage.getItem("pendingProjectsEntrance") === "true";
+          const shouldAnimateNow =
+            shouldRunImmediate ||
+            headerText.getBoundingClientRect().top <= window.innerHeight * 0.9;
+
+          if (shouldAnimateNow) {
+            gsap.fromTo(
+              [headerText, subText],
+              { y: 24, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.95,
+                stagger: 0.1,
+                ease: "power3.out",
               },
-            },
-          );
+            );
+            sessionStorage.removeItem("pendingProjectsEntrance");
+          } else {
+            gsap.fromTo(
+              [headerText, subText],
+              { y: 24, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 1.15,
+                stagger: 0.1,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: headerText,
+                  start: "top 85%",
+                  once: true,
+                },
+              },
+            );
+          }
         }
       }
 

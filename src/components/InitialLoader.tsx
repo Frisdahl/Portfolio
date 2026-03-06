@@ -67,7 +67,7 @@ const InitialLoader: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="initial-loader-wrap fixed inset-0 z-[300] bg-[#f5f5f3] flex items-center justify-center overflow-hidden"
+      className="initial-loader-wrap fixed inset-0 z-[300] bg-[var(--background)] flex items-center justify-center overflow-hidden"
     >
       <div className="overflow-hidden h-[1.2em] flex items-center">
         <div

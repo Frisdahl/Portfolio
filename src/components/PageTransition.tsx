@@ -1,30 +1,38 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import { _setTransitionTrigger } from "../utils/pageTransition";
 
+const COLUMN_COUNT = 5;
+
 const PageTransition = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const columnsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const topRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const bottomRefs = useRef<(HTMLDivElement | null)[]>([]);
   const location = useLocation();
   const isAnimatingRef = useRef(false);
   const isFirstMountRef = useRef(true);
   const ctxRef = useRef<gsap.Context | null>(null);
+  const animateRef = useRef<(onCovered?: () => void) => Promise<void>>(() => Promise.resolve());
 
-  const [columnCount, setColumnCount] = useState(12);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setColumnCount(window.innerWidth < 640 ? 5 : 12);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const animate = (onCovered?: () => void) => {
+  const runAnimation = (onCovered?: () => void) => {
     return new Promise<void>((resolve) => {
       if (isAnimatingRef.current) {
+        onCovered?.();
+        resolve();
+        return;
+      }
+      if (!containerRef.current) {
+        onCovered?.();
+        resolve();
+        return;
+      }
+
+      const tops = topRefs.current.filter(Boolean) as HTMLElement[];
+      const bottoms = bottomRefs.current.filter(Boolean) as HTMLElement[];
+      if (tops.length === 0 || bottoms.length === 0) {
+        onCovered?.();
         resolve();
         return;
       }
@@ -32,114 +40,152 @@ const PageTransition = () => {
       isAnimatingRef.current = true;
       sessionStorage.setItem("isNavigating", "true");
 
-      // 1. Prepare DOM
-      if (containerRef.current) {
-        gsap.set(containerRef.current, {
-          autoAlpha: 1,
-          display: "block",
-          pointerEvents: "all",
-        });
-      }
-
-      // Disable scrolling
+      gsap.set(containerRef.current, {
+        visibility: "visible",
+        opacity: 1,
+        pointerEvents: "all",
+      });
       document.body.style.overflow = "hidden";
 
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
+        const topsInner = topRefs.current.filter(Boolean) as HTMLElement[];
+        const bottomsInner = bottomRefs.current.filter(Boolean) as HTMLElement[];
+        const staggerDuration = 0.04;
+        const slideDuration = 0.28;
+        const pauseDuration = 0.06;
+
         const tl = gsap.timeline({
           onComplete: () => {
             isAnimatingRef.current = false;
             sessionStorage.removeItem("isNavigating");
-
             if (containerRef.current) {
               gsap.set(containerRef.current, {
-                autoAlpha: 0,
-                display: "none",
+                visibility: "hidden",
+                opacity: 0,
                 pointerEvents: "none",
               });
             }
             document.body.style.overflow = "";
-
-            // Dispatch event ONLY after the screen is clear
             window.dispatchEvent(new CustomEvent("page-transition-complete"));
           },
         });
 
-        // 2. Expand Phase
-        tl.set(columnsRef.current, { scaleX: 0, transformOrigin: "right" });
-        tl.to(columnsRef.current, {
-          scaleX: 1,
-          duration: 0.6,
-          stagger: { each: 0.03, from: "end" },
-          ease: "expo.inOut",
-          force3D: true,
-          onComplete: () => {
-            // Execute navigation/jump logic while screen is covered
-            if (onCovered) {
-              onCovered();
-            }
-            resolve();
+        tl.set(topsInner, { yPercent: -100 });
+        tl.set(bottomsInner, { yPercent: 100 });
+
+        tl.to(
+          topsInner,
+          {
+            yPercent: 0,
+            duration: slideDuration,
+            stagger: { each: staggerDuration, from: "start" },
+            ease: "power3.inOut",
+            force3D: true,
           },
+          0,
+        );
+        tl.to(
+          bottomsInner,
+          {
+            yPercent: 0,
+            duration: slideDuration,
+            stagger: { each: staggerDuration, from: "start" },
+            ease: "power3.inOut",
+            force3D: true,
+          },
+          0,
+        );
+
+        tl.add(() => {
+          if (onCovered) onCovered();
+          resolve();
         });
 
-        // 3. Brief pause while covered
-        tl.to({}, { duration: 0.2 });
+        tl.to({}, { duration: pauseDuration });
 
-        // 4. Retract Phase
-        tl.to(columnsRef.current, {
-          scaleX: 0,
-          transformOrigin: "left",
-          duration: 0.6,
-          stagger: { each: 0.03, from: "start" },
-          ease: "expo.inOut",
-          force3D: true,
-        });
+        tl.to(
+          topsInner,
+          {
+            yPercent: -100,
+            duration: slideDuration,
+            stagger: { each: staggerDuration, from: "start" },
+            ease: "power3.inOut",
+            force3D: true,
+          },
+          0,
+        );
+        tl.to(
+          bottomsInner,
+          {
+            yPercent: 100,
+            duration: slideDuration,
+            stagger: { each: staggerDuration, from: "start" },
+            ease: "power3.inOut",
+            force3D: true,
+          },
+          0,
+        );
       });
     });
   };
 
-  // Set the trigger once on mount
-  useEffect(() => {
-    _setTransitionTrigger((onCovered) => animate(onCovered));
+  animateRef.current = runAnimation;
+
+  useLayoutEffect(() => {
+    _setTransitionTrigger((onCovered) => animateRef.current(onCovered));
+    return () => _setTransitionTrigger(null);
   }, []);
 
-  // Handle location changes for links that don't use triggerPageTransition (e.g. back/forward)
   useEffect(() => {
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
       return;
     }
-
     if (!isAnimatingRef.current) {
-      animate();
+      runAnimation();
     }
   }, [location.pathname]);
 
-  return (
+  const overlay = (
     <div
       ref={containerRef}
       className="fixed inset-0 z-[99999] pointer-events-none"
-      style={{ display: "none", opacity: 0, visibility: "hidden" }}
+      style={{ visibility: "hidden", opacity: 0 }}
     >
-      <div className="absolute inset-0 flex w-full h-full z-0 overflow-hidden">
-        {[...Array(columnCount)].map((_, i) => (
+      <div className="absolute inset-0 flex w-full h-full overflow-hidden">
+        {[...Array(COLUMN_COUNT)].map((_, i) => (
           <div
             key={i}
-            ref={(el) => {
-              columnsRef.current[i] = el;
-            }}
-            className="h-[101%] -mt-[0.5%] bg-[var(--foreground)] flex-grow"
+            className="relative h-full overflow-hidden flex-shrink-0"
             style={{
+              width: `${100 / COLUMN_COUNT}%`,
               willChange: "transform",
-              width: `${100 / columnCount}%`,
-              margin: "0 -0.1%",
             }}
-          />
+          >
+            <div
+              ref={(el) => {
+                topRefs.current[i] = el;
+              }}
+              className="absolute left-0 right-0 top-0 h-1/2 bg-[var(--foreground)]"
+              style={{ willChange: "transform" }}
+            />
+            <div
+              ref={(el) => {
+                bottomRefs.current[i] = el;
+              }}
+              className="absolute left-0 right-0 bottom-0 h-1/2 bg-[var(--foreground)]"
+              style={{ willChange: "transform" }}
+            />
+          </div>
         ))}
       </div>
     </div>
   );
+
+  if (typeof document === "undefined") return null;
+  return createPortal(overlay, document.body);
 };
 
 export default PageTransition;

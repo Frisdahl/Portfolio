@@ -6,23 +6,30 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import ArrowIcon from "./ArrowIcon";
+import AnimatedNavLink from "./AnimatedNavLink";
+import { useMagnetic } from "../utils/animations/useMagnetic";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isPastHero, setIsPastHero] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isInProjectsSection, setIsInProjectsSection] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // Icon always top-right now; no state needed
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const talkButtonRef = useRef<HTMLButtonElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const navButtonsRef = useRef<HTMLElement>(null);
+  const navLinksRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLAnchorElement>(null);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
+
+  // Only apply magnetic effect when menu is closed
+  useMagnetic(talkButtonRef, { strength: 30, enabled: !isMenuOpen });
+  useMagnetic(nameRef, { strength: 20, enabled: !isMenuOpen });
+  useMagnetic(burgerRef, { strength: 30, enabled: !isMenuOpen });
+
   const entranceTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const activeDotRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const previousActiveItemRef = useRef<string | null>(null);
   const logoReplayTimeoutRef = useRef<number | null>(null);
   const lastLogoReplayAtRef = useRef(0);
 
@@ -42,41 +49,76 @@ const Header: React.FC = () => {
 
     updateHeaderDimensions();
 
-    const ctx = gsap.context(() => {
-      if (isHomePage) {
-        ScrollTrigger.create({
-          trigger: "#hero",
-          start: "bottom 100px",
-          onEnter: () => setIsPastHero(true),
-          onLeaveBack: () => setIsPastHero(false),
-          onRefresh: (self) => setIsPastHero(self.progress > 0),
-        });
-      } else {
-        setIsPastHero(true);
-      }
-    });
+    const setBurgerState = () => {
+      const header = document.querySelector("header");
+      const headerHeight = header ? header.getBoundingClientRect().height : 0;
+      const scrollY = window.scrollY || window.pageYOffset;
+      setIsPastHero(scrollY > headerHeight);
+    };
 
+    // Set initial state on mount
+    setBurgerState();
+
+    // Listen to scroll events
+    window.addEventListener("scroll", setBurgerState);
     window.addEventListener("resize", updateHeaderDimensions);
     window.addEventListener("page-transition-complete", updateHeaderDimensions);
 
     return () => {
-      ctx.revert();
+      window.removeEventListener("scroll", setBurgerState);
       window.removeEventListener("resize", updateHeaderDimensions);
       window.removeEventListener(
         "page-transition-complete",
         updateHeaderDimensions,
       );
     };
-  }, [location.pathname, isHomePage]);
+  }, [location.pathname]);
 
-  // Header entrance animation (name + buttons)
+  // Handle scroll-based visibility of burger
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      if (
-        !nameRef.current ||
-        !talkButtonRef.current ||
-        !menuButtonRef.current
-      ) {
+      if (isPastHero) {
+        gsap.to(burgerRef.current, {
+          autoAlpha: 1,
+          scale: 1,
+          duration: 0.4,
+          ease: "back.out(1.7)",
+          transformOrigin: "center center",
+          pointerEvents: "auto",
+        });
+      } else {
+        gsap.to(burgerRef.current, {
+          autoAlpha: 0,
+          scale: 0,
+          duration: 0.4,
+          ease: "power2.inOut",
+          transformOrigin: "center center",
+          pointerEvents: "none",
+        });
+      }
+    });
+    return () => ctx.revert();
+  }, [isPastHero]);
+
+  // Animate burger to square and icon to X when menu is open
+  // Only animate width/height, keep borderRadius always rounded square
+  useLayoutEffect(() => {
+    if (!burgerRef.current) return;
+    const el = burgerRef.current;
+    gsap.to(el, {
+      borderRadius: "18px",
+      width: isMenuOpen ? 320 : 56,
+      height: isMenuOpen ? 320 : 56,
+      backgroundColor: "#1b1b1a",
+      duration: 0.4,
+      ease: "linear",
+    });
+  }, [isMenuOpen]);
+
+  // Header entrance animation (name + nav links + talk button)
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      if (!nameRef.current || !talkButtonRef.current || !navLinksRef.current) {
         return;
       }
 
@@ -90,11 +132,10 @@ const Header: React.FC = () => {
 
       // 2. Initial State
       gsap.set(lines, { yPercent: 100 });
-      gsap.set([talkButtonRef.current, menuButtonRef.current], {
+      gsap.set([talkButtonRef.current, navLinksRef.current], {
         autoAlpha: 0,
         y: 20,
       });
-      // Show the main container but the text is hidden by yPercent + overflow
       gsap.set(nameRef.current, { autoAlpha: 1 });
 
       const tl = gsap.timeline({
@@ -109,18 +150,18 @@ const Header: React.FC = () => {
         lines,
         {
           yPercent: 0,
-          duration: 0.65,
-          stagger: 0.06,
+          duration: 0.15,
+          stagger: 0.02,
           ease: "power4.out",
         },
         0,
       ).to(
-        [talkButtonRef.current, menuButtonRef.current],
+        [talkButtonRef.current, navLinksRef.current],
         {
           autoAlpha: 1,
           y: 0,
-          duration: 0.5,
-          stagger: 0.06,
+          duration: 0.15,
+          stagger: 0.02,
           ease: "power2.out",
         },
         0,
@@ -167,66 +208,6 @@ const Header: React.FC = () => {
 
     return () => ctx.revert();
   }, []);
-
-  // 2. Synchronized Animation Timeline Setup
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const dropdown = dropdownRef.current;
-      const items = dropdown?.querySelectorAll(".menu-item-anim");
-
-      if (!dropdown || !items) return;
-
-      // Initial State
-      gsap.set(dropdown, {
-        autoAlpha: 0,
-        clipPath: "inset(0% 0% 100% 0%)",
-      });
-
-      gsap.set(items, {
-        y: 10,
-        autoAlpha: 0,
-      });
-
-      // Create the Master Timeline
-      const tl = gsap.timeline({
-        paused: true,
-        defaults: { ease: "power3.inOut" },
-      });
-
-      // Sequence: Panel -> Items (Button handled by React state + CSS for maximum smoothness)
-      tl.to(dropdown, {
-        autoAlpha: 1,
-        clipPath: "inset(0% 0% 0% 0%)",
-        duration: 0.6,
-        ease: "expo.out",
-      }).to(
-        items,
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.4,
-          stagger: 0.06,
-          ease: "power2.out",
-        },
-        "-=0.4",
-      );
-
-      timelineRef.current = tl;
-    });
-
-    return () => ctx.revert();
-  }, []);
-
-  // 3. Trigger Logic
-  useEffect(() => {
-    if (!timelineRef.current) return;
-
-    if (isMenuOpen) {
-      timelineRef.current.timeScale(1).play();
-    } else {
-      timelineRef.current.timeScale(1.5).reverse();
-    }
-  }, [isMenuOpen]);
 
   useEffect(() => {
     if (!isHomePage) {
@@ -293,36 +274,8 @@ const Header: React.FC = () => {
     };
   }, [isHomePage, location.pathname]);
 
-  // 4. Utility Effects
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isMenuOpen) setIsMenuOpen(false);
-    };
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        menuButtonRef.current &&
-        !menuButtonRef.current.contains(event.target as Node)
-      ) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    if (isMenuOpen) {
-      window.addEventListener("keydown", handleKeyDown);
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isMenuOpen]);
-
   const handleLogoClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    setIsMenuOpen(false);
     sessionStorage.removeItem("targetSection");
 
     if (!isHomePage) {
@@ -364,15 +317,37 @@ const Header: React.FC = () => {
     };
   }, []);
 
-  const handleLinkClick = async (
-    e: React.MouseEvent | null,
+  const handleLinkClick = (
+    e: React.MouseEvent<HTMLElement> | null,
     to: string,
     section?: string,
   ) => {
-    if (e && e.preventDefault) e.preventDefault();
-    setIsMenuOpen(false);
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
     if (section) {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "da1222",
+          },
+          body: JSON.stringify({
+            sessionId: "da1222",
+            location: "Header.tsx:handleLinkClick(section)",
+            message: "Projects/section link clicked",
+            data: { isHomePage, section, pathname: location.pathname },
+            timestamp: Date.now(),
+            hypothesisId: "H-B",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       if (isHomePage) {
         const headerElement = document.querySelector("header");
         const navRow = headerElement?.querySelector("div");
@@ -388,17 +363,13 @@ const Header: React.FC = () => {
           window.history.replaceState(null, "", location.pathname);
         }
 
-        sessionStorage.setItem("pendingProjectsEntrance", "true");
         sessionStorage.setItem("pendingSectionScroll", "true");
         sessionStorage.removeItem("targetSection");
         scrollTo(section, 0, topOffset, true);
-        window.setTimeout(() => {
-          window.dispatchEvent(new CustomEvent("replay-projects-entrance"));
-        }, 16);
       } else {
-        sessionStorage.setItem("pendingProjectsEntrance", "true");
         sessionStorage.setItem("pendingSectionScroll", "true");
         sessionStorage.setItem("targetSection", section);
+        document.documentElement.classList.add("scroll-to-section-pending");
         navigate("/");
       }
       return;
@@ -406,19 +377,18 @@ const Header: React.FC = () => {
 
     sessionStorage.removeItem("targetSection");
     sessionStorage.removeItem("pendingSectionScroll");
-    sessionStorage.removeItem("pendingProjectsEntrance");
 
     if (location.pathname !== to) {
       sessionStorage.setItem("isNavigating", "true");
-      await triggerPageTransition(() => navigate(to));
+      navigate(to);
+      triggerPageTransition();
     }
   };
 
   const menuItems = [
     { label: "Home", to: "/", section: undefined },
-    { label: "About me", to: "/about", section: undefined },
-    { label: "Projects", to: "/#projects", section: "#projects" },
-    { label: "Contact", to: "/contact", section: undefined },
+    { label: "About", to: "/about", section: undefined },
+    { label: "Works", to: "/#projects", section: "#projects" },
   ];
 
   const isMenuItemActive = (item: (typeof menuItems)[number]) => {
@@ -436,207 +406,112 @@ const Header: React.FC = () => {
     return location.pathname === item.to && !location.hash;
   };
 
-  const activeItemKey =
-    menuItems.find((item) => isMenuItemActive(item))?.label ?? null;
-
-  useLayoutEffect(() => {
-    const dots = menuItems
-      .map((item) => activeDotRefs.current[item.label])
-      .filter((dot): dot is HTMLDivElement => Boolean(dot));
-
-    if (!dots.length) return;
-
-    gsap.set(dots, { transformOrigin: "center center" });
-
-    if (!activeItemKey) {
-      gsap.set(dots, { scale: 0 });
-      previousActiveItemRef.current = null;
-      return;
-    }
-
-    const nextDot = activeDotRefs.current[activeItemKey];
-    if (!nextDot) return;
-
-    const previousKey = previousActiveItemRef.current;
-    if (!previousKey || previousKey === activeItemKey) {
-      dots.forEach((dot) => {
-        const isCurrent = dot === nextDot;
-        gsap.set(dot, { scale: isCurrent ? 1 : 0 });
-      });
-
-      previousActiveItemRef.current = activeItemKey;
-      return;
-    }
-
-    const previousDot = activeDotRefs.current[previousKey];
-    const timeline = gsap.timeline();
-
-    dots.forEach((dot) => {
-      if (dot !== previousDot && dot !== nextDot) {
-        gsap.set(dot, { scale: 0 });
-      }
-    });
-
-    if (previousDot) {
-      timeline.to(previousDot, {
-        scale: 0,
-        duration: 0.12,
-        ease: "power2.in",
-      });
-    }
-
-    timeline.set(nextDot, { scale: 0 }).to(nextDot, {
-      scale: 1,
-      duration: 0.18,
-      ease: "back.out(2)",
-    });
-
-    previousActiveItemRef.current = activeItemKey;
-
-    return () => {
-      timeline.kill();
-    };
-  }, [activeItemKey, isMenuOpen]);
-
   return (
-    <header className="fixed top-0 left-0 right-0 z-[220] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6 h-28 min-h-28 flex items-center">
-      <div className="flex items-start justify-between w-full relative">
-        {/* Logo Replacement: Stylized Name */}
-        <Link
-          ref={nameRef}
-          to="/"
-          onClick={handleLogoClick}
-          className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1b1b1a] pt-1 opacity-0"
-        >
-          <span className="text-base md:text-xl lg:text-2xl uppercase font-medium tracking-tight leading-none overflow-hidden inline-block">
-            <span className="italic">A</span>lexander
-          </span>
-          <span className=" text-base md:text-xl lg:text-2xl uppercase mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
-            <span className="italic">F</span>risdahl
-          </span>
-        </Link>
-
-        {/* Nav on the far right */}
-        <div className="flex flex-col items-end gap-2 relative">
-          <nav
-            ref={navButtonsRef}
-            className="pointer-events-auto flex items-start gap-2 shrink-0"
+    <>
+      <header className="absolute top-0 left-0 right-0 z-[220] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6 h-28 min-h-28 flex items-center">
+        <div className="flex items-start justify-between w-full relative">
+          {/* Logo Replacement: Stylized Name */}
+          <Link
+            ref={nameRef}
+            to="/"
+            onClick={handleLogoClick}
+            className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1b1b1a] pt-1 opacity-0"
           >
+            <span className=" text-base md:text-xl lg:text-xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
+              <span className="italic">A</span>lexander
+            </span>
+            <span className=" text-base md:text-xl lg:text-xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
+              <span className="italic">F</span>risdahl
+            </span>
+          </Link>
+
+          {/* Nav: links (split-char hover) + Let's talk */}
+          <div className="pointer-events-auto flex items-center gap-6 md:gap-8 shrink-0 relative min-h-[44px] md:min-h-[56px] justify-end">
+            <nav
+              ref={navLinksRef}
+              className="hidden md:flex items-center gap-6 lg:gap-8 opacity-0"
+            >
+              {menuItems.map((item) => {
+                const isActive = isMenuItemActive(item);
+                return (
+                  <AnimatedNavLink
+                    key={item.label}
+                    label={item.label}
+                    to={item.to}
+                    isActive={isActive}
+                    onClick={(e) => handleLinkClick(e, item.to, item.section)}
+                  />
+                );
+              })}
+            </nav>
             <button
               ref={talkButtonRef}
               onClick={(e) => handleLinkClick(e, "/contact")}
-              className="group/talk hidden md:flex h-10 sm:h-12 px-10 rounded-full bg-[#1b1b1a] text-[#fefffe] text-lg sm:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative min-w-[160px] opacity-0"
+              className="group/talk hidden md:flex h-9 gap-x-4 sm:h-10 px-8 rounded-full bg-[#1b1b1a] text-[#fefffe] text-md md:text-xl font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative min-w-[140px] opacity-0"
             >
-              <span className="whitespace-nowrap transition-transform duration-500 group-hover/talk:translate-x-3 font-medium">
+              <span className="whitespace-nowrap font-cabinet transition-transform duration-500 group-hover/talk:translate-x-4 font-medium">
                 Let's talk
               </span>
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse transition-all duration-300 group-hover/talk:opacity-0 group-hover/talk:scale-0" />
-              </div>
-              <div className="absolute left-6 top-1/2 -translate-y-1/2 -translate-x-10 opacity-0 transition-all duration-500 group-hover/talk:translate-x-0 group-hover/talk:opacity-100">
+              <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse transition-all duration-300 group-hover/talk:opacity-0 group-hover/talk:scale-0" />
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 -translate-x-10 opacity-0 transition-all duration-500 group-hover/talk:translate-x-0 group-hover/talk:opacity-100">
                 <ArrowIcon className="w-4 h-4" />
               </div>
             </button>
-
-            <button
-              ref={menuButtonRef}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-expanded={isMenuOpen}
-              className={`group/menu h-10 sm:h-12 px-6 md:px-10 min-w-[140px] md:min-w-[160px] rounded-full text-base md:text-xl uppercase font-medium tracking-tight transition-all duration-500 hover:brightness-110 cursor-pointer flex items-center justify-between gap-3 md:gap-4 overflow-hidden opacity-0 ${
-                isMenuOpen
-                  ? "bg-[#fefeff]"
-                  : isPastHero
-                    ? "bg-white/30 backdrop-blur-2xl"
-                    : "bg-[#f1efed]"
-              }`}
-            >
-              <div className="relative h-10 sm:h-12 flex-grow overflow-hidden pointer-events-none">
-                <div
-                  className="flex flex-col w-full h-[200%] transition-transform duration-[600ms] ease-[cubic-bezier(0.7,0,0.3,1)]"
-                  style={{
-                    transform: isMenuOpen
-                      ? "translateY(-50%)"
-                      : "translateY(0%)",
-                  }}
-                >
-                  <span className="h-1/2 flex items-center justify-start">
-                    Menu
-                  </span>
-                  <span className="h-1/2 flex items-center justify-start">
-                    Close
-                  </span>
-                </div>
-              </div>
-
-              <div
-                className={`flex items-center gap-1.5 transition-transform duration-400 ease-[cubic-bezier(0.7,0,0.3,1)] ${isMenuOpen ? "rotate-90" : "group-hover/menu:rotate-90"}`}
-              >
-                <div className="w-1.5 h-1.5 rounded-full bg-current transition-colors duration-500" />
-                <div className="w-1.5 h-1.5 rounded-full bg-current transition-colors duration-500" />
-              </div>
-            </button>
-          </nav>
-
-          <div
-            ref={dropdownRef}
-            aria-hidden={!isMenuOpen}
-            className="pointer-events-auto absolute top-full right-0 mt-2 w-full min-w-[320px] bg-[#fefeff] rounded-[1.5rem] overflow-hidden flex flex-col p-3 invisible opacity-0"
-          >
-            {menuItems.map((item) => {
-              const isActive = isMenuItemActive(item);
-
-              return (
-                <a
-                  key={item.label}
-                  href={item.to}
-                  onClick={(e) => handleLinkClick(e, item.to, item.section)}
-                  className={`menu-item-anim group/item flex items-center justify-between px-8 py-5 rounded-full transition-colors duration-300 text-[#1b1b1a] uppercase font-medium text-lg md:text-2xl tracking-tight overflow-hidden ${
-                    isActive
-                      ? "cursor-default opacity-80"
-                      : "hover:bg-[#1b1b1a]/5"
-                  }`}
-                >
-                  <div className="relative h-8 overflow-hidden flex-grow pointer-events-none">
-                    <div
-                      className={`flex flex-col transition-transform duration-[320ms] ease-[cubic-bezier(0.7,0,0.3,1)] h-[200%] ${
-                        isActive
-                          ? "translate-y-0"
-                          : "group-hover/item:-translate-y-1/2"
-                      }`}
-                    >
-                      <span className="h-1/2 flex items-center">
-                        {item.label}
-                      </span>
-                      <span className="h-1/2 flex items-center">
-                        {item.label}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="relative flex items-center justify-center w-6 h-6">
-                    <div
-                      ref={(el) => {
-                        activeDotRefs.current[item.label] = el;
-                      }}
-                      className="absolute w-2 h-2 rounded-full bg-[#1b1b1a] scale-0"
-                    />
-                    <div
-                      className={`absolute opacity-0 -translate-x-4 transition-all duration-300 ${
-                        isActive
-                          ? ""
-                          : "group-hover/item:opacity-100 group-hover/item:translate-x-0"
-                      }`}
-                    >
-                      <ArrowIcon className="w-5 h-5" />
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
           </div>
         </div>
+      </header>
+
+      {/* Floating Burger Button - fixed size, always top-right, expanding overlay for menu */}
+      <div className="fixed top-0 right-0 z-[999] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6 h-28 flex items-center justify-end overflow-visible">
+        {/* Expanding Burger/Menu Button - single button, always top-right, icon always centered */}
+        <button
+          ref={burgerRef}
+          aria-label="Menu"
+          className="pointer-events-auto bg-[#1b1b1a] shadow-lg fixed top-8 right-8 z-[1001] flex items-center justify-center overflow-hidden transition-all duration-400 rounded-[18px]"
+          style={{
+            visibility: "hidden",
+            width: isMenuOpen ? 320 : 56,
+            height: isMenuOpen ? 320 : 56,
+            transition: "width 0.4s linear, height 0.4s linear",
+            boxShadow: "0 8px 32px 0 rgba(0,0,0,0.25)",
+          }}
+          onClick={() => setIsMenuOpen((open) => !open)}
+        >
+          {/* Burger/X icon - always centered in button */}
+          <div className="w-full h-full flex items-center justify-center z-[1002]">
+            <div
+              className={`relative w-7 h-7 flex flex-col items-center justify-center`}
+            >
+              <div
+                className={`w-7 h-[2.5px] bg-[#fefffe] rounded transition-all duration-300 ${isMenuOpen ? "rotate-45 absolute top-1/2 left-0" : ""}`}
+                style={{ transition: "all 0.3s" }}
+              />
+              <div
+                className={`w-7 h-[2.5px] bg-[#fefffe] rounded transition-all duration-300 ${isMenuOpen ? "-rotate-45 absolute top-1/2 left-0" : ""}`}
+                style={{ transition: "all 0.3s" }}
+              />
+            </div>
+          </div>
+          {/* Menu links - only show when open */}
+          {isMenuOpen && (
+            <div className="flex flex-col h-full w-full pt-20 pl-10 pr-6 pb-10 absolute inset-0 z-[1100]">
+              <nav className="flex flex-col gap-8 justify-start items-start">
+                {menuItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.to}
+                    className="text-2xl text-[#fefffe] font-cabinet font-medium hover:underline text-left"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          )}
+        </button>
       </div>
-    </header>
+    </>
   );
 };
 

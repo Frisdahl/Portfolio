@@ -3,13 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
-import InitialLoader from "./components/InitialLoader";
 import PageTransition from "./components/PageTransition";
 import "./App.css";
-
 import useSmoothScroll from "./utils/useSmoothScroll";
 
-// Lazy Load Pages
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
@@ -96,8 +93,7 @@ function App() {
 
   return (
     <Router>
-      {/* <InitialLoader />
-      <PageTransition /> */}
+      <PageTransition />
       {showNonCriticalUI && <SpeedInsights />}
       <ScrollToTop />
       {showNonCriticalUI && (

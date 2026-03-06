@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from "react";
+
 import gsap from "gsap";
+import SplitType from "split-type";
 
 interface LinksProps {
-  links?: Array<{ 
-    label: string; 
+  links?: Array<{
+    label: string;
     href: string;
     onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   }>;
@@ -24,134 +26,89 @@ const Links: React.FC<LinksProps> = ({
   textColor = "text-[#1b1b1a]",
   underlineColor = "bg-[#1b1b1a]",
 }) => {
-  const lineRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const introTimelineRefs = useRef<(gsap.core.Timeline | null)[]>([]);
-  const outroTimelineRefs = useRef<(gsap.core.Timeline | null)[]>([]);
-  const isPointerInsideRefs = useRef<boolean[]>([]);
-  const leaveQueuedRefs = useRef<boolean[]>([]);
+  const splitInstances = useRef<(SplitType | null)[]>([]);
 
   useEffect(() => {
-    const cleanups: Array<() => void> = [];
+    // Clean up any previous splits
+    splitInstances.current.forEach((split) => split?.revert());
+    splitInstances.current = [];
 
-    links.forEach((_, i) => {
-      const line = lineRefs.current[i];
-      const link = linkRefs.current[i];
-      if (!line || !link) return;
-
-      // Set initial state
-      gsap.set(line, { scaleX: 0, transformOrigin: "left" });
-
-      // Initialize state trackers
-      isPointerInsideRefs.current[i] = false;
-      leaveQueuedRefs.current[i] = false;
-
-      // Create intro timeline (expand from left)
-      const introTimeline = gsap.timeline({
-        paused: true,
-        onComplete: () => {
-          if (leaveQueuedRefs.current[i]) {
-            leaveQueuedRefs.current[i] = false;
-            scheduleOutro(i);
-          }
-        },
+    linkRefs.current.forEach((link, i) => {
+      if (!link) return;
+      // Split the label into characters for animation
+      const split = new SplitType(link.querySelector(".link-label"), {
+        types: "chars",
       });
-
-      introTimeline.to(line, {
-        scaleX: 1,
-        transformOrigin: "left",
-        duration: 0.5,
-        ease: "power2.out",
-      });
-
-      // Create outro timeline (exit to the right)
-      const outroTimeline = gsap.timeline({
-        paused: true,
-      });
-
-      outroTimeline.to(line, {
-        scaleX: 0,
-        transformOrigin: "right",
-        duration: 0.5,
-        ease: "power2.in",
-      });
-
-      introTimelineRefs.current[i] = introTimeline;
-      outroTimelineRefs.current[i] = outroTimeline;
-
-      const scheduleOutro = (index: number) => {
-        const outro = outroTimelineRefs.current[index];
-        if (outro && !outro.isActive()) {
-          outro.restart();
-        }
-      };
-
-      const handleMouseEnter = () => {
-        isPointerInsideRefs.current[i] = true;
-        leaveQueuedRefs.current[i] = false;
-
-        const intro = introTimelineRefs.current[i];
-        const outro = outroTimelineRefs.current[i];
-
-        if (outro?.isActive()) {
-          outro.kill();
-        }
-
-        if (intro && !intro.isActive()) {
-          intro.restart();
-        }
-      };
-
-      const handleMouseLeave = () => {
-        isPointerInsideRefs.current[i] = false;
-        const intro = introTimelineRefs.current[i];
-
-        if (intro?.isActive()) {
-          leaveQueuedRefs.current[i] = true;
-        } else {
-          scheduleOutro(i);
-        }
-      };
-
-      link.addEventListener("mouseenter", handleMouseEnter);
-      link.addEventListener("mouseleave", handleMouseLeave);
-
-      cleanups.push(() => {
-        link.removeEventListener("mouseenter", handleMouseEnter);
-        link.removeEventListener("mouseleave", handleMouseLeave);
-        if (introTimelineRefs.current[i]) introTimelineRefs.current[i]?.kill();
-        if (outroTimelineRefs.current[i]) outroTimelineRefs.current[i]?.kill();
-      });
+      splitInstances.current[i] = split;
+      // Set initial state for characters
+      gsap.set(split.chars, { y: 0, opacity: 1 });
     });
 
-    return () => cleanups.forEach((fn) => fn());
+    return () => {
+      splitInstances.current.forEach((split) => split?.revert());
+    };
   }, [links]);
+
+  // Animation handlers
+  const handleMouseEnter = (i: number) => {
+    const split = splitInstances.current[i];
+    if (!split) return;
+    gsap.fromTo(
+      split.chars,
+      { y: 24, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        stagger: {
+          each: 0.04,
+          from: "start",
+          ease: "sine.inOut",
+        },
+        ease: "power2.out",
+      },
+    );
+  };
+
+  const handleMouseLeave = (i: number) => {
+    const split = splitInstances.current[i];
+    if (!split) return;
+    gsap.to(split.chars, {
+      y: -18,
+      opacity: 0,
+      duration: 0.4,
+      stagger: {
+        each: 0.04,
+        from: "end",
+        ease: "sine.inOut",
+      },
+      ease: "power2.in",
+      onComplete: () => {
+        // Reset state after animation
+        gsap.set(split.chars, { y: 0, opacity: 1 });
+      },
+    });
+  };
 
   return (
     <div className={className}>
-      {links.map((link, i) => {
-        return (
-          <a
-            key={link.label + i}
-            ref={(el) => {
-              linkRefs.current[i] = el;
-            }}
-            href={link.href}
-            onClick={link.onClick}
-            className={`inline-flex items-center ${linkClassName} ${textColor}`}
-          >
-            <span className="relative">
-              {link.label}
-              <span
-                ref={(el) => {
-                  lineRefs.current[i] = el;
-                }}
-                className={`absolute -bottom-1 left-0 w-full h-[1px] ${underlineColor}`}
-              ></span>
-            </span>
-          </a>
-        );
-      })}
+      {links.map((link, i) => (
+        <a
+          key={link.label + i}
+          ref={(el) => (linkRefs.current[i] = el)}
+          href={link.href}
+          onClick={link.onClick}
+          className={`inline-flex items-center ${linkClassName} ${textColor}`}
+          onMouseEnter={() => handleMouseEnter(i)}
+          onMouseLeave={() => handleMouseLeave(i)}
+          style={{ cursor: "pointer" }}
+        >
+          <span className="relative">
+            <span className="link-label block">{link.label}</span>
+          </span>
+        </a>
+      ))}
     </div>
   );
 };

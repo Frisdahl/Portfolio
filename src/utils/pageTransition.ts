@@ -1,10 +1,10 @@
 let trigger: null | ((onCovered?: () => void) => Promise<void>) = null;
 
 /**
- * Internal function to set the transition trigger.
+ * Internal function to set or clear the transition trigger.
  */
 export const _setTransitionTrigger = (
-  fn: (onCovered?: () => void) => Promise<void>
+  fn: null | ((onCovered?: () => void) => Promise<void>)
 ) => {
   trigger = fn;
 };

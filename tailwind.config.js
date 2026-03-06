@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -22,6 +22,7 @@
         instrumentsans: ["'Instrument Sans'", "sans-serif"],
         switzer: ["Switzer", "sans-serif"],
         newroman: ["NewRoman", "serif"],
+        cabinet: ["Cabinet", "sans-serif"],
         // Backwards compatibility for existing classes
         granary: ["Switzer", "sans-serif"],
         apparel: ["NewRoman", "serif"],
