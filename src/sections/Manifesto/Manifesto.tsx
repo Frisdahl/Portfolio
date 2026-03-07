@@ -61,7 +61,7 @@ const Manifesto: React.FC = () => {
           </div>
           <p
             ref={bodyRef}
-            className="text-xl md:text-xl text-[var(--foreground-muted)] max-w-md font-cabinet font-regular leading-[1.1] tracking-tight text-center"
+            className="text-xl md:text-2xl 3xl:text-xl text-[var(--foreground-muted)] max-w-xl font-cabinet font-regular leading-[1.1] tracking-tight text-center"
           >
             I specialize in building performant, motion-driven web interfaces
             using React, TypeScript and GSAP.

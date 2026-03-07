@@ -420,10 +420,10 @@ const Header: React.FC = () => {
             onClick={handleLogoClick}
             className="pointer-events-auto flex flex-col items-start shrink-0 text-[var(--foreground)] pt-1 opacity-0"
           >
-            <span className=" text-base md:text-xl lg:text-xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
+            <span className=" text-base md:text-xl lg:text-2xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
               <span className="italic">A</span>lexander
             </span>
-            <span className=" text-base md:text-xl lg:text-xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
+            <span className=" text-base md:text-xl lg:text-2xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
               <span className="italic">F</span>risdahl
             </span>
           </Link>
@@ -450,7 +450,7 @@ const Header: React.FC = () => {
             <button
               ref={talkButtonRef}
               onClick={(e) => handleLinkClick(e, "/contact")}
-              className="group/talk hidden md:flex h-9 gap-x-4 sm:h-10 px-8 rounded-full bg-[#E35239] text-[#1b1b1a] text-md md:text-xl font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative min-w-[140px]"
+              className="group/talk hidden md:flex gap-x-4 py-2 px-8 rounded-full bg-[#E35239] text-[#1b1b1a] text-md md:text-2xl font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative"
             >
               <span className="whitespace-nowrap font-cabinet transition-transform duration-500 group-hover/talk:translate-x-4 font-medium">
                 Let's talk

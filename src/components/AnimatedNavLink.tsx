@@ -17,7 +17,7 @@ const AnimatedNavLink: React.FC<AnimatedNavLinkProps> = ({
   to,
   isActive = false,
   onClick,
-  className = "header-nav-link text-md md:text-xl font-cabinet font-regular tracking-tight",
+  className = "header-nav-link text-xl xl:text-2xl font-cabinet font-regular tracking-tight",
   target,
   rel,
 }) => {

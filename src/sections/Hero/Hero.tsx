@@ -84,25 +84,25 @@ const Hero: React.FC = () => {
               to="https://facebook.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--foreground)] text-sm md:text-base font-cabinet"
+              className="text-[var(--foreground)] text-sm md:text-xl font-cabinet"
             />
             <AnimatedNavLink
               label="LinkedIn"
               to="https://linkedin.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--foreground)] text-sm md:text-base font-cabinet"
+              className="text-[var(--foreground)] text-sm md:text-xl font-cabinet"
             />
             <AnimatedNavLink
               label="Email"
               to="mailto:hello@example.com"
-              className="text-[var(--foreground)] text-sm md:text-base font-cabinet"
+              className="text-[var(--foreground)] text-sm md:text-xl font-cabinet"
             />
           </div>
-          <p className="text-[var(--foreground)]/80 font-cabinet md:text-2xl text-center order-1 md:order-2">
+          <p className="text-[var(--foreground)]/80 font-cabinet md:text-3xl text-center order-1 md:order-2">
             Scroll down
           </p>
-          <p className="text-[var(--foreground)]/80 font-cabinet md:text-md text-right order-3 md:order-3 md:text-right">
+          <p className="text-[var(--foreground)]/80 font-cabinet md:text-xl text-right order-3 md:order-3 md:text-right">
             Frontend | Motion designer
           </p>
         </div>
