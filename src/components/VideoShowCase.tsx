@@ -15,7 +15,7 @@ const VideoShowCase = () => {
       gsap.fromTo(
         videoWrapperRef.current,
         {
-          scale: 0.6,
+          scale: 0.7,
           y: 60,
         },
         {
@@ -25,7 +25,7 @@ const VideoShowCase = () => {
           scrollTrigger: {
             trigger: sectionRef.current, // static trigger
             start: "top 80%",
-            end: "bottom 20%",
+            end: "bottom 10%",
             scrub: 0.5,
           },
         },

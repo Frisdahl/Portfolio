@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import ArrowIcon from "./ArrowIcon";
 import PlusIcon from "../assets/icons/PlusIcon";
+import Links from "./Links";
 import AnimatedNavLink from "./AnimatedNavLink";
 import { useMagnetic } from "../utils/animations/useMagnetic";
 
@@ -77,8 +78,9 @@ const Header: React.FC = () => {
 
   // Handle scroll-based visibility of burger
   useLayoutEffect(() => {
+    const isMobile = window.innerWidth < 768;
     const ctx = gsap.context(() => {
-      if (isPastHero) {
+      if (isPastHero || isMobile) {
         gsap.to(burgerRef.current, {
           autoAlpha: 1,
           scale: 1,
@@ -430,7 +432,7 @@ const Header: React.FC = () => {
           <div className="pointer-events-auto flex items-center gap-6 md:gap-8 shrink-0 relative min-h-[44px] md:min-h-[56px] justify-end">
             <nav
               ref={navLinksRef}
-              className="hidden md:flex items-center gap-6 lg:gap-8 opacity-0"
+              className="hidden md:flex items-center gap-6 lg:gap-8"
             >
               {menuItems.map((item) => {
                 const isActive = isMenuItemActive(item);
@@ -448,12 +450,12 @@ const Header: React.FC = () => {
             <button
               ref={talkButtonRef}
               onClick={(e) => handleLinkClick(e, "/contact")}
-              className="group/talk hidden md:flex h-9 gap-x-4 sm:h-10 px-8 rounded-full bg-[#1b1b1a] text-[#fefffe] text-md md:text-xl font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative min-w-[140px] opacity-0"
+              className="group/talk hidden md:flex h-9 gap-x-4 sm:h-10 px-8 rounded-full bg-[#E35239] text-[#1b1b1a] text-md md:text-xl font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative min-w-[140px]"
             >
               <span className="whitespace-nowrap font-cabinet transition-transform duration-500 group-hover/talk:translate-x-4 font-medium">
                 Let's talk
               </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse transition-all duration-300 group-hover/talk:opacity-0 group-hover/talk:scale-0" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#1b1b1a] animate-pulse transition-all duration-300 group-hover/talk:opacity-0 group-hover/talk:scale-0" />
               <div className="absolute left-5 top-1/2 -translate-y-1/2 -translate-x-10 opacity-0 transition-all duration-500 group-hover/talk:translate-x-0 group-hover/talk:opacity-100">
                 <ArrowIcon className="w-4 h-4" />
               </div>
@@ -520,34 +522,36 @@ const Header: React.FC = () => {
             >
               {/* Menu items left */}
               <nav className="flex flex-col gap-10 justify-start items-start w-2/3">
-                {menuItems.map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.to}
-                    className="text-5xl text-[#fefffe] font-cabinet font-bold hover:underline text-left flex items-center group"
-                    onClick={() => setIsMenuOpen(false)}
-                    style={{ marginBottom: "2.5rem" }} // Extra spacing between items
-                  >
-                    <span className="mr-16">{item.label}</span>
-                    <span className="ml-16">
-                      <PlusIcon className="w-10 h-10 text-[#fefffe] group-hover:text-[#b3b3b3] transition-colors duration-300" />
-                    </span>
-                  </a>
-                ))}
+                <Links
+                  links={menuItems.map((item) => ({
+                    label: item.label,
+                    href: item.to,
+                    onClick: () => setIsMenuOpen(false),
+                  }))}
+                  className="flex flex-col gap-10 justify-start items-start"
+                  linkClassName="text-5xl text-[#fefffe] font-cabinet font-bold hover:underline text-left flex items-center group"
+                  textColor="text-[#fefffe]"
+                />
               </nav>
               {/* Glassobj video right */}
               <div className="flex items-center justify-end w-1/3 h-full">
-                <video
-                  src="/glassobj.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-auto rounded-2xl shadow-xl"
-                  style={{ maxHeight: "320px", objectFit: "cover" }}
-                  poster="/images/projectVideos/glassobj-poster.jpg"
-                  controls
-                />
+                <div className="aspect-square w-full max-w-[400px] flex items-center justify-center">
+                  <video
+                    src="/glassobj.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover rounded-2xl shadow-xl"
+                    style={{
+                      aspectRatio: "1 / 1",
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                    }}
+                    poster="/images/projectVideos/glassobj-poster.jpg"
+                    controls
+                  />
+                </div>
               </div>
             </div>
           )}

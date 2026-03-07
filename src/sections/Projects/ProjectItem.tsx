@@ -184,32 +184,6 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           ))}
         </div>
       </div>
-
-      <div className="mt-6 flex flex-col gap-1 w-full text-[#1b1b1a]">
-        <div className="flex items-start justify-between w-full">
-          <div
-            className="relative cursor-pointer overflow-hidden"
-            onClick={handleProjectClick}
-            onMouseEnter={handleTitleMouseEnter}
-            onMouseLeave={handleTitleMouseLeave}
-          >
-            <div className="flex flex-col items-start">
-              <h3 className="font-aeonik text-2xl md:text-2xl text-[#1b1b1a] font-medium leading-tight tracking-tight whitespace-nowrap capitalize">
-                {project.title}
-              </h3>
-              <span className="font-aeonik text-xs md:text-sm font-thin uppercase tracking-[0.16em] text-black mt-1">
-                {project.projectType}
-              </span>
-            </div>
-          </div>
-
-          <div className="pb-1 md:pb-1.5 md:pr-4">
-            <span className="font-aeonik text-2xl md:text-2xl text-[#1b1b1a] font-medium leading-tight tracking-tight whitespace-nowrap capitalize">
-              {project.year || "2024"}
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

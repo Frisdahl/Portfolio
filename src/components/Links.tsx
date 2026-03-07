@@ -41,7 +41,7 @@ const Links: React.FC<LinksProps> = ({
         types: "chars",
       });
       splitInstances.current[i] = split;
-      // Set initial state for characters
+      // Ensure characters are visible by default
       gsap.set(split.chars, { y: 0, opacity: 1 });
     });
 
@@ -54,40 +54,31 @@ const Links: React.FC<LinksProps> = ({
   const handleMouseEnter = (i: number) => {
     const split = splitInstances.current[i];
     if (!split) return;
-    gsap.fromTo(
-      split.chars,
-      { y: 24, opacity: 0 },
+    
+    gsap.fromTo(split.chars, 
+      { y: 10, opacity: 0 },
       {
         y: 0,
         opacity: 1,
-        duration: 0.5,
-        stagger: {
-          each: 0.04,
-          from: "start",
-          ease: "sine.inOut",
-        },
+        duration: 0.4,
+        stagger: 0.02,
         ease: "power2.out",
-      },
+        overwrite: true
+      }
     );
   };
 
   const handleMouseLeave = (i: number) => {
+    // Just ensure they are visible, no need to hide them
     const split = splitInstances.current[i];
     if (!split) return;
+    
     gsap.to(split.chars, {
-      y: -18,
-      opacity: 0,
-      duration: 0.4,
-      stagger: {
-        each: 0.04,
-        from: "end",
-        ease: "sine.inOut",
-      },
-      ease: "power2.in",
-      onComplete: () => {
-        // Reset state after animation
-        gsap.set(split.chars, { y: 0, opacity: 1 });
-      },
+      y: 0,
+      opacity: 1,
+      duration: 0.3,
+      ease: "power2.out",
+      overwrite: true
     });
   };
 

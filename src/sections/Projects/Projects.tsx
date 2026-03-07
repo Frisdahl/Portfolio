@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import ProjectItem from "./ProjectItem";
 import type { Project } from "./ProjectItem";
 import { initGridAnimations } from "./Projects.anim";
+import AnimatedButton from "../../components/AnimatedButton";
 
 const projects: Project[] = [
   {
@@ -46,59 +47,181 @@ const projects: Project[] = [
 
 const Projects: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const thumbRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [indicatorOffset, setIndicatorOffset] = React.useState(0);
+
+  useLayoutEffect(() => {
+    const updateOffset = () => {
+      const activeThumb = thumbRefs.current[activeIndex];
+      if (activeThumb) {
+        setIndicatorOffset(
+          activeThumb.offsetTop + activeThumb.offsetHeight / 2 - 4,
+        );
+      }
+    };
+
+    updateOffset();
+    window.addEventListener("resize", updateOffset);
+    return () => window.removeEventListener("resize", updateOffset);
+  }, [activeIndex]);
 
   useLayoutEffect(() => {
     if (!containerRef.current) return;
 
     const ctx = initGridAnimations(containerRef.current);
 
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Build array of visible entries with index and top
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .map((e) => ({
+            index: Number(e.target.getAttribute("data-index")),
+            top: e.boundingClientRect.top,
+          }));
+
+        if (visible.length > 0) {
+          const center = window.innerHeight / 2;
+          // Find the entry closest to the center
+          const closest = visible.reduce((a, b) =>
+            Math.abs(b.top - center) < Math.abs(a.top - center) ? b : a,
+          );
+          setActiveIndex(closest.index);
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    cardRefs.current.forEach((ref) => ref && observer.observe(ref));
+
     return () => {
+      observer.disconnect();
       ctx.revert();
     };
   }, []);
 
-  // Helper to chunk projects into rows of 2
-  const projectRows = [];
-  for (let i = 0; i < projects.length; i += 2) {
-    projectRows.push(projects.slice(i, i + 2));
-  }
-
   return (
-    <section className="w-full" ref={containerRef}>
+    <section
+      className="w-full"
+      ref={containerRef}
+      style={{ overflow: "visible" }}
+    >
       <div className="w-full px-4 md:px-10 lg:px-4 xl:px-6">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-12 mb-8 md:mb-8 overflow-hidden sm-flex">
-          <div className="overflow-hidden flex-shrink-0">
-            <h2 className="project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-semibold text-[#1b1b1a] leading-none tracking-tight whitespace-nowrap uppercase">
-              Work
-            </h2>
-          </div>
-          <div className="max-w-sm text-left overflow-hidden">
-            <p className="project-header-subtext uppercase font-aeonik text-lg md:text-md font-medium text-[#1b1b1a] leading-tight">
-              a selection of my most passionately crafted works with
-              forward-thinking clients and friends over the years.
-            </p>
-          </div>
-        </div>
-
-        {/* Project Grid */}
-        <div className="space-y-16 md:space-y-24 pt-16">
-          {projectRows.map((rowItems, rowIndex) => (
+        {/* Main 12-Column Grid Container */}
+        <div
+          className="grid grid-cols-1 lg:grid-cols-12 gap-y-16 lg:gap-x-12 xl:gap-x-16"
+          style={{ alignItems: "stretch" }}
+        >
+          {/* Left Column Container */}
+          <div className="lg:col-span-4 relative h-full">
+            {/* Sticky Wrapper - Forced sticky with inline styles and a high z-index */}
             <div
-              key={rowIndex}
-              className="project-row grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 md:gap-y-24"
+              className="flex flex-col h-[90svh] items-start justify-between mb-12 lg:mb-0"
+              style={{
+                position: "sticky",
+                top: "8vh",
+                zIndex: 10,
+              }}
+              data-lenis-sticky
             >
-              {rowItems.map((project, index) => (
-                <div key={project.id} className="project-card">
-                  <ProjectItem
-                    project={project}
-                    index={rowIndex * 2 + index}
-                    aspectClassName="aspect-[4/3]"
-                  />
+              <div>
+                <div className="overflow-hidden mb-8">
+                  <h2 className="project-header-text text-5xl md:text-6xl lg:text-7xl w-full text-left font-cabinet font-medium text-[#1b1b1a] leading-none tracking-tight">
+                    Featured work
+                  </h2>
                 </div>
-              ))}
+                <div className="max-w-md text-left overflow-hidden">
+                  <p className="text-xl md:text-2xl text-[#818081] font-cabinet font-regular leading-[1.2] tracking-tight">
+                    A selection of my most passionately crafted works with
+                    forward-thinking clients and friends over the years.
+                  </p>
+                </div>
+              </div>
+
+              {/* Thumbnail Navigation */}
+              <div className="hidden lg:flex flex-col gap-y-3 mt-12 w-fit relative">
+                {projects.map((project, index) => (
+                  <div
+                    key={project.id}
+                    ref={(el) => {
+                      thumbRefs.current[index] = el;
+                    }}
+                    className="relative flex items-center group/thumb"
+                  >
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      onClick={() => {
+                        const el = document.getElementById(
+                          `project-${project.id}`,
+                        );
+                        if (el) {
+                          const headerOffset = 120;
+                          const elementPosition =
+                            el.getBoundingClientRect().top;
+                          const offsetPosition =
+                            elementPosition + window.pageYOffset - headerOffset;
+                          window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth",
+                          });
+                        }
+                      }}
+                      className="w-32 aspect-[16/9] cursor-pointer object-cover grayscale group-hover/thumb:grayscale-0 transition-all duration-300 rounded-sm"
+                    />
+                  </div>
+                ))}
+
+                {/* Sliding Indicator */}
+                <div
+                  className="absolute w-2 h-2 rounded-full bg-[#E35239] pointer-events-none"
+                  style={{
+                    left: "calc(8rem + 1rem)", // Thumbnail width (w-32 = 8rem) + gap (1rem)
+                    transform: `translateY(${indicatorOffset}px)`,
+                    transition: "transform 0.5s cubic-bezier(0, 0, 0.58, 1)",
+                  }}
+                />
+              </div>
+
+              <div className="mt-12">
+                <AnimatedButton
+                  text="See all projects"
+                  baseBgColor="bg-[#E35239]"
+                  hoverBgColor="#1b1b1a"
+                  baseTextColor="#1b1b1a"
+                  hoverTextColor="#fff"
+                  fontSize="text-lg md:text-xl"
+                  showBorder={false}
+                  onClick={() => {
+                    window.location.href = "/projects";
+                  }}
+                />
+              </div>
             </div>
-          ))}
+          </div>
+
+          {/* Right Column: Project List */}
+          <div className="lg:col-span-8 flex flex-col gap-y-24 md:gap-y-24">
+            {projects.map((project, index) => (
+              <div
+                id={`project-${project.id}`}
+                key={project.id}
+                className="project-card w-full"
+                ref={(el) => {
+                  cardRefs.current[index] = el;
+                }}
+                data-index={index}
+              >
+                <ProjectItem
+                  project={project}
+                  index={index}
+                  aspectClassName="aspect-[16/9]"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

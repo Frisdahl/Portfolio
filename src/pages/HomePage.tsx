@@ -285,15 +285,11 @@ function HomePage() {
       </DeferredSection>
 
       {/* Projects Section */}
-      <DeferredSection
-        sectionId="projects"
-        className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
-        containIntrinsicSize="1400px"
-        fallbackClassName="w-full min-h-[1000px] md:min-h-[1400px]"
-        forceMount={forceMountProjects}
-      >
-        <Projects />
-      </DeferredSection>
+      <div id="projects" className="mb-32 md:mb-48 lg:mb-32 xl:mb-64">
+        <Suspense fallback={<div className="w-full min-h-[1000px] md:min-h-[1400px]" />}>
+          <Projects />
+        </Suspense>
+      </div>
 
       {/* Services */}
       <DeferredSection
