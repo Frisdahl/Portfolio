@@ -11,6 +11,10 @@ import { useLocation } from "react-router-dom";
 import Hero from "../sections/Hero/Hero";
 import { scrollTo } from "../utils/smoothScroll";
 import VideoShowCase from "../components/VideoShowCase";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Manifesto = lazy(() => import("../sections/Manifesto/Manifesto"));
 const Projects = lazy(() => import("../sections/Projects/Projects"));
@@ -25,6 +29,28 @@ type DeferredSectionProps = {
   forceMount?: boolean;
   sectionId?: string;
 };
+
+function ThemeTransition() {
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      // Transition from Light to Dark
+      gsap.to(":root", {
+        "--background": "#0F1011",
+        "--foreground": "#e6e6e7",
+        "--foreground-muted": "#a1a1a1",
+        scrollTrigger: {
+          trigger: "#projects",
+          start: "top 90%",
+          end: "top 20%",
+          scrub: 1.2,
+        },
+      });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  return null;
+}
 
 function DeferredSection({
   className,
@@ -265,6 +291,7 @@ function HomePage() {
 
   return (
     <div className="HomePage">
+      <ThemeTransition />
       <Hero />
 
       <DeferredSection
@@ -286,7 +313,9 @@ function HomePage() {
 
       {/* Projects Section */}
       <div id="projects" className="mb-32 md:mb-48 lg:mb-32 xl:mb-64">
-        <Suspense fallback={<div className="w-full min-h-[1000px] md:min-h-[1400px]" />}>
+        <Suspense
+          fallback={<div className="w-full min-h-[1000px] md:min-h-[1400px]" />}
+        >
           <Projects />
         </Suspense>
       </div>

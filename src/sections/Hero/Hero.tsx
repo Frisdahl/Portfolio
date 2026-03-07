@@ -65,10 +65,10 @@ const Hero: React.FC = () => {
             ref={contentRef}
             className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6 py-8"
           >
-            <p className="text-[#1b1b1a] text-lg md:text-2xl font-regular mb-8 font-aeonik">
+            <p className="text-[var(--foreground)] text-lg md:text-2xl font-regular mb-8 font-aeonik">
               Hi! i'm Alexander
             </p>
-            <h1 className="text-[#1b1b1a] text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-regular font-cabinet tracking-tight">
+            <h1 className="text-[var(--foreground)] text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-regular font-cabinet tracking-tight">
               Full-stack Developer <br /> UI & UX Designer.
             </h1>
           </div>

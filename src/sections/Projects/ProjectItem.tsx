@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { showComingSoon } from "../../utils/comingSoon";
+import { gsap } from "gsap";
 
 export interface Project {
   id: number;
@@ -29,9 +29,16 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 }) => {
   const navigate = useNavigate();
   const [isInView, setIsInView] = useState(false);
-  const [showTagPills, setShowTagPills] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const itemRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const tagsRef = useRef<HTMLDivElement>(null);
+  const infoRef = useRef<HTMLDivElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
   const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasPrewarmedRef = useRef(false);
 
@@ -66,22 +73,119 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         await video.play();
         video.pause();
       } catch {
-        // Ignore if browser blocks prewarm play; hover play still works.
+        // Ignore prewarm failures
       }
     };
 
     prewarm();
   }, [isInView, project.video]);
 
+  // Cursor following logic - Using absolute coordinates for the card
   useEffect(() => {
-    return () => {
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current);
-      }
+    if (!isHovered || !cursorRef.current || !itemRef.current) return;
+
+    const cursor = cursorRef.current;
+    const item = itemRef.current;
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = item.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      gsap.to(cursor, {
+        x,
+        y,
+        duration: 0.4,
+        ease: "power3.out",
+        overwrite: "auto",
+      });
     };
+
+    window.addEventListener("mousemove", onMouseMove);
+    return () => window.removeEventListener("mousemove", onMouseMove);
+  }, [isHovered]);
+
+  // GSAP Timeline Setup
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      // Adjusted durations to sum up to exactly the same end-time for instant reaction
+      const tl = gsap.timeline({
+        paused: true,
+        defaults: { ease: "expo.out", duration: 0.7 },
+      });
+
+      // 1. Background Blur & Scale (Base duration 0.8)
+      tl.to(
+        bgRef.current,
+        {
+          filter: "blur(12px)",
+          scale: 1.1,
+          duration: 0.8,
+        },
+        0,
+      );
+
+      // 2. Dark Overlay
+      tl.to(
+        overlayRef.current,
+        {
+          opacity: 1,
+          duration: 0.5,
+        },
+        0,
+      );
+
+      // 3. Tags & Trailer (Parallel)
+      tl.fromTo(
+        tagsRef.current,
+        { y: -30, opacity: 0 },
+        { y: 0, opacity: 1 },
+        0.1,
+      ).fromTo(
+        videoContainerRef.current,
+        { scale: 0.4, opacity: 0 },
+        { scale: 0.6, opacity: 1 },
+        0.1,
+      );
+
+      // 4. Info Slide
+      const infoElements = infoRef.current?.querySelectorAll(
+        ".overflow-hidden > *",
+      );
+      if (infoElements) {
+        tl.fromTo(infoElements, { y: "110%" }, { y: "0%", stagger: 0.05 }, 0.2);
+      }
+
+      // 5. Cursor Entrance - Perfectly aligned to END at 0.8s
+      // (Start at 0.4s + Duration 0.4s = 0.8s)
+      tl.fromTo(
+        cursorRef.current,
+        { scale: 0, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.4,
+          ease: "back.out(1.7)",
+        },
+        0.4,
+      );
+
+      tlRef.current = tl;
+    }, itemRef);
+
+    return () => ctx.revert();
   }, []);
 
-  // Helper to create a slug from the project title
+  // Trigger Timeline on Hover
+  useEffect(() => {
+    if (isHovered) {
+      tlRef.current?.timeScale(1).play();
+    } else {
+      // Faster reverse for snappier exit
+      tlRef.current?.timeScale(1.5).reverse();
+    }
+  }, [isHovered]);
+
   const getSlug = (title: string) =>
     title
       .toLowerCase()
@@ -90,99 +194,140 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   const handleProjectClick = (e: React.MouseEvent) => {
     e.preventDefault();
-
-    // Always navigate to project page
     const slug = getSlug(project.title);
     navigate(`/projects/${slug}`);
+  };
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    setIsHovered(true);
+
+    if (cursorRef.current && itemRef.current) {
+      const rect = itemRef.current.getBoundingClientRect();
+      gsap.set(cursorRef.current, {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        xPercent: -50,
+        yPercent: -50,
+      });
+    }
+
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+      pauseTimeoutRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => undefined);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (!videoRef.current) return;
+    const video = videoRef.current;
+    pauseTimeoutRef.current = setTimeout(() => {
+      video.pause();
+    }, 200);
   };
 
   const videoSrc = project.video?.startsWith("/")
     ? project.video
     : `/${project.video}`;
 
-  const handleMediaMouseEnter = () => {
-    setShowTagPills(true);
-
-    if (pauseTimeoutRef.current) {
-      clearTimeout(pauseTimeoutRef.current);
-      pauseTimeoutRef.current = null;
-    }
-
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => undefined);
-    }
-  };
-
-  const handleMediaMouseLeave = () => {
-    setShowTagPills(false);
-
-    if (!videoRef.current) return;
-
-    const video = videoRef.current;
-    pauseTimeoutRef.current = setTimeout(() => {
-      video.pause();
-    }, 120);
-  };
-
-  const handleTitleMouseEnter = () => {
-    setShowTagPills(true);
-  };
-
-  const handleTitleMouseLeave = () => {
-    setShowTagPills(false);
-  };
-
   return (
     <div
       ref={itemRef}
-      className={`w-full group ${fillHeight ? "h-full flex flex-col" : ""}`}
+      className={`w-full relative group overflow-hidden rounded-[1.5rem] md:rounded-xl cursor-pointer ${fillHeight ? "h-full flex flex-col" : ""}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleProjectClick}
     >
-      {/* Media Container - Clickable and Hoverable */}
+      {/* Interactive Cursor Follower */}
       <div
-        className={`relative w-full overflow-hidden rounded-[1.5rem] md:rounded-xl cursor-pointer transform translate-z-0 ${fillHeight ? "h-full" : aspectClassName}`}
-        onClick={handleProjectClick}
-        onMouseEnter={handleMediaMouseEnter}
-        onMouseLeave={handleMediaMouseLeave}
+        ref={cursorRef}
+        className="pointer-events-none absolute left-0 top-0 z-50 opacity-0 flex items-center justify-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl"
+        style={{
+          willChange: "transform",
+        }}
       >
-        {project.video && isInView ? (
-          <video
-            ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover"
-            muted
-            playsInline
-            loop={true}
-            preload="metadata"
-            disablePictureInPicture
-          >
-            <source src={videoSrc} type="video/mp4" />
-            <source src={videoSrc.replace(".mp4", ".webm")} type="video/webm" />
-          </video>
-        ) : !project.video ? (
-          <img
-            src={project.image}
-            alt={project.title}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-neutral-900 animate-pulse" />
-        )}
+        <span className="text-white text-sm font-cabinet font-medium tracking-widest whitespace-nowrap">
+          See Case
+        </span>
+      </div>
 
-        <div className="absolute left-6 bottom-6 z-20 flex flex-wrap gap-2 pointer-events-none">
-          {project.tags.map((tag, index) => (
+      {/* Background Layer */}
+      <div
+        ref={bgRef}
+        className={`w-full h-full overflow-hidden bg-neutral-200 ${fillHeight ? "" : aspectClassName}`}
+        style={{ willChange: "filter, transform" }}
+      >
+        <img
+          src={project.image}
+          alt={project.title}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
+      </div>
+
+      {/* Hover Overlay Container */}
+      <div
+        ref={overlayRef}
+        className="absolute inset-0 z-30 opacity-0 pointer-events-none flex flex-col items-center justify-between py-4 md:py-8 px-6"
+        style={{
+          background:
+            "radial-gradient(circle at center, rgba(13, 13, 13, 0.4) 0%, rgba(13, 13, 13, 0.8) 100%)",
+        }}
+      >
+        {/* Top: Tags */}
+        <div
+          ref={tagsRef}
+          className="flex flex-wrap justify-center gap-2 max-w-md"
+        >
+          {project.tags.map((tag) => (
             <span
-              key={`${project.id}-${tag}`}
-              className={`px-3 py-1 rounded-md bg-white/20 backdrop-blur-xl [backdrop-filter:saturate(150%)_blur(16px)] shadow-[0_6px_24px_rgba(0,0,0,0.22)] text-white text-[10px] md:text-xs font-medium uppercase tracking-[0.12em] transition-[opacity,transform,filter] duration-300 ease-out ${
-                showTagPills
-                  ? "opacity-100 translate-x-0 blur-0"
-                  : "opacity-0 -translate-x-4 blur-sm"
-              }`}
-              style={{ transitionDelay: `${showTagPills ? index * 50 : 0}ms` }}
+              key={tag}
+              className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] tracking-widest font-medium"
             >
               {tag}
             </span>
           ))}
         </div>
+
+        {/* Bottom: Info - With Masked Slide-up */}
+        <div ref={infoRef} className="flex flex-col items-center text-center">
+          <div className="overflow-hidden">
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-cabinet font-medium text-white mb-1 tracking-tight">
+              {project.title}
+            </h3>
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-white/60 font-aeonik text-sm md:text-base tracking-widest">
+              {project.projectType}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Center: Video Trailer Container */}
+      <div
+        ref={videoContainerRef}
+        className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center overflow-hidden"
+        style={{
+          transformOrigin: "center center",
+          opacity: 0,
+        }}
+      >
+        {project.video && isInView && (
+          <video
+            ref={videoRef}
+            className="w-full h-full object-contain will-change-transform"
+            muted
+            playsInline
+            loop={true}
+            preload="metadata"
+          >
+            <source src={videoSrc} type="video/mp4" />
+          </video>
+        )}
       </div>
     </div>
   );

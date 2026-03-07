@@ -189,7 +189,7 @@ const Services: React.FC = () => {
     <section
       id="services"
       ref={sectionRef}
-      className="w-full text-[#1b1b1a] text-left font-aeonik px-4 md:px-10 lg:px-4 xl:px-6"
+      className="w-full text-[var(--foreground)] text-left font-aeonik px-4 md:px-10 lg:px-4 xl:px-6"
     >
       {/* Services List Container */}
       <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen md:static md:mx-0 md:w-full">

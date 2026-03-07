@@ -9,8 +9,8 @@ const projects: Project[] = [
     id: 1,
     title: "NordWear",
     projectType: "Website",
-    image: "/images/Bang&Olufsen.webp",
-    video: "/projectVideos/NordWear/NordWear-trailer-web.mp4",
+    image: "/images/projectImages/NordWear-img-opt.webp",
+    video: "/projectVideos/NordWear/NordWear-trailer.webm",
     link: "https://nordwear-shop.dk/",
     year: "2025",
     tags: ["React", "Typescript", "Next.js", "Gsap"],
@@ -128,12 +128,12 @@ const Projects: React.FC = () => {
             >
               <div>
                 <div className="overflow-hidden mb-8">
-                  <h2 className="project-header-text text-5xl md:text-6xl lg:text-7xl w-full text-left font-cabinet font-medium text-[#1b1b1a] leading-none tracking-tight">
+                  <h2 className="project-header-text text-5xl md:text-6xl lg:text-7xl w-full text-left font-cabinet font-medium text-[var(--foreground)] leading-none tracking-tight">
                     Featured work
                   </h2>
                 </div>
                 <div className="max-w-md text-left overflow-hidden">
-                  <p className="text-xl md:text-2xl text-[#818081] font-cabinet font-regular leading-[1.2] tracking-tight">
+                  <p className="text-xl md:text-2xl text-[var(--foreground-muted)] font-cabinet font-regular leading-[1.2] tracking-tight">
                     A selection of my most passionately crafted works with
                     forward-thinking clients and friends over the years.
                   </p>
@@ -188,10 +188,12 @@ const Projects: React.FC = () => {
               <div className="mt-12">
                 <AnimatedButton
                   text="See all projects"
-                  baseBgColor="bg-[#E35239]"
-                  hoverBgColor="#1b1b1a"
-                  baseTextColor="#1b1b1a"
-                  hoverTextColor="#fff"
+                  baseBgColor="bg-[#e35338]"
+                  baseBorderColor="border-[#e35338]"
+                  hoverBorderColor="border-[#e35338]"
+                  hoverBgColor="bg-[#131313]"
+                  baseTextColor="text-[var(--background)]"
+                  hoverTextColor="text-[#E35239]"
                   fontSize="text-lg md:text-xl"
                   showBorder={false}
                   onClick={() => {
@@ -203,7 +205,7 @@ const Projects: React.FC = () => {
           </div>
 
           {/* Right Column: Project List */}
-          <div className="lg:col-span-8 flex flex-col gap-y-24 md:gap-y-24">
+          <div className="lg:col-span-8 flex flex-col gap-y-8 md:gap-y-24">
             {projects.map((project, index) => (
               <div
                 id={`project-${project.id}`}

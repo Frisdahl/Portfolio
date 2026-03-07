@@ -95,7 +95,7 @@ const AnimatedNavLink: React.FC<AnimatedNavLinkProps> = ({
       onMouseLeave={handleMouseLeave}
       target={target}
       rel={rel}
-      className={`${className} inline-block text-[#1b1b1a] relative transition-opacity duration-300 ${
+      className={`${className} inline-block text-[var(--foreground)] relative transition-opacity duration-300 ${
         isActive ? "cursor-default opacity-60" : "hover:opacity-100"
       }`}
     >

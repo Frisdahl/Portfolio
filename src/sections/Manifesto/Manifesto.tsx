@@ -54,14 +54,14 @@ const Manifesto: React.FC = () => {
           <div className="overflow-hidden">
             <h2
               ref={headingRef}
-              className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-7xl mb-16 text-[#131312] font-cabinet font-medium leading-[1.25] text-center"
+              className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-7xl mb-8 text-[var(--foreground)] font-cabinet font-medium leading-[1.25] text-center"
             >
               I design and build purposeful digital experiences.
             </h2>
           </div>
           <p
             ref={bodyRef}
-            className="text-2xl md:text-3xl text-[#818081] font-cabinet font-regular leading-[1.1] tracking-tight text-center"
+            className="text-xl md:text-xl text-[var(--foreground-muted)] max-w-md font-cabinet font-regular leading-[1.1] tracking-tight text-center"
           >
             I specialize in building performant, motion-driven web interfaces
             using React, TypeScript and GSAP.

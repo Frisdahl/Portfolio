@@ -2,10 +2,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap");
 
 :root {
-  --background: #e6e6e7 !important;
-  --background-rgb: 230, 230, 231 !important;
-  --foreground: #1b1b1a;
-  --foreground-rgb: 27, 27, 26;
+  --background: #e6e6e7;
+  --background-rgb: 230, 230, 231;
+  --foreground: #131313;
+  --foreground-rgb: 19, 19, 19;
   --foreground-muted: #666;
   --divider: rgba(0, 0, 0, 0.1);
 }
@@ -49,7 +49,7 @@ body,
 .App,
 .HomePage,
 main {
-  background-color: var(--background) !important;
+  background-color: var(--background);
   color: var(--foreground);
   font-family: "Aeonik", sans-serif;
 }
@@ -314,7 +314,12 @@ body {
     scrollbar-color: var(--foreground) var(--background);
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: "Cabinet Grotesk", "Cabinet", sans-serif;
   }
 }

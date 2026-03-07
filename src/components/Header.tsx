@@ -418,7 +418,7 @@ const Header: React.FC = () => {
             ref={nameRef}
             to="/"
             onClick={handleLogoClick}
-            className="pointer-events-auto flex flex-col items-start shrink-0 text-[#1b1b1a] pt-1 opacity-0"
+            className="pointer-events-auto flex flex-col items-start shrink-0 text-[var(--foreground)] pt-1 opacity-0"
           >
             <span className=" text-base md:text-xl lg:text-xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
               <span className="italic">A</span>lexander
