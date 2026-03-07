@@ -35,9 +35,11 @@ function ThemeTransition() {
     const ctx = gsap.context(() => {
       // Transition from Light to Dark
       gsap.to(":root", {
-        "--background": "#0F1011",
+        "--background": "#131313",
         "--foreground": "#e6e6e7",
         "--foreground-muted": "#a1a1a1",
+        "--menu-bg": "#e6e6e7",
+        "--menu-text": "#131313",
         scrollTrigger: {
           trigger: "#projects",
           start: "top 90%",
@@ -296,7 +298,7 @@ function HomePage() {
 
       <DeferredSection
         className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
-        containIntrinsicSize="900px"
+        containIntrinsicSize="500px"
         fallbackClassName="w-full min-h-[700px] md:min-h-[900px]"
       >
         <VideoShowCase />

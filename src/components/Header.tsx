@@ -7,7 +7,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import ArrowIcon from "./ArrowIcon";
 import PlusIcon from "../assets/icons/PlusIcon";
-import Links from "./Links";
 import AnimatedNavLink from "./AnimatedNavLink";
 import { useMagnetic } from "../utils/animations/useMagnetic";
 
@@ -18,13 +17,16 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [isPastHero, setIsPastHero] = useState(false);
   const [isInProjectsSection, setIsInProjectsSection] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // Icon always top-right now; no state needed
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const talkButtonRef = useRef<HTMLButtonElement>(null);
   const navLinksRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLAnchorElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
+  const menuContentRef = useRef<HTMLDivElement>(null);
+  const shakaIconRef = useRef<HTMLSpanElement>(null);
 
   // Only apply magnetic effect when menu is closed
   useMagnetic(talkButtonRef, { strength: 30, enabled: !isMenuOpen });
@@ -37,7 +39,7 @@ const Header: React.FC = () => {
 
   const isHomePage = location.pathname === "/";
 
-  // 1. Layout Sync & Scroll Detection
+  // Layout Sync & Scroll Detection
   useLayoutEffect(() => {
     const updateHeaderDimensions = () => {
       if (nameRef.current) {
@@ -51,28 +53,24 @@ const Header: React.FC = () => {
 
     updateHeaderDimensions();
 
-    const setBurgerState = () => {
+    const setScrollState = () => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      setIsAtTop(scrollY < 100);
+      
       const header = document.querySelector("header");
       const headerHeight = header ? header.getBoundingClientRect().height : 0;
-      const scrollY = window.scrollY || window.pageYOffset;
       setIsPastHero(scrollY > headerHeight);
     };
 
-    // Set initial state on mount
-    setBurgerState();
-
-    // Listen to scroll events
-    window.addEventListener("scroll", setBurgerState);
+    setScrollState();
+    window.addEventListener("scroll", setScrollState);
     window.addEventListener("resize", updateHeaderDimensions);
     window.addEventListener("page-transition-complete", updateHeaderDimensions);
 
     return () => {
-      window.removeEventListener("scroll", setBurgerState);
+      window.removeEventListener("scroll", setScrollState);
       window.removeEventListener("resize", updateHeaderDimensions);
-      window.removeEventListener(
-        "page-transition-complete",
-        updateHeaderDimensions,
-      );
+      window.removeEventListener("page-transition-complete", updateHeaderDimensions);
     };
   }, [location.pathname]);
 
@@ -82,16 +80,17 @@ const Header: React.FC = () => {
     const ctx = gsap.context(() => {
       if (isPastHero || isMobile) {
         gsap.to(burgerRef.current, {
-          autoAlpha: 1,
           scale: 1,
           duration: 0.4,
           ease: "back.out(1.7)",
           transformOrigin: "center center",
           pointerEvents: "auto",
+          onStart: () => {
+            gsap.set(burgerRef.current, { visibility: "visible" });
+          }
         });
       } else {
         gsap.to(burgerRef.current, {
-          autoAlpha: 0,
           scale: 0,
           duration: 0.4,
           ease: "power2.inOut",
@@ -103,29 +102,86 @@ const Header: React.FC = () => {
     return () => ctx.revert();
   }, [isPastHero]);
 
-  // Animate burger to square and icon to X when menu is open
-  // Only animate width/height, keep borderRadius always rounded square
+  // Handle clicks outside menu to close it
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (burgerRef.current && !burgerRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen]);
+
+  // Animate burger with content-aware sizing
   useLayoutEffect(() => {
     if (!burgerRef.current) return;
     const el = burgerRef.current;
-    gsap.to(el, {
-      borderRadius: "18px",
-      width: isMenuOpen ? 320 : 56,
-      height: isMenuOpen ? 320 : 56,
-      backgroundColor: "#1b1b1a",
-      duration: 0.4,
-      ease: "linear",
+    
+    let targetWidth = 140;
+    let targetHeight = 56;
+    let targetRadius = 28;
+
+    if (isMenuOpen && menuContentRef.current) {
+      const rect = menuContentRef.current.getBoundingClientRect();
+      targetWidth = Math.max(rect.width, 400); 
+      targetHeight = rect.height; 
+      targetRadius = 24;
+    }
+
+    const tl = gsap.timeline();
+
+    tl.to(el, {
+      borderRadius: targetRadius,
+      width: targetWidth,
+      height: targetHeight,
+      duration: 0.6,
+      ease: "expo.inOut",
+      force3D: true,
     });
+
+    if (menuContentRef.current) {
+      tl.to(menuContentRef.current, {
+        opacity: isMenuOpen ? 1 : 0,
+        pointerEvents: isMenuOpen ? "auto" : "none",
+        duration: 0.3,
+        ease: "power2.out"
+      }, isMenuOpen ? 0.3 : 0);
+    }
   }, [isMenuOpen]);
 
-  // Header entrance animation (name + nav links + talk button)
+  // Shaka Shake Animation
+  useEffect(() => {
+    if (!isMenuOpen || !shakaIconRef.current) return;
+    
+    const shakeTween = gsap.to(shakaIconRef.current, {
+      keyframes: [
+        { rotation: -14, duration: 0.08 },
+        { rotation: 14, duration: 0.08 },
+        { rotation: -10, duration: 0.07 },
+        { rotation: 10, duration: 0.07 },
+        { rotation: 0, duration: 0.1 },
+      ],
+      transformOrigin: "50% 60%",
+      repeat: -1,
+      repeatDelay: 3.6,
+    });
+
+    return () => {
+      shakeTween.kill();
+    };
+  }, [isMenuOpen]);
+
+  // Header entrance animation
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       if (!nameRef.current || !talkButtonRef.current || !navLinksRef.current) {
         return;
       }
 
-      // 1. Setup SplitType for the name
       const nameSpans = nameRef.current.querySelectorAll("span.uppercase");
       const splits = Array.from(nameSpans).map(
         (span) => new SplitType(span as HTMLElement, { types: "lines" }),
@@ -133,7 +189,6 @@ const Header: React.FC = () => {
 
       const lines = splits.flatMap((s) => s.lines);
 
-      // 2. Initial State
       gsap.set(lines, { yPercent: 100 });
       gsap.set([talkButtonRef.current, navLinksRef.current], {
         autoAlpha: 0,
@@ -149,46 +204,35 @@ const Header: React.FC = () => {
         },
       });
 
-      tl.to(
-        lines,
-        {
-          yPercent: 0,
-          duration: 0.15,
-          stagger: 0.02,
-          ease: "power4.out",
-        },
-        0,
-      ).to(
-        [talkButtonRef.current, navLinksRef.current],
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.15,
-          stagger: 0.02,
-          ease: "power2.out",
-        },
-        0,
-      );
+      tl.to(lines, {
+        yPercent: 0,
+        duration: 0.15,
+        stagger: 0.02,
+        ease: "power4.out",
+      }, 0).to([talkButtonRef.current, navLinksRef.current], {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.15,
+        stagger: 0.02,
+        ease: "power2.out",
+      }, 0);
 
       entranceTimelineRef.current = tl;
 
       const playEntrance = () => {
         const entranceTimeline = entranceTimelineRef.current;
         if (!entranceTimeline) return;
-
         if (entranceTimeline.progress() === 0) {
           entranceTimeline.play();
           return;
         }
-
         window.dispatchEvent(new CustomEvent("header-entrance-complete"));
       };
 
       window.addEventListener("initial-loader-complete", playEntrance);
       window.addEventListener("page-transition-complete", playEntrance);
 
-      const isInitialLoaderDone =
-        sessionStorage.getItem("hasSeenInitialLoader") === "true";
+      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
       const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
       const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
@@ -196,10 +240,7 @@ const Header: React.FC = () => {
         playEntrance();
       }
 
-      const safetyTimeout = setTimeout(
-        playEntrance,
-        isLoaderActive ? 8000 : 250,
-      );
+      const safetyTimeout = setTimeout(playEntrance, isLoaderActive ? 8000 : 250);
 
       return () => {
         window.removeEventListener("initial-loader-complete", playEntrance);
@@ -221,18 +262,11 @@ const Header: React.FC = () => {
     let sectionObserver: IntersectionObserver | null = null;
     let domObserver: MutationObserver | null = null;
 
-    const disconnectSectionObserver = () => {
-      if (sectionObserver) {
-        sectionObserver.disconnect();
-        sectionObserver = null;
-      }
-    };
-
     const observeProjectsSection = () => {
       const projectsSection = document.getElementById("projects");
       if (!projectsSection) return false;
 
-      disconnectSectionObserver();
+      if (sectionObserver) sectionObserver.disconnect();
 
       const headerElement = document.querySelector("header");
       const headerHeight = headerElement?.getBoundingClientRect().height ?? 0;
@@ -260,129 +294,48 @@ const Header: React.FC = () => {
           domObserver = null;
         }
       });
-
       domObserver.observe(document.body, { childList: true, subtree: true });
     }
 
-    const handleResize = () => {
-      observeProjectsSection();
-    };
-
-    window.addEventListener("resize", handleResize);
-
+    window.addEventListener("resize", observeProjectsSection);
     return () => {
-      window.removeEventListener("resize", handleResize);
-      disconnectSectionObserver();
-      domObserver?.disconnect();
+      window.removeEventListener("resize", observeProjectsSection);
+      if (sectionObserver) sectionObserver.disconnect();
+      if (domObserver) domObserver.disconnect();
     };
   }, [isHomePage, location.pathname]);
 
   const handleLogoClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    sessionStorage.removeItem("targetSection");
-
     if (!isHomePage) {
-      sessionStorage.setItem("forceHomeEntrance", "true");
-      sessionStorage.removeItem("isNavigating");
       navigate("/");
     } else {
-      if (window.location.hash) {
-        window.history.replaceState(null, "", location.pathname);
-      }
-
-      if (logoReplayTimeoutRef.current) {
-        window.clearTimeout(logoReplayTimeoutRef.current);
-        logoReplayTimeoutRef.current = null;
-      }
-
-      const shouldReplayEntrance = window.scrollY > 64;
       scrollTo(0, 0, 0, true);
-
-      if (shouldReplayEntrance) {
-        logoReplayTimeoutRef.current = window.setTimeout(() => {
-          const now = Date.now();
-          if (now - lastLogoReplayAtRef.current < 900) {
-            return;
-          }
-          lastLogoReplayAtRef.current = now;
-          window.dispatchEvent(new CustomEvent("replay-hero-entrance"));
-          logoReplayTimeoutRef.current = null;
-        }, 16);
-      }
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (logoReplayTimeoutRef.current) {
-        window.clearTimeout(logoReplayTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const handleLinkClick = (
-    e: React.MouseEvent<HTMLElement> | null,
-    to: string,
-    section?: string,
-  ) => {
+  const handleLinkClick = (e: React.MouseEvent<HTMLElement> | null, to: string, section?: string) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
 
     if (section) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "da1222",
-          },
-          body: JSON.stringify({
-            sessionId: "da1222",
-            location: "Header.tsx:handleLinkClick(section)",
-            message: "Projects/section link clicked",
-            data: { isHomePage, section, pathname: location.pathname },
-            timestamp: Date.now(),
-            hypothesisId: "H-B",
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       if (isHomePage) {
-        const headerElement = document.querySelector("header");
-        const navRow = headerElement?.querySelector("div");
-        const headerHeight = navRow
-          ? navRow.getBoundingClientRect().height
-          : (headerElement?.getBoundingClientRect().height ?? 0);
-
-        const isMobile = window.innerWidth < 768;
-        const topPadding = isMobile ? 24 : 40;
-        const topOffset = -(headerHeight + topPadding + 8);
-
-        if (window.location.hash) {
-          window.history.replaceState(null, "", location.pathname);
-        }
-
-        sessionStorage.setItem("pendingSectionScroll", "true");
-        sessionStorage.removeItem("targetSection");
-        scrollTo(section, 0, topOffset, true);
+        scrollTo(section, 0, -120, true);
       } else {
-        sessionStorage.setItem("pendingSectionScroll", "true");
         sessionStorage.setItem("targetSection", section);
-        document.documentElement.classList.add("scroll-to-section-pending");
         navigate("/");
       }
       return;
     }
 
-    sessionStorage.removeItem("targetSection");
-    sessionStorage.removeItem("pendingSectionScroll");
+    if (to === "/" && isHomePage && !isAtTop) {
+        scrollTo(0, 0, 0, true);
+        return;
+    }
 
     if (location.pathname !== to) {
-      sessionStorage.setItem("isNavigating", "true");
       navigate(to);
       triggerPageTransition();
     }
@@ -395,17 +348,10 @@ const Header: React.FC = () => {
   ];
 
   const isMenuItemActive = (item: (typeof menuItems)[number]) => {
-    const isProjectsItem = item.section === "#projects";
-    const isHomeItem = !item.section && item.to === "/";
-
-    if (isProjectsItem) {
-      return isHomePage && isInProjectsSection;
+    if (item.section === "#projects") return isHomePage && isInProjectsSection;
+    if (!item.section && item.to === "/") {
+        return isHomePage && !isInProjectsSection && isAtTop;
     }
-
-    if (isHomeItem) {
-      return isHomePage && !isInProjectsSection;
-    }
-
     return location.pathname === item.to && !location.hash;
   };
 
@@ -413,48 +359,36 @@ const Header: React.FC = () => {
     <>
       <header className="absolute top-0 left-0 right-0 z-[220] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6 h-28 min-h-28 flex items-center">
         <div className="flex items-start justify-between w-full relative">
-          {/* Logo Replacement: Stylized Name */}
           <Link
             ref={nameRef}
             to="/"
             onClick={handleLogoClick}
             className="pointer-events-auto flex flex-col items-start shrink-0 text-[var(--foreground)] pt-1 opacity-0"
           >
-            <span className=" text-base md:text-xl lg:text-2xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
-              <span className="italic">A</span>lexander
-            </span>
-            <span className=" text-base md:text-xl lg:text-2xl mt-1 font-medium tracking-tight leading-none overflow-hidden inline-block">
-              <span className="italic">F</span>risdahl
+            <span className="flex flex-row gap-2 text-base md:text-xl lg:text-2xl mt-1 font-medium tracking-tight leading-none overflow-hidden">
+              <span className="inline-block"><span className="italic">A</span>lexander</span>
+              <span className="inline-block"><span className="italic">F</span>risdahl</span>
             </span>
           </Link>
 
-          {/* Nav: links (split-char hover) + Let's talk */}
           <div className="pointer-events-auto flex items-center gap-6 md:gap-8 shrink-0 relative min-h-[44px] md:min-h-[56px] justify-end">
-            <nav
-              ref={navLinksRef}
-              className="hidden md:flex items-center gap-6 lg:gap-8"
-            >
-              {menuItems.map((item) => {
-                const isActive = isMenuItemActive(item);
-                return (
-                  <AnimatedNavLink
-                    key={item.label}
-                    label={item.label}
-                    to={item.to}
-                    isActive={isActive}
-                    onClick={(e) => handleLinkClick(e, item.to, item.section)}
-                  />
-                );
-              })}
+            <nav ref={navLinksRef} className="hidden md:flex items-center gap-6 lg:gap-8">
+              {menuItems.map((item) => (
+                <AnimatedNavLink
+                  key={item.label}
+                  label={item.label}
+                  to={item.to}
+                  isActive={isMenuItemActive(item)}
+                  onClick={(e) => handleLinkClick(e, item.to, item.section)}
+                />
+              ))}
             </nav>
             <button
               ref={talkButtonRef}
               onClick={(e) => handleLinkClick(e, "/contact")}
               className="group/talk hidden md:flex gap-x-4 py-2 px-8 rounded-full bg-[#E35239] text-[#1b1b1a] text-md md:text-2xl font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative"
             >
-              <span className="whitespace-nowrap font-cabinet transition-transform duration-500 group-hover/talk:translate-x-4 font-medium">
-                Let's talk
-              </span>
+              <span className="whitespace-nowrap font-cabinet transition-transform duration-500 group-hover/talk:translate-x-4 font-medium">Let's talk</span>
               <div className="w-1.5 h-1.5 rounded-full bg-[#1b1b1a] animate-pulse transition-all duration-300 group-hover/talk:opacity-0 group-hover/talk:scale-0" />
               <div className="absolute left-5 top-1/2 -translate-y-1/2 -translate-x-10 opacity-0 transition-all duration-500 group-hover/talk:translate-x-0 group-hover/talk:opacity-100">
                 <ArrowIcon className="w-4 h-4" />
@@ -464,97 +398,76 @@ const Header: React.FC = () => {
         </div>
       </header>
 
-      {/* Floating Burger Button - fixed size, always top-right, expanding overlay for menu */}
       <div className="fixed top-0 right-0 z-[999] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6 h-28 flex items-center justify-end overflow-visible">
-        {/* Expanding Burger/Menu Button - single button, always top-right, icon always stays in same spot */}
         <button
           ref={burgerRef}
           aria-label="Menu"
-          className="pointer-events-auto bg-[#1b1b1a] shadow-lg fixed top-8 right-8 z-[1001] flex items-center justify-center overflow-hidden transition-all duration-400 rounded-[18px]"
-          style={{
-            visibility: "hidden",
-            minWidth: isMenuOpen ? 700 : 56,
-            minHeight: isMenuOpen ? 500 : 56,
-            width: isMenuOpen ? "auto" : 56,
-            height: isMenuOpen ? "auto" : 56,
-            transition:
-              "min-width 0.4s linear, min-height 0.4s linear, width 0.4s linear, height 0.4s linear",
+          className="pointer-events-auto shadow-lg fixed top-8 right-8 z-[1001] flex items-start justify-start overflow-hidden"
+          style={{ 
+            visibility: "hidden", 
             boxShadow: "0 8px 32px 0 rgba(0,0,0,0.25)",
+            backgroundColor: "var(--menu-bg)",
+            opacity: 1
           }}
           onClick={() => setIsMenuOpen((open) => !open)}
         >
-          {/* Burger/X icon - always stays in same spot (top-right) */}
-          <div
-            style={{
-              position: "absolute",
-              top: 16,
-              right: 16,
-              width: 28,
-              height: 28,
-              zIndex: 1002,
-              pointerEvents: "none",
-            }}
-          >
-            <div
-              className={`relative w-7 h-7 flex flex-col items-center justify-center`}
-            >
-              <div
-                className={`w-7 h-[2.5px] bg-[#fefffe] rounded transition-all duration-300 ${isMenuOpen ? "rotate-45 absolute top-1/2 left-0" : ""}`}
-                style={{
-                  transition: "all 0.3s",
-                  marginBottom: isMenuOpen ? 0 : 1,
-                }}
-              />
-              <div
-                className={`w-7 h-[2.5px] bg-[#fefffe] rounded transition-all duration-300 ${isMenuOpen ? "-rotate-45 absolute top-1/2 left-0" : ""}`}
-                style={{
-                  transition: "all 0.3s",
-                  marginTop: isMenuOpen ? 0 : 6,
-                }}
-              />
+          {/* Static Header Area for Menu/Close Text */}
+          <div className="absolute top-0 right-0 w-[140px] h-[56px] flex items-center justify-center gap-4 z-[1002] pointer-events-none text-[var(--menu-text)]">
+            <span className="text-xs font-aeonik font-bold uppercase tracking-[0.2em] pt-0.5">
+              {isMenuOpen ? "Close" : "Menu"}
+            </span>
+            <div className="flex gap-1.5 items-center">
+              <div className={`w-1.5 h-1.5 rounded-full bg-current transition-all duration-300 ${isMenuOpen ? "scale-125" : ""}`} />
+              <div className={`w-1.5 h-1.5 rounded-full bg-current transition-all duration-300 ${isMenuOpen ? "scale-125 opacity-50" : ""}`} />
             </div>
           </div>
-          {/* Menu links - only show when open */}
-          {isMenuOpen && (
-            <div
-              className="flex flex-row h-full w-full pt-20 pl-10 pr-6 pb-10 absolute inset-0 z-[1100]"
-              style={{ minWidth: 700, minHeight: 500 }}
-            >
-              {/* Menu items left */}
-              <nav className="flex flex-col gap-10 justify-start items-start w-2/3">
-                <Links
-                  links={menuItems.map((item) => ({
-                    label: item.label,
-                    href: item.to,
-                    onClick: () => setIsMenuOpen(false),
-                  }))}
-                  className="flex flex-col gap-10 justify-start items-start"
-                  linkClassName="text-5xl text-[#fefffe] font-cabinet font-bold hover:underline text-left flex items-center group"
-                  textColor="text-[#fefffe]"
-                />
-              </nav>
-              {/* Glassobj video right */}
-              <div className="flex items-center justify-end w-1/3 h-full">
-                <div className="aspect-square w-full max-w-[400px] flex items-center justify-center">
-                  <video
-                    src="/glassobj.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover rounded-2xl shadow-xl"
-                    style={{
-                      aspectRatio: "1 / 1",
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                    }}
-                    poster="/images/projectVideos/glassobj-poster.jpg"
-                    controls
-                  />
-                </div>
+
+          {/* Measuring Content Container */}
+          <div 
+            ref={menuContentRef} 
+            className="flex flex-col pt-12 px-10 pb-10 opacity-0 pointer-events-none"
+          >
+            {/* Greeting Section */}
+            <div className="flex items-center gap-6 mb-12 mt-8 px-2">
+              <div className="flex items-center justify-center text-5xl leading-none rotate-[15deg]">
+                <span ref={shakaIconRef} className="leading-none">
+                  🤙🏼
+                </span>
+              </div>
+              <div className="flex flex-col text-left justify-center">
+                <p className="text-[var(--menu-text)] text-lg font-cabinet font-medium leading-tight">Nice to see you!</p>
+                <p className="text-[var(--menu-text)] opacity-40 text-sm font-aeonik max-w-[200px] leading-tight">I'm Alex, Frontend Developer based in Copenhagen.</p>
               </div>
             </div>
-          )}
+
+            {/* Menu Links - FULL WIDTH CLICKABLE ROWS */}
+            <nav className="flex flex-col gap-2 items-start w-full min-w-[320px]">
+              {menuItems.map((item, index) => (
+                <div 
+                  key={item.label} 
+                  className="flex items-center justify-between w-full group/menu-item gap-12 cursor-pointer py-3 px-2 rounded-xl transition-colors"
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  onClick={(e) => {
+                    setIsMenuOpen(false);
+                    handleLinkClick(e, item.to, item.section);
+                  }}
+                >
+                  <AnimatedNavLink
+                    label={item.label}
+                    to={item.to}
+                    isActive={isMenuItemActive(item)}
+                    className="text-5xl font-cabinet font-medium pointer-events-none"
+                    textColor="var(--menu-text)"
+                    externalHover={hoveredIndex === index}
+                  />
+                  <div className={`transition-transform duration-500 ${hoveredIndex === index ? "rotate-90" : ""}`}>
+                    <PlusIcon className={`w-6 h-6 text-[var(--menu-text)] transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"}`} />
+                  </div>
+                </div>
+              ))}
+            </nav>
+          </div>
         </button>
       </div>
     </>

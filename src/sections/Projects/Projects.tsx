@@ -169,7 +169,11 @@ const Projects: React.FC = () => {
                           });
                         }
                       }}
-                      className="w-32 aspect-[16/9] cursor-pointer object-cover grayscale group-hover/thumb:grayscale-0 transition-all duration-300 rounded-sm"
+                      className={`w-42 aspect-[16/9] cursor-pointer object-cover transition-all duration-300 rounded-sm ${
+                        index === activeIndex
+                          ? "grayscale-0"
+                          : "grayscale group-hover/thumb:grayscale-0"
+                      }`}
                     />
                   </div>
                 ))}
@@ -178,7 +182,7 @@ const Projects: React.FC = () => {
                 <div
                   className="absolute w-2 h-2 rounded-full bg-[#E35239] pointer-events-none"
                   style={{
-                    left: "calc(8rem + 1rem)", // Thumbnail width (w-32 = 8rem) + gap (1rem)
+                    left: "calc(10.5rem + 1rem)", // Thumbnail width (w-32 = 8rem) + gap (1rem)
                     transform: `translateY(${indicatorOffset}px)`,
                     transition: "transform 0.5s cubic-bezier(0, 0, 0.58, 1)",
                   }}

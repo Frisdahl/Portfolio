@@ -80,7 +80,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     prewarm();
   }, [isInView, project.video]);
 
-  // Cursor following logic - Using absolute coordinates for the card
+  // Smoother Cursor Trail
   useEffect(() => {
     if (!isHovered || !cursorRef.current || !itemRef.current) return;
 
@@ -95,8 +95,8 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       gsap.to(cursor, {
         x,
         y,
-        duration: 0.4,
-        ease: "power3.out",
+        duration: 0.5, // Increased for a more viscous, premium feel
+        ease: "power4.out",
         overwrite: "auto",
       });
     };
@@ -108,19 +108,20 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   // GSAP Timeline Setup
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Adjusted durations to sum up to exactly the same end-time for instant reaction
+      // Using Power4 for that high-end motion design feel
       const tl = gsap.timeline({
         paused: true,
-        defaults: { ease: "expo.out", duration: 0.7 },
+        defaults: { ease: "power4.out", duration: 0.9 },
       });
 
-      // 1. Background Blur & Scale (Base duration 0.8)
+      // 1. Background Blur & Subtle Zoom (Power2 for background to keep it calm)
       tl.to(
         bgRef.current,
         {
-          filter: "blur(12px)",
-          scale: 1.1,
-          duration: 0.8,
+          filter: "blur(15px)",
+          scale: 1.15,
+          duration: 1.1,
+          ease: "power2.out",
         },
         0,
       );
@@ -130,44 +131,48 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         overlayRef.current,
         {
           opacity: 1,
-          duration: 0.5,
+          duration: 0.7,
         },
         0,
       );
 
-      // 3. Tags & Trailer (Parallel)
+      // 3. Tags & Trailer - More overlapping for fluidity
       tl.fromTo(
         tagsRef.current,
-        { y: -30, opacity: 0 },
-        { y: 0, opacity: 1 },
-        0.1,
+        { y: -25, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8 },
+        0.05,
       ).fromTo(
         videoContainerRef.current,
-        { scale: 0.4, opacity: 0 },
-        { scale: 0.6, opacity: 1 },
-        0.1,
+        { scale: 0.45, opacity: 0 },
+        { scale: 0.6, opacity: 1, duration: 0.85 },
+        0.05,
       );
 
-      // 4. Info Slide
+      // 4. Masked Info Slide - Minimal stagger
       const infoElements = infoRef.current?.querySelectorAll(
         ".overflow-hidden > *",
       );
       if (infoElements) {
-        tl.fromTo(infoElements, { y: "110%" }, { y: "0%", stagger: 0.05 }, 0.2);
+        tl.fromTo(
+          infoElements,
+          { y: "105%" },
+          { y: "0%", stagger: 0.04, duration: 0.8 },
+          0.12,
+        );
       }
 
-      // 5. Cursor Entrance - Perfectly aligned to END at 0.8s
-      // (Start at 0.4s + Duration 0.4s = 0.8s)
+      // 5. Cursor Entrance - Perfectly timed to arrive with the rest
       tl.fromTo(
         cursorRef.current,
         { scale: 0, opacity: 0 },
         {
           scale: 1,
           opacity: 1,
-          duration: 0.4,
-          ease: "back.out(1.7)",
+          duration: 0.5,
+          ease: "back.out(1.5)",
         },
-        0.4,
+        0.35,
       );
 
       tlRef.current = tl;
@@ -181,8 +186,8 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     if (isHovered) {
       tlRef.current?.timeScale(1).play();
     } else {
-      // Faster reverse for snappier exit
-      tlRef.current?.timeScale(1.5).reverse();
+      // Balanced exit speed - snappy but smooth
+      tlRef.current?.timeScale(1.3).reverse();
     }
   }, [isHovered]);
 
@@ -244,12 +249,12 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       {/* Interactive Cursor Follower */}
       <div
         ref={cursorRef}
-        className="pointer-events-none absolute left-0 top-0 z-50 opacity-0 flex items-center justify-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl"
+        className="pointer-events-none absolute left-0 top-0 z-50 opacity-0 flex items-center justify-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl"
         style={{
           willChange: "transform",
         }}
       >
-        <span className="text-white text-sm font-cabinet font-medium tracking-widest whitespace-nowrap">
+        <span className="text-white text-sm font-cabinet font-medium uppercase tracking-widest whitespace-nowrap">
           See Case
         </span>
       </div>
@@ -285,14 +290,14 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] tracking-widest font-medium"
+              className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-[10px] uppercase tracking-widest font-medium"
             >
               {tag}
             </span>
           ))}
         </div>
 
-        {/* Bottom: Info - With Masked Slide-up */}
+        {/* Bottom: Info */}
         <div ref={infoRef} className="flex flex-col items-center text-center">
           <div className="overflow-hidden">
             <h3 className="text-3xl md:text-4xl lg:text-5xl font-cabinet font-medium text-white mb-1 tracking-tight">
@@ -300,7 +305,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             </h3>
           </div>
           <div className="overflow-hidden">
-            <p className="text-white/60 font-aeonik text-sm md:text-base tracking-widest">
+            <p className="text-white/60 font-aeonik text-sm md:text-base uppercase tracking-widest">
               {project.projectType}
             </p>
           </div>

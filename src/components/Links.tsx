@@ -1,7 +1,5 @@
-import React, { useEffect, useRef } from "react";
-
+import React, { useRef } from "react";
 import gsap from "gsap";
-import SplitType from "split-type";
 
 interface LinksProps {
   links?: Array<{
@@ -24,60 +22,34 @@ const Links: React.FC<LinksProps> = ({
   className = "flex flex-wrap gap-x-12 gap-y-4",
   linkClassName = "text-xs uppercase font-semibold tracking-[0.3em] py-1",
   textColor = "text-[#1b1b1a]",
-  underlineColor = "bg-[#1b1b1a]",
 }) => {
-  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const splitInstances = useRef<(SplitType | null)[]>([]);
-
-  useEffect(() => {
-    // Clean up any previous splits
-    splitInstances.current.forEach((split) => split?.revert());
-    splitInstances.current = [];
-
-    linkRefs.current.forEach((link, i) => {
-      if (!link) return;
-      // Split the label into characters for animation
-      const split = new SplitType(link.querySelector(".link-label"), {
-        types: "chars",
-      });
-      splitInstances.current[i] = split;
-      // Ensure characters are visible by default
-      gsap.set(split.chars, { y: 0, opacity: 1 });
-    });
-
-    return () => {
-      splitInstances.current.forEach((split) => split?.revert());
-    };
-  }, [links]);
+  const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Animation handlers
   const handleMouseEnter = (i: number) => {
-    const split = splitInstances.current[i];
-    if (!split) return;
+    const dot = dotRefs.current[i];
+    if (!dot) return;
     
-    gsap.fromTo(split.chars, 
-      { y: 10, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.4,
-        stagger: 0.02,
-        ease: "power2.out",
-        overwrite: true
-      }
-    );
+    gsap.to(dot, {
+      scale: 1,
+      x: 0,
+      opacity: 1,
+      duration: 0.4,
+      ease: "back.out(1.7)",
+      overwrite: true
+    });
   };
 
   const handleMouseLeave = (i: number) => {
-    // Just ensure they are visible, no need to hide them
-    const split = splitInstances.current[i];
-    if (!split) return;
+    const dot = dotRefs.current[i];
+    if (!dot) return;
     
-    gsap.to(split.chars, {
-      y: 0,
-      opacity: 1,
+    gsap.to(dot, {
+      scale: 0,
+      x: -10,
+      opacity: 0,
       duration: 0.3,
-      ease: "power2.out",
+      ease: "power2.in",
       overwrite: true
     });
   };
@@ -87,14 +59,19 @@ const Links: React.FC<LinksProps> = ({
       {links.map((link, i) => (
         <a
           key={link.label + i}
-          ref={(el) => (linkRefs.current[i] = el)}
           href={link.href}
           onClick={link.onClick}
-          className={`inline-flex items-center ${linkClassName} ${textColor}`}
+          className={`inline-flex items-center gap-4 group ${linkClassName} ${textColor}`}
           onMouseEnter={() => handleMouseEnter(i)}
           onMouseLeave={() => handleMouseLeave(i)}
           style={{ cursor: "pointer" }}
         >
+          {/* Animated Dot */}
+          <div
+            ref={(el) => (dotRefs.current[i] = el)}
+            className="w-2.5 h-2.5 rounded-full bg-current opacity-0 scale-0 -translate-x-[10px]"
+            style={{ willChange: "transform, opacity" }}
+          />
           <span className="relative">
             <span className="link-label block">{link.label}</span>
           </span>
