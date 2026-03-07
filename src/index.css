@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap");
 
 :root {
-  --background: #e6e6e7;
+  --background: #eaeaea;
   --background-rgb: 230, 230, 231;
   --foreground: #131313;
   --foreground-rgb: 19, 19, 19;
@@ -162,6 +162,7 @@ body {
   src: url("/fonts/Apparel/Fontspring-DEMO-apparel-regular.woff2")
     format("woff2");
   font-weight: 400;
+
   font-style: normal;
 }
 @font-face {
