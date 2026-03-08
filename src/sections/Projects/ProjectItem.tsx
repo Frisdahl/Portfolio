@@ -290,7 +290,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-[10px] uppercase tracking-widest font-medium"
+              className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-sm uppercase tracking-widest font-medium"
             >
               {tag}
             </span>

@@ -220,7 +220,11 @@ const Header: React.FC = () => {
         },
         0,
       ).to(
+<<<<<<< HEAD
         navLinksRef.current,
+=======
+        [talkButtonRef.current, navLinksRef.current],
+>>>>>>> origin/dev
         {
           autoAlpha: 1,
           y: 0,
@@ -349,7 +353,11 @@ const Header: React.FC = () => {
           <div className="pointer-events-auto flex items-center gap-6 md:gap-8 shrink-0 relative min-h-[44px] md:min-h-[56px] justify-end">
             <nav
               ref={navLinksRef}
+<<<<<<< HEAD
               className="hidden md:flex items-center gap-6 lg:gap-8 text-xl"
+=======
+              className="hidden md:flex text-md md:text-2xl items-center gap-6 lg:gap-8"
+>>>>>>> origin/dev
             >
               {menuItems.map((item) => (
                 <AnimatedNavLink
@@ -361,12 +369,28 @@ const Header: React.FC = () => {
                 />
               ))}
             </nav>
+<<<<<<< HEAD
             <CtaButton
               fontSize="text-xl"
               text="Let's talk"
               to="/contact"
               className="hidden md:flex"
             />
+=======
+            <button
+              ref={talkButtonRef}
+              onClick={(e) => handleLinkClick(e, "/contact")}
+              className="group/talk hidden md:flex gap-x-4 py-2 px-8 rounded-full bg-[#E35239] text-[#1b1b1a] text-md md:text-2xl font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative"
+            >
+              <span className="whitespace-nowrap font-cabinet transition-transform duration-500 group-hover/talk:translate-x-4 font-medium">
+                Let's talk
+              </span>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#1b1b1a] animate-pulse transition-all duration-300 group-hover/talk:opacity-0 group-hover/talk:scale-0" />
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 -translate-x-10 opacity-0 transition-all duration-500 group-hover/talk:translate-x-0 group-hover/talk:opacity-100">
+                <ArrowIcon className="w-4 h-4" />
+              </div>
+            </button>
+>>>>>>> origin/dev
           </div>
         </div>
       </header>
@@ -375,7 +399,11 @@ const Header: React.FC = () => {
         <button
           ref={burgerRef}
           aria-label="Menu"
+<<<<<<< HEAD
           className="pointer-events-auto shadow-lg fixed top-8 right-8 z-[1001] flex items-start justify-start overflow-hidden cursor-pointer"
+=======
+          className="pointer-events-auto shadow-lg fixed top-8 right-8 z-[1001] flex items-start justify-start overflow-hidden"
+>>>>>>> origin/dev
           style={{
             visibility: "hidden",
             boxShadow: "0 8px 32px 0 rgba(0,0,0,0.25)",
@@ -416,7 +444,11 @@ const Header: React.FC = () => {
                   Nice to see you!
                 </p>
                 <p className="text-[var(--menu-text)] opacity-40 text-sm font-aeonik max-w-[200px] leading-tight">
+<<<<<<< HEAD
                   I'm Alex, Full-stack Developer based in Copenhagen.
+=======
+                  I'm Alex, Frontend Developer based in Copenhagen.
+>>>>>>> origin/dev
                 </p>
               </div>
             </div>
