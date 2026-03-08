@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import ArrowIcon from "../components/ArrowIcon";
 import CtaButton from "../components/CtaButton";
 import CurvedMarquee from "../components/CurvedMarquee";
+import CurvedTransition from "../components/CurvedTransition";
 
 type Project = {
   title: string;
@@ -132,12 +133,13 @@ const ProjectPage: React.FC = () => {
   const descRef = useRef<HTMLParagraphElement>(null);
   const scrollPromptRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
+  const workedOnRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
 
     const ctx = gsap.context(() => {
-      // 1. Entrance Animations
+      // ... existing entrance animations ...
       const tl = gsap.timeline({
         defaults: { ease: "power4.out", duration: 1.4 },
       });
@@ -174,19 +176,42 @@ const ProjectPage: React.FC = () => {
           "-=1.2",
         );
 
-      // 2. Theme Transition (Light to Dark on Scroll)
-      gsap.to(":root", {
+      // 1. Theme Transition: Light to Dark (at the top)
+      const topTrigger = gsap.timeline({
+        scrollTrigger: {
+          trigger: imageRef.current,
+          start: "bottom 60%",
+          end: "bottom 20%",
+          scrub: 1,
+        },
+      });
+
+      topTrigger.to(":root", {
         "--background": "#131313",
         "--foreground": "rgb(230, 230, 231)",
         "--foreground-muted": "#a1a1a1",
         "--menu-bg": "rgb(230, 230, 231)",
         "--menu-text": "#131313",
+        ease: "none",
+      });
+
+      // 2. Theme Transition: Back to Light (at the bottom)
+      const bottomTrigger = gsap.timeline({
         scrollTrigger: {
-          trigger: imageRef.current,
-          start: "bottom 60%",
-          end: "bottom 20%",
-          scrub: 1.2,
+          trigger: workedOnRef.current,
+          start: "top 85%",
+          end: "top 45%",
+          scrub: 1,
         },
+      });
+
+      bottomTrigger.to(":root", {
+        "--background": "#e7e7e7",
+        "--foreground": "#1b1b1a",
+        "--foreground-muted": "#666",
+        "--menu-bg": "#131313",
+        "--menu-text": "#e7e7e7",
+        ease: "none",
       });
     });
 
@@ -406,7 +431,10 @@ const ProjectPage: React.FC = () => {
           </div>
         )}
 
-        <div className="w-full flex flex-col lg:flex-row justify-between items-start gap-10 lg:gap-32 mb-32">
+        <div 
+          ref={workedOnRef}
+          className="w-full flex flex-col lg:flex-row justify-between items-start gap-10 lg:gap-32 mb-32"
+        >
           {/* Left: Paragraph and CTA */}
           <div className="flex-1 flex flex-col items-start max-w-xl">
             <p className="text-2xl md:text-2xl text-[var(--foreground)] text-left max-w-xl leading-tight mb-8">
