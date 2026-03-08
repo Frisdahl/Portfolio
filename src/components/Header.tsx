@@ -5,9 +5,9 @@ import { triggerPageTransition } from "../utils/pageTransition";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
-import ArrowIcon from "./ArrowIcon";
 import PlusIcon from "../assets/icons/PlusIcon";
 import AnimatedNavLink from "./AnimatedNavLink";
+import CtaButton from "./CtaButton";
 import { useMagnetic } from "../utils/animations/useMagnetic";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -21,21 +21,17 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const talkButtonRef = useRef<HTMLButtonElement>(null);
   const navLinksRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLAnchorElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
   const menuContentRef = useRef<HTMLDivElement>(null);
   const shakaIconRef = useRef<HTMLSpanElement>(null);
 
-  // Only apply magnetic effect when menu is closed
-  useMagnetic(talkButtonRef, { strength: 30, enabled: !isMenuOpen });
+  // Apply magnetic effect
   useMagnetic(nameRef, { strength: 20, enabled: !isMenuOpen });
   useMagnetic(burgerRef, { strength: 30, enabled: !isMenuOpen });
 
   const entranceTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const logoReplayTimeoutRef = useRef<number | null>(null);
-  const lastLogoReplayAtRef = useRef(0);
 
   const isHomePage = location.pathname === "/";
 
@@ -56,7 +52,7 @@ const Header: React.FC = () => {
     const setScrollState = () => {
       const scrollY = window.scrollY || window.pageYOffset;
       setIsAtTop(scrollY < 100);
-      
+
       const header = document.querySelector("header");
       const headerHeight = header ? header.getBoundingClientRect().height : 0;
       setIsPastHero(scrollY > headerHeight);
@@ -70,7 +66,10 @@ const Header: React.FC = () => {
     return () => {
       window.removeEventListener("scroll", setScrollState);
       window.removeEventListener("resize", updateHeaderDimensions);
-      window.removeEventListener("page-transition-complete", updateHeaderDimensions);
+      window.removeEventListener(
+        "page-transition-complete",
+        updateHeaderDimensions,
+      );
     };
   }, [location.pathname]);
 
@@ -87,7 +86,7 @@ const Header: React.FC = () => {
           pointerEvents: "auto",
           onStart: () => {
             gsap.set(burgerRef.current, { visibility: "visible" });
-          }
+          },
         });
       } else {
         gsap.to(burgerRef.current, {
@@ -107,7 +106,10 @@ const Header: React.FC = () => {
     if (!isMenuOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (burgerRef.current && !burgerRef.current.contains(event.target as Node)) {
+      if (
+        burgerRef.current &&
+        !burgerRef.current.contains(event.target as Node)
+      ) {
         setIsMenuOpen(false);
       }
     };
@@ -120,15 +122,15 @@ const Header: React.FC = () => {
   useLayoutEffect(() => {
     if (!burgerRef.current) return;
     const el = burgerRef.current;
-    
+
     let targetWidth = 140;
     let targetHeight = 56;
     let targetRadius = 28;
 
     if (isMenuOpen && menuContentRef.current) {
       const rect = menuContentRef.current.getBoundingClientRect();
-      targetWidth = Math.max(rect.width, 400); 
-      targetHeight = rect.height; 
+      targetWidth = Math.max(rect.width, 400);
+      targetHeight = rect.height;
       targetRadius = 24;
     }
 
@@ -144,19 +146,23 @@ const Header: React.FC = () => {
     });
 
     if (menuContentRef.current) {
-      tl.to(menuContentRef.current, {
-        opacity: isMenuOpen ? 1 : 0,
-        pointerEvents: isMenuOpen ? "auto" : "none",
-        duration: 0.3,
-        ease: "power2.out"
-      }, isMenuOpen ? 0.3 : 0);
+      tl.to(
+        menuContentRef.current,
+        {
+          opacity: isMenuOpen ? 1 : 0,
+          pointerEvents: isMenuOpen ? "auto" : "none",
+          duration: 0.3,
+          ease: "power2.out",
+        },
+        isMenuOpen ? 0.3 : 0,
+      );
     }
   }, [isMenuOpen]);
 
   // Shaka Shake Animation
   useEffect(() => {
     if (!isMenuOpen || !shakaIconRef.current) return;
-    
+
     const shakeTween = gsap.to(shakaIconRef.current, {
       keyframes: [
         { rotation: -14, duration: 0.08 },
@@ -178,7 +184,7 @@ const Header: React.FC = () => {
   // Header entrance animation
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      if (!nameRef.current || !talkButtonRef.current || !navLinksRef.current) {
+      if (!nameRef.current || !navLinksRef.current) {
         return;
       }
 
@@ -190,7 +196,7 @@ const Header: React.FC = () => {
       const lines = splits.flatMap((s) => s.lines);
 
       gsap.set(lines, { yPercent: 100 });
-      gsap.set([talkButtonRef.current, navLinksRef.current], {
+      gsap.set(navLinksRef.current, {
         autoAlpha: 0,
         y: 20,
       });
@@ -204,18 +210,26 @@ const Header: React.FC = () => {
         },
       });
 
-      tl.to(lines, {
-        yPercent: 0,
-        duration: 0.15,
-        stagger: 0.02,
-        ease: "power4.out",
-      }, 0).to([talkButtonRef.current, navLinksRef.current], {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.15,
-        stagger: 0.02,
-        ease: "power2.out",
-      }, 0);
+      tl.to(
+        lines,
+        {
+          yPercent: 0,
+          duration: 0.15,
+          stagger: 0.02,
+          ease: "power4.out",
+        },
+        0,
+      ).to(
+        navLinksRef.current,
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.15,
+          stagger: 0.02,
+          ease: "power2.out",
+        },
+        0,
+      );
 
       entranceTimelineRef.current = tl;
 
@@ -232,7 +246,8 @@ const Header: React.FC = () => {
       window.addEventListener("initial-loader-complete", playEntrance);
       window.addEventListener("page-transition-complete", playEntrance);
 
-      const isInitialLoaderDone = sessionStorage.getItem("hasSeenInitialLoader") === "true";
+      const isInitialLoaderDone =
+        sessionStorage.getItem("hasSeenInitialLoader") === "true";
       const isLoaderActive = !!document.querySelector(".initial-loader-wrap");
       const isNavigating = sessionStorage.getItem("isNavigating") === "true";
 
@@ -240,7 +255,10 @@ const Header: React.FC = () => {
         playEntrance();
       }
 
-      const safetyTimeout = setTimeout(playEntrance, isLoaderActive ? 8000 : 250);
+      const safetyTimeout = setTimeout(
+        playEntrance,
+        isLoaderActive ? 8000 : 250,
+      );
 
       return () => {
         window.removeEventListener("initial-loader-complete", playEntrance);
@@ -253,58 +271,6 @@ const Header: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
-  useEffect(() => {
-    if (!isHomePage) {
-      setIsInProjectsSection(false);
-      return;
-    }
-
-    let sectionObserver: IntersectionObserver | null = null;
-    let domObserver: MutationObserver | null = null;
-
-    const observeProjectsSection = () => {
-      const projectsSection = document.getElementById("projects");
-      if (!projectsSection) return false;
-
-      if (sectionObserver) sectionObserver.disconnect();
-
-      const headerElement = document.querySelector("header");
-      const headerHeight = headerElement?.getBoundingClientRect().height ?? 0;
-      const topOffset = Math.round(headerHeight + 8);
-
-      sectionObserver = new IntersectionObserver(
-        ([entry]) => {
-          setIsInProjectsSection(entry.isIntersecting);
-        },
-        {
-          root: null,
-          threshold: 0,
-          rootMargin: `-${topOffset}px 0px -55% 0px`,
-        },
-      );
-
-      sectionObserver.observe(projectsSection);
-      return true;
-    };
-
-    if (!observeProjectsSection()) {
-      domObserver = new MutationObserver(() => {
-        if (observeProjectsSection()) {
-          domObserver?.disconnect();
-          domObserver = null;
-        }
-      });
-      domObserver.observe(document.body, { childList: true, subtree: true });
-    }
-
-    window.addEventListener("resize", observeProjectsSection);
-    return () => {
-      window.removeEventListener("resize", observeProjectsSection);
-      if (sectionObserver) sectionObserver.disconnect();
-      if (domObserver) domObserver.disconnect();
-    };
-  }, [isHomePage, location.pathname]);
-
   const handleLogoClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (!isHomePage) {
@@ -314,7 +280,11 @@ const Header: React.FC = () => {
     }
   };
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLElement> | null, to: string, section?: string) => {
+  const handleLinkClick = (
+    e: React.MouseEvent<HTMLElement> | null,
+    to: string,
+    section?: string,
+  ) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -330,9 +300,10 @@ const Header: React.FC = () => {
       return;
     }
 
+    // Scroll to top if clicking Home while already on HomePage but scrolled down
     if (to === "/" && isHomePage && !isAtTop) {
-        scrollTo(0, 0, 0, true);
-        return;
+      scrollTo(0, 0, 0, true);
+      return;
     }
 
     if (location.pathname !== to) {
@@ -350,7 +321,7 @@ const Header: React.FC = () => {
   const isMenuItemActive = (item: (typeof menuItems)[number]) => {
     if (item.section === "#projects") return isHomePage && isInProjectsSection;
     if (!item.section && item.to === "/") {
-        return isHomePage && !isInProjectsSection && isAtTop;
+      return isHomePage && !isInProjectsSection && isAtTop;
     }
     return location.pathname === item.to && !location.hash;
   };
@@ -366,13 +337,20 @@ const Header: React.FC = () => {
             className="pointer-events-auto flex flex-col items-start shrink-0 text-[var(--foreground)] pt-1 opacity-0"
           >
             <span className="flex flex-row gap-2 text-base md:text-xl lg:text-2xl mt-1 font-medium tracking-tight leading-none overflow-hidden">
-              <span className="inline-block"><span className="italic">A</span>lexander</span>
-              <span className="inline-block"><span className="italic">F</span>risdahl</span>
+              <span className="inline-block">
+                <span className="italic">A</span>lexander
+              </span>
+              <span className="inline-block">
+                <span className="italic">F</span>risdahl
+              </span>
             </span>
           </Link>
 
           <div className="pointer-events-auto flex items-center gap-6 md:gap-8 shrink-0 relative min-h-[44px] md:min-h-[56px] justify-end">
-            <nav ref={navLinksRef} className="hidden md:flex items-center gap-6 lg:gap-8">
+            <nav
+              ref={navLinksRef}
+              className="hidden md:flex items-center gap-6 lg:gap-8 text-xl"
+            >
               {menuItems.map((item) => (
                 <AnimatedNavLink
                   key={item.label}
@@ -383,17 +361,12 @@ const Header: React.FC = () => {
                 />
               ))}
             </nav>
-            <button
-              ref={talkButtonRef}
-              onClick={(e) => handleLinkClick(e, "/contact")}
-              className="group/talk hidden md:flex gap-x-4 py-2 px-8 rounded-full bg-[#E35239] text-[#1b1b1a] text-md md:text-2xl font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative"
-            >
-              <span className="whitespace-nowrap font-cabinet transition-transform duration-500 group-hover/talk:translate-x-4 font-medium">Let's talk</span>
-              <div className="w-1.5 h-1.5 rounded-full bg-[#1b1b1a] animate-pulse transition-all duration-300 group-hover/talk:opacity-0 group-hover/talk:scale-0" />
-              <div className="absolute left-5 top-1/2 -translate-y-1/2 -translate-x-10 opacity-0 transition-all duration-500 group-hover/talk:translate-x-0 group-hover/talk:opacity-100">
-                <ArrowIcon className="w-4 h-4" />
-              </div>
-            </button>
+            <CtaButton
+              fontSize="text-xl"
+              text="Let's talk"
+              to="/contact"
+              className="hidden md:flex"
+            />
           </div>
         </div>
       </header>
@@ -402,12 +375,12 @@ const Header: React.FC = () => {
         <button
           ref={burgerRef}
           aria-label="Menu"
-          className="pointer-events-auto shadow-lg fixed top-8 right-8 z-[1001] flex items-start justify-start overflow-hidden"
-          style={{ 
-            visibility: "hidden", 
+          className="pointer-events-auto shadow-lg fixed top-8 right-8 z-[1001] flex items-start justify-start overflow-hidden cursor-pointer"
+          style={{
+            visibility: "hidden",
             boxShadow: "0 8px 32px 0 rgba(0,0,0,0.25)",
             backgroundColor: "var(--menu-bg)",
-            opacity: 1
+            opacity: 1,
           }}
           onClick={() => setIsMenuOpen((open) => !open)}
         >
@@ -417,14 +390,18 @@ const Header: React.FC = () => {
               {isMenuOpen ? "Close" : "Menu"}
             </span>
             <div className="flex gap-1.5 items-center">
-              <div className={`w-1.5 h-1.5 rounded-full bg-current transition-all duration-300 ${isMenuOpen ? "scale-125" : ""}`} />
-              <div className={`w-1.5 h-1.5 rounded-full bg-current transition-all duration-300 ${isMenuOpen ? "scale-125 opacity-50" : ""}`} />
+              <div
+                className={`w-1.5 h-1.5 rounded-full bg-current transition-all duration-300 ${isMenuOpen ? "scale-125" : ""}`}
+              />
+              <div
+                className={`w-1.5 h-1.5 rounded-full bg-current transition-all duration-300 ${isMenuOpen ? "scale-125 opacity-50" : ""}`}
+              />
             </div>
           </div>
 
           {/* Measuring Content Container */}
-          <div 
-            ref={menuContentRef} 
+          <div
+            ref={menuContentRef}
             className="flex flex-col pt-12 px-10 pb-10 opacity-0 pointer-events-none"
           >
             {/* Greeting Section */}
@@ -435,16 +412,20 @@ const Header: React.FC = () => {
                 </span>
               </div>
               <div className="flex flex-col text-left justify-center">
-                <p className="text-[var(--menu-text)] text-lg font-cabinet font-medium leading-tight">Nice to see you!</p>
-                <p className="text-[var(--menu-text)] opacity-40 text-sm font-aeonik max-w-[200px] leading-tight">I'm Alex, Frontend Developer based in Copenhagen.</p>
+                <p className="text-[var(--menu-text)] text-lg font-cabinet font-medium leading-tight">
+                  Nice to see you!
+                </p>
+                <p className="text-[var(--menu-text)] opacity-40 text-sm font-aeonik max-w-[200px] leading-tight">
+                  I'm Alex, Full-stack Developer based in Copenhagen.
+                </p>
               </div>
             </div>
 
             {/* Menu Links - FULL WIDTH CLICKABLE ROWS */}
             <nav className="flex flex-col gap-2 items-start w-full min-w-[320px]">
               {menuItems.map((item, index) => (
-                <div 
-                  key={item.label} 
+                <div
+                  key={item.label}
                   className="flex items-center justify-between w-full group/menu-item gap-12 cursor-pointer py-3 px-2 rounded-xl transition-colors"
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
@@ -461,8 +442,12 @@ const Header: React.FC = () => {
                     textColor="var(--menu-text)"
                     externalHover={hoveredIndex === index}
                   />
-                  <div className={`transition-transform duration-500 ${hoveredIndex === index ? "rotate-90" : ""}`}>
-                    <PlusIcon className={`w-6 h-6 text-[var(--menu-text)] transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"}`} />
+                  <div
+                    className={`transition-transform duration-500 ${hoveredIndex === index ? "rotate-90" : ""}`}
+                  >
+                    <PlusIcon
+                      className={`w-6 h-6 text-[var(--menu-text)] transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"}`}
+                    />
                   </div>
                 </div>
               ))}

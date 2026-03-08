@@ -2,14 +2,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap");
 
 :root {
-  --background: #e6e6e7;
+  --background: #e7e7e7;
   --background-rgb: 230, 230, 231;
   --foreground: #1b1b1a;
   --foreground-rgb: 27, 27, 26;
   --foreground-muted: #666;
   --divider: rgba(0, 0, 0, 0.1);
   --menu-bg: #131313;
-  --menu-text: #e6e6e7;
+  --menu-text: #e7e7e7;
 }
 
 /* Aeonik Font (New Default) */

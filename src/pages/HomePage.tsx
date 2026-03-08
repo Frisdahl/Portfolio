@@ -33,12 +33,21 @@ type DeferredSectionProps = {
 function ThemeTransition() {
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
+      // Set initial light theme values explicitly to avoid browser rounding errors
+      gsap.set(":root", {
+        "--background": "#e7e7e7",
+        "--foreground": "#1b1b1a",
+        "--foreground-muted": "#666",
+        "--menu-bg": "#131313",
+        "--menu-text": "rgb(230, 230, 231)",
+      });
+
       // Transition from Light to Dark
       gsap.to(":root", {
         "--background": "#131313",
-        "--foreground": "#e6e6e7",
+        "--foreground": "rgb(230, 230, 231)",
         "--foreground-muted": "#a1a1a1",
-        "--menu-bg": "#e6e6e7",
+        "--menu-bg": "rgb(230, 230, 231)",
         "--menu-text": "#131313",
         scrollTrigger: {
           trigger: "#projects",

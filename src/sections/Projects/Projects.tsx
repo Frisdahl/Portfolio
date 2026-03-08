@@ -2,14 +2,14 @@ import React, { useLayoutEffect, useRef } from "react";
 import ProjectItem from "./ProjectItem";
 import type { Project } from "./ProjectItem";
 import { initGridAnimations } from "./Projects.anim";
-import AnimatedButton from "../../components/AnimatedButton";
+import CtaButton from "../../components/CtaButton";
 
 const projects: Project[] = [
   {
     id: 1,
     title: "NordWear",
     projectType: "Website",
-    image: "/images/projectImages/NordWear-img-opt.webp",
+    image: "/images/projectImages/NordWear/NordWear-img-opt.webp",
     video: "/projectVideos/NordWear/NordWear-trailer.webm",
     link: "https://nordwear-shop.dk/",
     year: "2025",
@@ -74,7 +74,6 @@ const Projects: React.FC = () => {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Build array of visible entries with index and top
         const visible = entries
           .filter((e) => e.isIntersecting)
           .map((e) => ({
@@ -84,7 +83,6 @@ const Projects: React.FC = () => {
 
         if (visible.length > 0) {
           const center = window.innerHeight / 2;
-          // Find the entry closest to the center
           const closest = visible.reduce((a, b) =>
             Math.abs(b.top - center) < Math.abs(a.top - center) ? b : a,
           );
@@ -109,14 +107,11 @@ const Projects: React.FC = () => {
       style={{ overflow: "visible" }}
     >
       <div className="w-full px-4 md:px-10 lg:px-4 xl:px-6">
-        {/* Main 12-Column Grid Container */}
         <div
           className="grid grid-cols-1 lg:grid-cols-12 gap-y-16 lg:gap-x-12 xl:gap-x-16"
           style={{ alignItems: "stretch" }}
         >
-          {/* Left Column Container */}
           <div className="lg:col-span-4 relative h-full">
-            {/* Sticky Wrapper - Forced sticky with inline styles and a high z-index */}
             <div
               className="flex flex-col h-[90svh] items-start justify-between mb-12 lg:mb-0"
               style={{
@@ -140,7 +135,6 @@ const Projects: React.FC = () => {
                 </div>
               </div>
 
-              {/* Thumbnail Navigation */}
               <div className="hidden lg:flex flex-col gap-y-3 mt-12 w-fit relative">
                 {projects.map((project, index) => (
                   <div
@@ -178,11 +172,10 @@ const Projects: React.FC = () => {
                   </div>
                 ))}
 
-                {/* Sliding Indicator */}
                 <div
                   className="absolute w-2 h-2 rounded-full bg-[#E35239] pointer-events-none"
                   style={{
-                    left: "calc(10.5rem + 1rem)", // Thumbnail width (w-32 = 8rem) + gap (1rem)
+                    left: "calc(10.5rem + 1rem)",
                     transform: `translateY(${indicatorOffset}px)`,
                     transition: "transform 0.5s cubic-bezier(0, 0, 0.58, 1)",
                   }}
@@ -190,16 +183,11 @@ const Projects: React.FC = () => {
               </div>
 
               <div className="mt-12">
-                <AnimatedButton
+                <CtaButton
                   text="See all projects"
-                  baseBgColor="bg-[#e35338]"
-                  baseBorderColor="border-[#e35338]"
-                  hoverBorderColor="border-[#e35338]"
-                  hoverBgColor="bg-[#131313]"
-                  baseTextColor="text-[var(--background)]"
-                  hoverTextColor="text-[#E35239]"
-                  fontSize="text-lg md:text-xl"
-                  showBorder={false}
+                  bgColor="bg-[#e35338]"
+                  textColor="text-[var(--background)]"
+                  dotColor="bg-[var(--background)]"
                   onClick={() => {
                     window.location.href = "/projects";
                   }}
@@ -208,7 +196,6 @@ const Projects: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Project List */}
           <div className="lg:col-span-8 flex flex-col gap-y-8 md:gap-y-24">
             {projects.map((project, index) => (
               <div
