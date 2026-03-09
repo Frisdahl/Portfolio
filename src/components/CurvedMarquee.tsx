@@ -66,8 +66,8 @@ const CurvedMarquee: React.FC<CurvedMarqueeProps> = ({
           
           <linearGradient id="edgeFade" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="white" stopOpacity="0" />
-            <stop offset="10%" stopColor="white" stopOpacity="1" />
-            <stop offset="90%" stopColor="white" stopOpacity="1" />
+            <stop offset="5%" stopColor="white" stopOpacity="1" />
+            <stop offset="95%" stopColor="white" stopOpacity="1" />
             <stop offset="100%" stopColor="white" stopOpacity="0" />
           </linearGradient>
           
@@ -101,7 +101,7 @@ const CurvedMarquee: React.FC<CurvedMarqueeProps> = ({
             fontWeight: 600,
             textTransform: "uppercase",
             letterSpacing: "0.15em",
-            opacity: 0.8
+            opacity: 1
           }}
         >
           <textPath

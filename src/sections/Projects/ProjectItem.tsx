@@ -1,18 +1,7 @@
 import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
-
-export interface Project {
-  id: number;
-  title: string;
-  description?: string;
-  projectType: "Mobile Application" | "Website" | "Prototype";
-  image: string;
-  video?: string;
-  link: string;
-  year?: string;
-  tags: string[];
-}
+import type { Project } from "../../types/project";
 
 interface ProjectItemProps {
   project: Project;
@@ -191,16 +180,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
     }
   }, [isHovered]);
 
-  const getSlug = (title: string) =>
-    title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
-
   const handleProjectClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    const slug = getSlug(project.title);
-    navigate(`/projects/${slug}`);
+    navigate(`/projects/${project.slug}`);
   };
 
   const handleMouseEnter = (e: React.MouseEvent) => {
@@ -269,6 +251,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
           src={project.image}
           alt={project.title}
           className="w-full h-full object-cover"
+          style={{ imageRendering: "-webkit-optimize-contrast" }}
           loading="lazy"
         />
       </div>
@@ -276,23 +259,23 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       {/* Hover Overlay Container */}
       <div
         ref={overlayRef}
-        className="absolute inset-0 z-30 opacity-0 pointer-events-none flex flex-col items-center justify-between py-4 md:py-8 px-6"
+        className="absolute inset-0 z-30 opacity-0 pointer-events-none flex flex-col justify-end p-8"
         style={{
           background:
             "radial-gradient(circle at center, rgba(13, 13, 13, 0.4) 0%, rgba(13, 13, 13, 0.8) 100%)",
         }}
       >
-        {/* Bottom: Info */}
-        <div ref={infoRef} className="flex flex-col items-center text-center">
+        {/* Project Info - Bottom Aligned with slide animation */}
+        <div ref={infoRef} className="flex flex-col items-start text-left">
           <div className="overflow-hidden">
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-cabinet font-medium text-white mb-1 tracking-tight">
-              {project.title}
-            </h3>
-          </div>
-          <div className="overflow-hidden">
-            <p className="text-white/60 font-aeonik text-sm md:text-base uppercase tracking-widest">
+            <p className="text-xs uppercase tracking-[0.3em] text-white/70 mb-2 transition-transform duration-500 ease-out translate-y-full group-hover:translate-y-0 delay-75">
               {project.projectType}
             </p>
+          </div>
+          <div className="overflow-hidden">
+            <h3 className="text-2xl md:text-3xl lg:text-4xl font-cabinet font-medium text-white uppercase leading-none transition-transform duration-500 ease-out translate-y-full group-hover:translate-y-0 delay-150">
+              {project.title}
+            </h3>
           </div>
         </div>
       </div>
@@ -309,7 +292,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
         {project.video && isInView && (
           <video
             ref={videoRef}
-            className="w-full h-full object-contain will-change-transform"
+            className="w-full h-full max-h-[70%] object-contain will-change-transform"
             muted
             playsInline
             loop={true}

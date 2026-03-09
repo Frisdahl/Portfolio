@@ -55,16 +55,16 @@ const AnimatedNavLink: React.FC<AnimatedNavLinkProps> = ({
     if (isActive) return;
     gsap.to(splitRef.current?.chars || [], {
       yPercent: -100,
-      duration: 0.4,
-      stagger: 0.02,
-      ease: "power2.inOut",
+      duration: 0.5,
+      stagger: 0.015,
+      ease: "power4.inOut",
       overwrite: true,
     });
     gsap.to(hoverSplitRef.current?.chars || [], {
       yPercent: 0,
-      duration: 0.4,
-      stagger: 0.02,
-      ease: "power2.inOut",
+      duration: 0.5,
+      stagger: 0.015,
+      ease: "power4.inOut",
       overwrite: true,
     });
   };
@@ -73,16 +73,16 @@ const AnimatedNavLink: React.FC<AnimatedNavLinkProps> = ({
     if (isActive) return;
     gsap.to(splitRef.current?.chars || [], {
       yPercent: 0,
-      duration: 0.4,
-      stagger: 0.02,
-      ease: "power2.inOut",
+      duration: 0.5,
+      stagger: 0.015,
+      ease: "power4.inOut",
       overwrite: true,
     });
     gsap.to(hoverSplitRef.current?.chars || [], {
       yPercent: 100,
-      duration: 0.4,
-      stagger: 0.02,
-      ease: "power2.inOut",
+      duration: 0.5,
+      stagger: 0.015,
+      ease: "power4.inOut",
       overwrite: true,
     });
   };

@@ -186,6 +186,81 @@ export function scaleIn(
 }
 
 /**
+ * Split text into lines and animate them with a stagger effect.
+ */
+export function splitLinesAndAnimate(
+  targets: string | HTMLElement | HTMLElement[],
+  options: {
+    stagger?: number;
+    duration?: number;
+    ease?: string;
+    delay?: number;
+    start?: string;
+    scrollTrigger?: boolean;
+  } = {}
+) {
+  const elements = typeof targets === "string" 
+    ? gsap.utils.toArray(targets) as HTMLElement[] 
+    : Array.isArray(targets) ? targets : [targets];
+
+  elements.forEach((element) => {
+    const originalText = element.innerText;
+    const words = originalText.split(" ");
+    
+    // 1. Wrap each word in a span to measure positions
+    element.innerHTML = words
+      .map((word) => `<span>${word} </span>`)
+      .join("");
+
+    const spans = element.querySelectorAll("span");
+    const lines: HTMLElement[][] = [];
+    let currentLine: HTMLElement[] = [];
+    let lastTop = -1;
+
+    // 2. Group spans by their top position (detecting lines)
+    spans.forEach((span) => {
+      const top = span.offsetTop;
+      if (top !== lastTop && lastTop !== -1) {
+        lines.push(currentLine);
+        currentLine = [];
+      }
+      currentLine.push(span);
+      lastTop = top;
+    });
+    lines.push(currentLine);
+
+    // 3. Rebuild DOM with line wrappers (clean text, no spans)
+    element.innerHTML = "";
+    lines.forEach((line) => {
+      const lineText = line.map(span => span.innerText).join(" ");
+      const lineDiv = document.createElement("div");
+      lineDiv.className = "overflow-hidden w-full";
+      const innerDiv = document.createElement("div");
+      innerDiv.className = "split-line-inner w-full";
+      innerDiv.textContent = lineText;
+      lineDiv.appendChild(innerDiv);
+      element.appendChild(lineDiv);
+    });
+
+    // 4. Animate the lines
+    const lineInners = element.querySelectorAll(".split-line-inner");
+    
+    gsap.from(lineInners, {
+      yPercent: 100,
+      opacity: 0,
+      stagger: options.stagger ?? 0.08,
+      duration: options.duration ?? 1.2,
+      ease: options.ease ?? "power4.out",
+      delay: options.delay ?? 0,
+      scrollTrigger: options.scrollTrigger ? {
+        trigger: element,
+        start: options.start ?? "top 90%",
+      } : undefined
+    });
+  });
+}
+
+/**
  * Kill reveal tweens. Use inside useEffect/useLayoutEffect cleanup, or rely on gsap.context() for full revert.
  */
 export function killReveal(tween: gsap.core.Tween | gsap.core.Tween[]): void {

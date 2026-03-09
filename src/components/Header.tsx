@@ -146,16 +146,90 @@ const Header: React.FC = () => {
     });
 
     if (menuContentRef.current) {
-      tl.to(
-        menuContentRef.current,
-        {
-          opacity: isMenuOpen ? 1 : 0,
-          pointerEvents: isMenuOpen ? "auto" : "none",
-          duration: 0.3,
-          ease: "power2.out",
-        },
-        isMenuOpen ? 0.3 : 0,
-      );
+      const menuElements =
+        menuContentRef.current.querySelectorAll(".menu-link-item");
+      const shakaElement = menuContentRef.current.querySelector(".shaka-container");
+      const greetingElements = menuContentRef.current.querySelectorAll(".greeting-item");
+
+      if (isMenuOpen) {
+        tl.to(
+          menuContentRef.current,
+          {
+            opacity: 1,
+            pointerEvents: "auto",
+            duration: 0.3,
+            ease: "power2.out",
+          },
+          0.3,
+        );
+
+        // Entrance animation with natural flow
+        tl.fromTo(
+          shakaElement,
+          { opacity: 0, scale: 0.8 },
+          { 
+            opacity: 1, 
+            scale: 1, 
+            duration: 0.6, 
+            ease: "power2.out" 
+          },
+          0.4
+        )
+        .fromTo(
+          greetingElements,
+          { y: 20, opacity: 0 },
+          { 
+            y: 0, 
+            opacity: 1, 
+            duration: 0.6, 
+            stagger: 0.1, 
+            ease: "power3.out" 
+          },
+          0.5
+        )
+        .fromTo(
+          menuElements,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: "power3.out",
+            clearProps: "all",
+          },
+          0.6,
+        );
+      } else {
+        tl.to(
+          [...greetingElements, ...menuElements],
+          {
+            y: 20,
+            opacity: 0,
+            duration: 0.3,
+            stagger: 0.03,
+            ease: "power2.in",
+          },
+          0,
+        );
+
+        tl.to(
+          shakaElement,
+          { opacity: 0, scale: 0.8, duration: 0.3, ease: "power2.in" },
+          0.1
+        );
+
+        tl.to(
+          menuContentRef.current,
+          {
+            opacity: 0,
+            pointerEvents: "none",
+            duration: 0.3,
+            ease: "power2.in",
+          },
+          0.2,
+        );
+      }
     }
   }, [isMenuOpen]);
 
@@ -371,24 +445,41 @@ const Header: React.FC = () => {
         </div>
       </header>
 
-      <div className="fixed top-0 right-0 z-[999] pointer-events-none py-6 md:py-10 px-4 md:px-10 lg:px-4 xl:px-6 h-28 flex items-center justify-end overflow-visible">
-        <button
+      <div className="fixed top-0 right-0 z-[999] pointer-events-none text-xl py-2 flex items-center justify-end overflow-visible">
+        <div
           ref={burgerRef}
-          aria-label="Menu"
-          className="pointer-events-auto shadow-lg fixed top-8 right-8 z-[1001] flex items-start justify-start overflow-hidden cursor-pointer"
+          className="pointer-events-auto shadow-lg fixed top-6 md:top-10 right-4 md:right-10 lg:right-4 xl:right-6 z-[1001] flex items-start justify-start overflow-hidden"
           style={{
             visibility: "hidden",
-            boxShadow: "0 8px 32px 0 rgba(0,0,0,0.25)",
             backgroundColor: "var(--menu-bg)",
             opacity: 1,
           }}
-          onClick={() => setIsMenuOpen((open) => !open)}
         >
-          {/* Static Header Area for Menu/Close Text */}
-          <div className="absolute top-0 right-0 w-[140px] h-[56px] flex items-center justify-center gap-4 z-[1002] pointer-events-none text-[var(--menu-text)]">
-            <span className="text-xs font-aeonik font-bold uppercase tracking-[0.2em] pt-0.5">
-              {isMenuOpen ? "Close" : "Menu"}
-            </span>
+          {/* Static Header Area for Menu/Close Text - This is the clickable toggle area */}
+          <button
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            className="absolute top-0 right-0 w-[140px] h-[56px] flex items-center justify-center gap-4 z-[1002] cursor-pointer text-[var(--menu-text)] bg-transparent border-none outline-none"
+          >
+            <div className="relative h-[28px] overflow-hidden">
+              <div
+                className="transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
+                style={{
+                  transform: isMenuOpen ? "translateY(-28px)" : "translateY(0)",
+                }}
+              >
+                <div className="h-[28px] flex items-center justify-center">
+                  <span className="text-sm md:text-lg lg:text-xl font-cabinet font-regular tracking-tight">
+                    Menu
+                  </span>
+                </div>
+                <div className="h-[28px] flex items-center justify-center">
+                  <span className="text-sm md:text-lg lg:text-xl font-cabinet font-regular tracking-tight">
+                    Close
+                  </span>
+                </div>
+              </div>
+            </div>
             <div className="flex gap-1.5 items-center">
               <div
                 className={`w-1.5 h-1.5 rounded-full bg-current transition-all duration-300 ${isMenuOpen ? "scale-125" : ""}`}
@@ -397,7 +488,7 @@ const Header: React.FC = () => {
                 className={`w-1.5 h-1.5 rounded-full bg-current transition-all duration-300 ${isMenuOpen ? "scale-125 opacity-50" : ""}`}
               />
             </div>
-          </div>
+          </button>
 
           {/* Measuring Content Container */}
           <div
@@ -406,18 +497,26 @@ const Header: React.FC = () => {
           >
             {/* Greeting Section */}
             <div className="flex items-center gap-6 mb-12 mt-8 px-2">
-              <div className="flex items-center justify-center text-5xl leading-none rotate-[15deg]">
-                <span ref={shakaIconRef} className="leading-none">
+              <div className="shaka-container flex items-center justify-center text-5xl leading-none">
+                <span 
+                  ref={shakaIconRef} 
+                  className="leading-none inline-block origin-[50%_60%]"
+                  style={{ transform: "rotate(15deg)" }}
+                >
                   🤙🏼
                 </span>
               </div>
               <div className="flex flex-col text-left justify-center">
-                <p className="text-[var(--menu-text)] text-lg font-cabinet font-medium leading-tight">
-                  Nice to see you!
-                </p>
-                <p className="text-[var(--menu-text)] opacity-40 text-sm font-aeonik max-w-[200px] leading-tight">
-                  I'm Alex, Full-stack Developer based in Copenhagen.
-                </p>
+                <div className="overflow-hidden">
+                  <p className="greeting-item text-[var(--menu-text)] text-lg font-cabinet font-medium leading-tight">
+                    Nice to see you!
+                  </p>
+                </div>
+                <div className="overflow-hidden">
+                  <p className="greeting-item text-[var(--menu-text)] opacity-40 text-sm font-aeonik max-w-[200px] leading-tight">
+                    I'm Alex, Full-stack Developer based in Copenhagen.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -434,26 +533,32 @@ const Header: React.FC = () => {
                     handleLinkClick(e, item.to, item.section);
                   }}
                 >
-                  <AnimatedNavLink
-                    label={item.label}
-                    to={item.to}
-                    isActive={isMenuItemActive(item)}
-                    className="text-5xl font-cabinet font-medium pointer-events-none"
-                    textColor="var(--menu-text)"
-                    externalHover={hoveredIndex === index}
-                  />
-                  <div
-                    className={`transition-transform duration-500 ${hoveredIndex === index ? "rotate-90" : ""}`}
-                  >
-                    <PlusIcon
-                      className={`w-6 h-6 text-[var(--menu-text)] transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"}`}
-                    />
+                  <div className="overflow-hidden">
+                    <div className="menu-link-item">
+                      <AnimatedNavLink
+                        label={item.label}
+                        to={item.to}
+                        isActive={isMenuItemActive(item)}
+                        className="text-5xl font-cabinet font-medium pointer-events-none"
+                        textColor="var(--menu-text)"
+                        externalHover={hoveredIndex === index}
+                      />
+                    </div>
+                  </div>
+                  <div className="overflow-hidden">
+                    <div
+                      className={`menu-link-item transition-transform duration-500 ${hoveredIndex === index ? "rotate-90" : ""}`}
+                    >
+                      <PlusIcon
+                        className={`w-6 h-6 text-[var(--menu-text)] transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"}`}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
             </nav>
           </div>
-        </button>
+        </div>
       </div>
     </>
   );

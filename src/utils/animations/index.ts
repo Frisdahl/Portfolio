@@ -12,6 +12,7 @@ export {
   revealYPercent,
   scaleIn,
   killReveal,
+  splitLinesAndAnimate,
 } from "./scrollReveal";
 export { useReveal } from "./useReveal";
 export type {

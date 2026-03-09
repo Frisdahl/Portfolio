@@ -7,28 +7,54 @@ gsap.registerPlugin(ScrollTrigger);
 const VideoShowCase = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoWrapperRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useLayoutEffect(() => {
-    if (!sectionRef.current || !videoWrapperRef.current) return;
+    if (!sectionRef.current || !videoWrapperRef.current || !videoRef.current) return;
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 95%",
+          end: "bottom 40%",
+          scrub: 1.5,
+        },
+      });
+
+      tl.fromTo(
         videoWrapperRef.current,
         {
-          scale: 0.7,
-          y: 60,
+          scale: 0.85,
+          y: 80,
+          clipPath: "inset(15% 15% 15% 15% round 20px)",
+          opacity: 0.4,
         },
         {
           scale: 1,
           y: 0,
+          clipPath: "inset(0% 0% 0% 0% round 0px)",
+          opacity: 1,
+          ease: "power2.out",
+        }
+      );
+
+      // Parallax effect on the video itself
+      gsap.fromTo(
+        videoRef.current,
+        {
+          scale: 1.2,
+        },
+        {
+          scale: 1,
           ease: "none",
           scrollTrigger: {
-            trigger: sectionRef.current, // static trigger
-            start: "top 80%",
-            end: "bottom 10%",
-            scrub: 0.5,
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
           },
-        },
+        }
       );
     }, sectionRef);
 
@@ -36,17 +62,18 @@ const VideoShowCase = () => {
   }, []);
 
   return (
-    <div ref={sectionRef} className="flex justify-center">
+    <div ref={sectionRef} className="flex justify-center py-20">
       <div
         ref={videoWrapperRef}
-        className="w-[80vw] max-w-[100vw] min-w-[320px] aspect-[16/9] overflow-hidden origin-center"
+        className="w-[90vw] max-w-[1400px] aspect-[16/9] overflow-hidden origin-center shadow-2xl"
       >
         <video
+          ref={videoRef}
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover scale-110"
         >
           <source
             src="/projectVideos/videoshowcase/promo_h264.mp4"

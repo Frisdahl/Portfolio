@@ -43,11 +43,13 @@ const CtaButton: React.FC<CtaButtonProps> = ({
   // Apply the premium magnetic effect
   useMagnetic(elementRef, { strength: magneticStrength });
 
-  const commonClasses = `group/talk inline-flex gap-x-4 py-3 px-8 rounded-full ${bgColor} ${textColor} ${fontSize || "text-md md:text-2xl"} font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative ${className}`;
+  const commonClasses = `group/talk inline-flex gap-x-4 py-2 px-8 rounded-full ${bgColor} ${textColor} ${fontSize || "text-md md:text-2xl"} font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative ${className}`;
 
   const content = (
     <>
-      <span className={`whitespace-nowrap font-cabinet transition-transform duration-500 font-medium ${forceHover ? "translate-x-4" : "group-hover/talk:translate-x-4"}`}>
+      <span
+        className={`whitespace-nowrap font-cabinet transition-transform duration-500 font-medium ${forceHover ? "translate-x-4" : "group-hover/talk:translate-x-4"}`}
+      >
         {text}
       </span>
 
@@ -58,7 +60,9 @@ const CtaButton: React.FC<CtaButtonProps> = ({
 
       {/* Sliding Arrow */}
       {showArrow && (
-        <div className={`absolute left-5 top-1/2 -translate-y-1/2 transition-all duration-500 ${forceHover ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0 group-hover/talk:translate-x-0 group-hover/talk:opacity-100"}`}>
+        <div
+          className={`absolute left-5 top-1/2 -translate-y-1/2 transition-all duration-500 ${forceHover ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0 group-hover/talk:translate-x-0 group-hover/talk:opacity-100"}`}
+        >
           <ArrowIcon className={`w-4 h-4 ${arrowColor}`} />
         </div>
       )}

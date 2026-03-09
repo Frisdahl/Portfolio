@@ -1,49 +1,8 @@
 import React, { useLayoutEffect, useRef } from "react";
 import ProjectItem from "./ProjectItem";
-import type { Project } from "./ProjectItem";
 import { initGridAnimations } from "./Projects.anim";
 import CtaButton from "../../components/CtaButton";
-
-const projects: Project[] = [
-  {
-    id: 1,
-    title: "NordWear",
-    projectType: "Website",
-    image: "/images/projectImages/NordWear/NordWear-img-opt.webp",
-    video: "/projectVideos/NordWear/NordWear-trailer.webm",
-    link: "https://nordwear-shop.dk/",
-    year: "2025",
-    tags: ["React", "Typescript", "Next.js", "Gsap"],
-  },
-  {
-    id: 2,
-    title: "Visuel Atelier",
-    projectType: "Prototype",
-    image: "/images/Visuel-Atelier.webp",
-    link: "",
-    year: "2023",
-    tags: ["React", "Typescript", "Vite", "Gsap"],
-  },
-  {
-    id: 3,
-    title: "Bang & Olufsen",
-    projectType: "Mobile Application",
-    image: "/images/Bang&Olufsen.webp",
-    video: "/projectVideos/bang-olufsen-iphone-trailer.mp4",
-    link: "#",
-    year: "2024",
-    tags: ["React", "Typescript", "Express", "Gsap"],
-  },
-  {
-    id: 4,
-    title: "Project Four",
-    projectType: "Website",
-    image: "https://placehold.co/1200x800",
-    link: "#",
-    year: "2023",
-    tags: ["React", "Typescript", "Express", "Vite"],
-  },
-];
+import { projects } from "../../data/projects";
 
 const Projects: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -128,7 +87,7 @@ const Projects: React.FC = () => {
                   </h2>
                 </div>
                 <div className="max-w-md text-left overflow-hidden">
-                  <p className="text-xl md:text-2xl text-[var(--foreground-muted)] font-cabinet font-regular leading-[1.2] tracking-tight">
+                  <p className="project-header-subtext text-xl md:text-2xl text-[var(--foreground-muted)] font-cabinet font-regular leading-[1.2] tracking-tight">
                     A selection of my most passionately crafted works with
                     forward-thinking clients and friends over the years.
                   </p>

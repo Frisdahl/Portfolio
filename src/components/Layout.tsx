@@ -3,6 +3,7 @@ import Header from "./Header";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import lenis from "../utils/lenis";
+import Footer from "./Footer";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,6 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main className="relative z-20 flex-grow bg-[var(--background)]">
         {children}
       </main>
+      <Footer />
     </div>
   );
 };

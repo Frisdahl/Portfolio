@@ -76,8 +76,8 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Bottom bar: full width, same padding as header (aligns with logo and buttons) */}
-      <footer className="flex-shrink-0 w-full px-4 md:px-10 lg:px-4 xl:px-6 py-4 md:py-5 ">
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-0 items-center justify-between text-sm md:text-base">
+      <footer className="justify-between w-full px-4 md:px-10 lg:px-4 xl:px-6 py-4 md:py-5 ">
+        <div className="w-full items-center flex justify-between text-sm md:text-base">
           <div className="flex flex-wrap items-center gap-4 md:gap-6 order-2 md:order-1 justify-center md:justify-start">
             <AnimatedNavLink
               label="Facebook"
@@ -99,9 +99,6 @@ const Hero: React.FC = () => {
               className="text-[var(--foreground)] text-sm md:text-xl font-cabinet"
             />
           </div>
-          <p className="text-[var(--foreground)]/80 font-cabinet md:text-3xl text-center order-1 md:order-2">
-            Scroll down
-          </p>
           <p className="text-[var(--foreground)]/80 font-cabinet md:text-xl text-right order-3 md:order-3 md:text-right">
             Frontend | Motion designer
           </p>

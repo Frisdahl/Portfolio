@@ -32,55 +32,52 @@ export const initGridAnimations = (container: HTMLElement) => {
       if (didSetup) return;
       didSetup = true;
 
-      // 1. Header Entrance Animation
-      const headerText = headerTextEl as HTMLElement;
-      const subText = subTextEl as HTMLElement;
-
-      if (headerText && subText) {
+      // 1. Header Entrance Animation (Paragraph only)
+      if (subTextEl) {
         const fromNav = sessionStorage.getItem("projectsFromNav") === "true";
+        
+        // Split only the paragraph text
+        const subTextSplit = new SplitType(subTextEl, { types: "lines" });
+        const allLines = subTextSplit.lines || [];
+
         if (fromNav) {
           sessionStorage.removeItem("projectsFromNav");
-          gsap.set([headerText, subText], { y: 0, opacity: 1 });
+          gsap.set(allLines, { y: 0, opacity: 1 });
         } else {
-          gsap.set([headerText, subText], { opacity: 1 });
+          gsap.set(allLines, { opacity: 0, y: 60 });
+          
           const shouldRunImmediate =
             sessionStorage.getItem("pendingProjectsEntrance") === "true";
-          const shouldAnimateNow =
-            shouldRunImmediate ||
-            headerText.getBoundingClientRect().top <= window.innerHeight * 0.9;
 
-          if (shouldAnimateNow) {
-            gsap.fromTo(
-              [headerText, subText],
-              { y: 24, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.95,
-                stagger: 0.1,
-                ease: "power3.out",
-              },
-            );
+          if (shouldRunImmediate) {
+            gsap.to(allLines, {
+              y: 0,
+              opacity: 1,
+              duration: 1,
+              stagger: 0.1,
+              ease: "power4.out",
+            });
             sessionStorage.removeItem("pendingProjectsEntrance");
           } else {
-            gsap.fromTo(
-              [headerText, subText],
-              { y: 24, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 1.15,
-                stagger: 0.1,
-                ease: "power3.out",
-                scrollTrigger: {
-                  trigger: headerText,
-                  start: "top 85%",
-                  once: true,
-                },
+            gsap.to(allLines, {
+              y: 0,
+              opacity: 1,
+              duration: 1.2,
+              stagger: 0.1,
+              ease: "power4.out",
+              scrollTrigger: {
+                trigger: subTextEl,
+                start: "top 85%",
+                once: true,
               },
-            );
+            });
           }
         }
+      }
+
+      // Ensure heading is always visible
+      if (headerTextEl) {
+        gsap.set(headerTextEl, { opacity: 1, y: 0 });
       }
 
       gsap.set(allCards, { opacity: 1, clearProps: "transform" });
