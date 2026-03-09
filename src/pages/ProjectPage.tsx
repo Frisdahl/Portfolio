@@ -181,20 +181,6 @@ const ProjectPage: React.FC = () => {
         );
       }
 
-      // Improved, smooth arrow loop
-      const arrowTl = gsap.timeline({ repeat: -1, repeatDelay: 0.5 });
-      arrowTl
-        .fromTo(
-          ".scroll-arrow",
-          { x: -15, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-        )
-        .to(
-          ".scroll-arrow",
-          { x: 15, opacity: 0, duration: 0.6, ease: "power2.in" },
-          "+=0.4",
-        );
-
       gsap
         .timeline({
           scrollTrigger: {
@@ -278,11 +264,6 @@ const ProjectPage: React.FC = () => {
               <span className="text-sm tracking-[0.3em] font-thin lowercase">
                 scroll to explore
               </span>
-              <div className="rotate-90">
-                <div className="scroll-arrow">
-                  <ArrowIcon className="w-4 h-4" />
-                </div>
-              </div>
             </div>
           </div>
         </div>
