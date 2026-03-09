@@ -33,7 +33,7 @@ type DeferredSectionProps = {
 function ThemeTransition() {
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Set initial light theme values explicitly to avoid browser rounding errors
+      // Set initial light theme values explicitly
       gsap.set(":root", {
         "--background": "#e7e7e7",
         "--foreground": "#1b1b1a",
@@ -42,19 +42,38 @@ function ThemeTransition() {
         "--menu-text": "rgb(230, 230, 231)",
       });
 
-      // Transition from Light to Dark
-      gsap.to(":root", {
+      // Single timeline for the entire projects window
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#projects",
+          start: "top 100%", // Start fading at the very top of the projects buffer
+          end: "bottom 0%",   // End fading when the bottom buffer leaves
+          scrub: 1,
+          ease: "none",
+        },
+      });
+
+      // 1. Fade to Dark at the start
+      tl.to(":root", {
         "--background": "#131313",
         "--foreground": "rgb(230, 230, 231)",
         "--foreground-muted": "#a1a1a1",
         "--menu-bg": "rgb(230, 230, 231)",
         "--menu-text": "#131313",
-        scrollTrigger: {
-          trigger: "#projects",
-          start: "top 90%",
-          end: "top 20%",
-          scrub: 1.2,
-        },
+        duration: 0.15,
+        ease: "none",
+      })
+      // 2. Stay Dark through the content
+      .to({}, { duration: 0.7 })
+      // 3. Fade back to Light at the end
+      .to(":root", {
+        "--background": "#e7e7e7",
+        "--foreground": "#1b1b1a",
+        "--foreground-muted": "#666",
+        "--menu-bg": "#131313",
+        "--menu-text": "rgb(230, 230, 231)",
+        duration: 0.15,
+        ease: "none",
       });
     });
     return () => ctx.revert();
@@ -313,17 +332,18 @@ function HomePage() {
         <VideoShowCase />
       </DeferredSection>
 
-      {/* Manifesto */}
+      {/* Manifesto - Symmetrical padding for better balance */}
       <DeferredSection
-        className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
+        sectionId="manifesto"
+        className="py-32 md:py-48 lg:py-32 xl:py-64"
         containIntrinsicSize="900px"
         fallbackClassName="w-full min-h-[700px] md:min-h-[900px]"
       >
         <Manifesto />
       </DeferredSection>
 
-      {/* Projects Section */}
-      <div id="projects" className="mb-32 md:mb-48 lg:mb-32 xl:mb-64">
+      {/* Projects Section - Added significant padding for cleaner transitions */}
+      <div id="projects" className="py-64 md:py-96">
         <Suspense
           fallback={<div className="w-full min-h-[1000px] md:min-h-[1400px]" />}
         >
@@ -332,13 +352,13 @@ function HomePage() {
       </div>
 
       {/* Services */}
-      <DeferredSection
+      {/*       <DeferredSection
         className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
         containIntrinsicSize="1200px"
         fallbackClassName="w-full min-h-[900px] md:min-h-[1200px]"
       >
         <Services />
-      </DeferredSection>
+      </DeferredSection> */}
 
       {/* Tech Stack Section */}
       <DeferredSection

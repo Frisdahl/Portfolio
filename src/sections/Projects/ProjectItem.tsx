@@ -282,21 +282,6 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             "radial-gradient(circle at center, rgba(13, 13, 13, 0.4) 0%, rgba(13, 13, 13, 0.8) 100%)",
         }}
       >
-        {/* Top: Tags */}
-        <div
-          ref={tagsRef}
-          className="flex flex-wrap justify-center gap-2 max-w-md"
-        >
-          {project.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-sm uppercase tracking-widest font-medium"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
         {/* Bottom: Info */}
         <div ref={infoRef} className="flex flex-col items-center text-center">
           <div className="overflow-hidden">

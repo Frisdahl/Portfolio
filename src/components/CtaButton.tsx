@@ -17,6 +17,8 @@ interface CtaButtonProps {
   dotColor?: string;
   magneticStrength?: number;
   showArrow?: boolean;
+  forceHover?: boolean;
+  arrowColor?: string;
 }
 
 const CtaButton: React.FC<CtaButtonProps> = ({
@@ -33,6 +35,8 @@ const CtaButton: React.FC<CtaButtonProps> = ({
   dotColor = "bg-[#1b1b1a]",
   magneticStrength = 30,
   showArrow = true,
+  forceHover = false,
+  arrowColor = "currentColor",
 }) => {
   const elementRef = useRef<any>(null);
 
@@ -43,19 +47,19 @@ const CtaButton: React.FC<CtaButtonProps> = ({
 
   const content = (
     <>
-      <span className="whitespace-nowrap font-cabinet transition-transform duration-500 group-hover/talk:translate-x-4 font-medium">
+      <span className={`whitespace-nowrap font-cabinet transition-transform duration-500 font-medium ${forceHover ? "translate-x-4" : "group-hover/talk:translate-x-4"}`}>
         {text}
       </span>
 
       {/* Animated Dot */}
       <div
-        className={`w-1.5 h-1.5 rounded-full ${dotColor} animate-pulse transition-all duration-300 group-hover/talk:opacity-0 group-hover/talk:scale-0`}
+        className={`w-1.5 h-1.5 rounded-full ${dotColor} animate-pulse transition-all duration-300 ${forceHover ? "opacity-0 scale-0" : "group-hover/talk:opacity-0 group-hover/talk:scale-0"}`}
       />
 
       {/* Sliding Arrow */}
       {showArrow && (
-        <div className="absolute left-5 top-1/2 -translate-y-1/2 -translate-x-10 opacity-0 transition-all duration-500 group-hover/talk:translate-x-0 group-hover/talk:opacity-100">
-          <ArrowIcon className="w-4 h-4" />
+        <div className={`absolute left-5 top-1/2 -translate-y-1/2 transition-all duration-500 ${forceHover ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0 group-hover/talk:translate-x-0 group-hover/talk:opacity-100"}`}>
+          <ArrowIcon className={`w-4 h-4 ${arrowColor}`} />
         </div>
       )}
     </>

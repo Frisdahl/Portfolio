@@ -185,12 +185,12 @@ const TechStack: React.FC = () => {
   }, []);
 
   return (
-    <section className="w-full px-4 md:px-10 lg:px-4 xl:px-6 font-aeonik">
+    <section className="w-full px-4 md:px-10 lg:px-4 xl:px-6 font-cabinet">
       {/* Heading Area */}
-      <div className="mb-16 md:mb-24">
+      <div className="mb-16 md:mb-24 text-center">
         <h2
           ref={headingRef}
-          className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-bold uppercase tracking-tight text-[var(--foreground)] leading-[0.8] mb-12"
+          className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-7xl mb-8 text-[var(--foreground)] font-cabinet font-medium leading-[1.25] text-center"
         >
           <span className="inline-block whitespace-nowrap">
             {headingData[0].map((item, i) => (
@@ -208,12 +208,10 @@ const TechStack: React.FC = () => {
             ))}
           </span>
         </h2>
-
-        <div className="text-left">
-          <p className="uppercase font-aeonik text-lg md:text-md font-medium text-[var(--foreground)] leading-tight">
-            Professional At
-          </p>
-        </div>
+        <p className="mx-auto text-xl md:text-2xl 3xl:text-xl text-[var(--foreground-muted)] max-w-2xl font-cabinet font-regular leading-[1.1] tracking-tight text-center">
+          I work with modern tools to craft seamless digital experiences that
+          are visually appealing but also performant and user-friendly.
+        </p>
       </div>
 
       {/* Mobile Grid */}
