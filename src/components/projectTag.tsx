@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ProjectTagProps {
   label: string;
   type: string;

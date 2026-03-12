@@ -1,7 +1,9 @@
 /**
  * Reusable scroll-triggered animations using transform and opacity only.
  */
-import { gsap, ScrollTrigger } from "./gsap";
+import { gsap } from "./gsap";
+// @ts-ignore - used for ScrollTrigger.Vars type below
+import type { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DURATION, EASE, TRIGGER_PRESETS, type TriggerPresetKey } from "./constants";
 
 export type ScrollTriggerConfig =

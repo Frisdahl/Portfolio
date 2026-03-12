@@ -82,7 +82,7 @@ const ProjectGallerySection: React.FC<Props> = ({
             {slides.map((slide, i) => (
               <img
                 key={`big-${slide.image}-${i}`}
-                ref={(el) => (bigImgsRef.current[i] = el)}
+                ref={(el) => { bigImgsRef.current[i] = el; }}
                 src={slide.image}
                 alt={slide.alt}
                 className="project-gallery-big-img"

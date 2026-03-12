@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { gsap } from "gsap";
@@ -16,7 +16,7 @@ const PageTransition = () => {
   const ctxRef = useRef<gsap.Context | null>(null);
   const animateRef = useRef<(onCovered?: () => void) => Promise<void>>(() => Promise.resolve());
 
-  const runAnimation = (onCovered?: () => void) => {
+  const runAnimation = useCallback((onCovered?: () => void) => {
     return new Promise<void>((resolve) => {
       if (isAnimatingRef.current) {
         onCovered?.();
@@ -129,14 +129,13 @@ const PageTransition = () => {
         );
       });
     });
-  };
-
-  animateRef.current = runAnimation;
+  }, []);
 
   useLayoutEffect(() => {
+    animateRef.current = runAnimation;
     _setTransitionTrigger((onCovered) => animateRef.current(onCovered));
     return () => _setTransitionTrigger(null);
-  }, []);
+  }, [runAnimation]);
 
   useEffect(() => {
     if (isFirstMountRef.current) {
@@ -146,7 +145,7 @@ const PageTransition = () => {
     if (!isAnimatingRef.current) {
       runAnimation();
     }
-  }, [location.pathname]);
+  }, [location.pathname, runAnimation]);
 
   const overlay = (
     <div

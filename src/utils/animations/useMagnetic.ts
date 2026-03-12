@@ -1,4 +1,4 @@
-import { useLayoutEffect, RefObject } from "react";
+import { useLayoutEffect, type RefObject } from "react";
 import { gsap } from "gsap";
 
 interface UseMagneticOptions {

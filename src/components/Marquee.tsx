@@ -28,9 +28,9 @@ const Marquee: React.FC<MarqueeProps> = ({
     const ctx = gsap.context(() => {
       let currentScrollDirection = 0; // 0 means not yet determined
 
-      function roll(target: HTMLElement, vars: any, reverse: boolean = false) {
+      function roll(target: HTMLElement, vars: gsap.TweenVars, reverse: boolean = false) {
         vars = vars || {};
-        vars.ease || (vars.ease = "none");
+        if (!vars.ease) vars.ease = "none";
         
         const tl = gsap.timeline({
           repeat: -1,
@@ -60,7 +60,7 @@ const Marquee: React.FC<MarqueeProps> = ({
         tl.totalTime(tl.duration() * 100);
 
         const resizeHandler = () => {
-          let time = tl.totalTime();
+          const time = tl.totalTime();
           tl.totalTime(0);
           positionClones();
           tl.totalTime(time);
@@ -76,8 +76,8 @@ const Marquee: React.FC<MarqueeProps> = ({
 
       const { tl: rollTimeline, cleanup: resizeCleanup } = roll(textRef.current!, { duration: speed });
 
-      // Default direction: Scroll Down (1) -> Left to Right (timeScale: -1)
-      gsap.set(rollTimeline, { timeScale: -1 });
+      // Use initialDirection: 1 (Down) -> LTR (-1), -1 (Up) -> RTL (1)
+      gsap.set(rollTimeline, { timeScale: initialDirection === 1 ? -1 : 1 });
 
       const st = ScrollTrigger.create({
         onUpdate(self) {
@@ -106,7 +106,7 @@ const Marquee: React.FC<MarqueeProps> = ({
     }, containerRef);
 
     return () => ctx.revert();
-  }, [text, speed]);
+  }, [text, speed, initialDirection]);
 
   return (
     <div

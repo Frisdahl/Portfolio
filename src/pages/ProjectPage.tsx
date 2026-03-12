@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { gsap, ScrollTrigger, splitLinesAndAnimate } from "../utils/animations";
-import ArrowIcon from "../components/ArrowIcon";
+import { gsap, splitLinesAndAnimate } from "../utils/animations";
 import CtaButton from "../components/CtaButton";
 import CurvedMarquee from "../components/CurvedMarquee";
 
@@ -17,7 +16,7 @@ const ProjectPage: React.FC = () => {
   const scrollPromptRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const workedOnRef = useRef<HTMLDivElement>(null);
-  const btnContainerRef = useRef<HTMLAnchorElement>(null);
+  const btnContainerRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLDivElement>(null);
   const sharedThumbCtaRef = useRef<HTMLDivElement>(null);
   const marqueeContainerRef = useRef<HTMLDivElement>(null);
@@ -293,13 +292,10 @@ const ProjectPage: React.FC = () => {
         <div className="w-full flex flex-col lg:flex-row justify-between items-start mb-32 gap-y-16">
           <div className="flex-1 flex flex-col items-start max-w-xl lg:w-[25%]">
             <p className="split-line text-2xl md:text-2xl text-[var(--foreground)] text-left max-w-xl leading-tight mb-8">
-              This project demonstrates a modern approach to digital
-              experiences, focusing on performance, accessibility, and beautiful
-              design.
+              {project.descriptionSecondary || project.description}
             </p>
             <p className="split-line text-md md:text-md italic text-[var(--foreground)] opacity-60 text-left max-w-3xl leading-tight mb-16">
-              This project is a conceptual case study. Visual direction and
-              stylistic inspiration were drawn from Errant.dk.
+              {project.disclaimer || ""}
             </p>
             <div ref={ctaBtnRef}>
               <CtaButton
@@ -450,8 +446,7 @@ const ProjectPage: React.FC = () => {
         >
           <div className="flex-1 flex flex-col items-start max-w-xl">
             <p className="text-2xl md:text-2xl text-[var(--foreground)] text-left max-w-xl leading-tight mb-8">
-              My work covering frontend development, backend architecture and
-              interface design.
+              {project.workedOnHeading || "My Contributions"}
             </p>
           </div>
           <div className="flex gap-16 text-left">

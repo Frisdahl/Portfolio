@@ -5,56 +5,56 @@ import { gsap } from "gsap";
  * @param items - Array of elements to loop
  * @param config - Configuration object
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function horizontalLoop(items: any[], config: any) {
-  items = gsap.utils.toArray(items);
-  config = config || {};
-  let tl = gsap.timeline({
-      repeat: config.repeat,
-      paused: config.paused,
-      defaults: { ease: "none" },
-      onReverseComplete: () => tl.totalTime(tl.rawTime() + tl.duration() * 100),
-    }),
-    length = items.length,
-    startX = items[0].offsetLeft,
-    times: any[] = [],
-    widths: any[] = [],
-    xPercents: any[] = [],
-    curIndex = 0,
-    pixelsPerSecond = (config.speed || 1) * 100,
-    snap = config.snap === false ? (v: any) => v : gsap.utils.snap(config.snap || 1),
-    totalWidth: number,
-    curX: number,
-    distanceToStart: number,
-    distanceToLoop: number,
-    item: any,
-    i: number;
+  const elements = gsap.utils.toArray(items) as HTMLElement[];
+  const cfg = config || {};
+  const tl = gsap.timeline({
+    repeat: cfg.repeat,
+    paused: cfg.paused,
+    defaults: { ease: "none" },
+    onReverseComplete: () => { tl.totalTime(tl.rawTime() + tl.duration() * 100); },
+  });
+  const length = elements.length;
+  const startX = elements[0].offsetLeft;
+  const times: number[] = [];
+  const widths: number[] = [];
+  const xPercents: number[] = [];
+  let curIndex = 0;
+  const pixelsPerSecond = (cfg.speed || 1) * 100;
+  const snap = cfg.snap === false ? (v: number) => v : gsap.utils.snap(cfg.snap || 1);
+  let curX: number;
+  let distanceToStart: number;
+  let distanceToLoop: number;
+  let item: HTMLElement;
+  let i: number;
 
-  gsap.set(items, {
-    xPercent: (i, el) => {
-      let w = (widths[i] = parseFloat(gsap.getProperty(el, "width", "px")));
-      xPercents[i] = snap(
-        (parseFloat(gsap.getProperty(el, "x", "px")) / w) * 100 +
-          gsap.getProperty(el, "xPercent")
+  gsap.set(elements, {
+    xPercent: (index, el) => {
+      const w = (widths[index] = parseFloat(gsap.getProperty(el, "width", "px") as string));
+      xPercents[index] = snap(
+        (parseFloat(gsap.getProperty(el, "x", "px") as string) / w) * 100 +
+          (gsap.getProperty(el, "xPercent") as number)
       );
-      return xPercents[i];
+      return xPercents[index];
     },
   });
-  gsap.set(items, { x: 0 });
+  gsap.set(elements, { x: 0 });
 
-  totalWidth =
-    items[length - 1].offsetLeft +
+  const totalWidth =
+    elements[length - 1].offsetLeft +
     (xPercents[length - 1] / 100) * widths[length - 1] -
     startX +
-    items[length - 1].offsetWidth *
-      gsap.getProperty(items[length - 1], "scaleX") +
-    (parseFloat(config.paddingRight) || 0);
+    elements[length - 1].offsetWidth *
+      (gsap.getProperty(elements[length - 1], "scaleX") as number) +
+    (parseFloat(cfg.paddingRight) || 0);
 
   for (i = 0; i < length; i++) {
-    item = items[i];
+    item = elements[i];
     curX = (xPercents[i] / 100) * widths[i];
     distanceToStart = item.offsetLeft + curX - startX;
     distanceToLoop =
-      distanceToStart + widths[i] * gsap.getProperty(item, "scaleX");
+      distanceToStart + widths[i] * (gsap.getProperty(item, "scaleX") as number);
     tl.to(
       item,
       {
@@ -82,29 +82,35 @@ export function horizontalLoop(items: any[], config: any) {
     times[i] = distanceToStart / pixelsPerSecond;
   }
 
-  function toIndex(index: number, vars: any) {
-    vars = vars || {};
-    Math.abs(index - curIndex) > length / 2 &&
-      (index += index > curIndex ? -length : length);
-    let newIndex = gsap.utils.wrap(0, length, index),
-      time = times[newIndex];
-    if (time > tl.time() !== index > curIndex) {
+  function toIndex(index: number, vars: gsap.TweenVars = {}) {
+    let targetIndex = index;
+    if (Math.abs(targetIndex - curIndex) > length / 2) {
+      targetIndex += targetIndex > curIndex ? -length : length;
+    }
+    const newIndex = gsap.utils.wrap(0, length, targetIndex);
+    let time = times[newIndex];
+    if (time > tl.time() !== targetIndex > curIndex) {
       vars.modifiers = { time: gsap.utils.wrap(0, tl.duration()) };
-      time += tl.duration() * (index > curIndex ? 1 : -1);
+      time += tl.duration() * (targetIndex > curIndex ? 1 : -1);
     }
     curIndex = newIndex;
     vars.overwrite = true;
     return tl.tweenTo(time, vars);
   }
 
-  tl.next = (vars: any) => toIndex(curIndex + 1, vars);
-  tl.previous = (vars: any) => toIndex(curIndex - 1, vars);
-  tl.current = () => curIndex;
-  tl.toIndex = (index: number, vars: any) => toIndex(index, vars);
-  tl.times = times;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (tl as any).next = (vars: gsap.TweenVars) => toIndex(curIndex + 1, vars);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (tl as any).previous = (vars: gsap.TweenVars) => toIndex(curIndex - 1, vars);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (tl as any).current = () => curIndex;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (tl as any).toIndex = (index: number, vars: gsap.TweenVars) => toIndex(index, vars);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (tl as any).times = times;
   tl.progress(1, true).progress(0, true);
-  if (config.reversed) {
-    tl.vars.onReverseComplete();
+  if (cfg.reversed) {
+    tl.vars.onReverseComplete?.();
     tl.reverse();
   }
   return tl;

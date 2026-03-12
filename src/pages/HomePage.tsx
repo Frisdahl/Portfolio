@@ -18,7 +18,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Manifesto = lazy(() => import("../sections/Manifesto/Manifesto"));
 const Projects = lazy(() => import("../sections/Projects/Projects"));
-const Services = lazy(() => import("../sections/Services/Services"));
+// const Services = lazy(() => import("../sections/Services/Services"));
 const TechStack = lazy(() => import("../sections/TechStack/TechStack"));
 
 type DeferredSectionProps = {
@@ -49,7 +49,6 @@ function ThemeTransition() {
           start: "top 80%", // Start fading to dark when projects are 20% up
           end: "bottom 100%", // Return to light exactly when projects section ends
           scrub: 1,
-          ease: "none",
         },
       });
 
@@ -90,14 +89,15 @@ function DeferredSection({
   forceMount = false,
   sectionId,
 }: DeferredSectionProps) {
-  const [shouldMount, setShouldMount] = useState(false);
+  const [shouldMount, setShouldMount] = useState(forceMount);
   const sectionRef = useRef<HTMLDivElement>(null);
 
+  if (forceMount && !shouldMount) {
+    setShouldMount(true);
+  }
+
   useEffect(() => {
-    if (forceMount) {
-      setShouldMount(true);
-      return;
-    }
+    if (forceMount) return;
 
     const element = sectionRef.current;
     if (!element || shouldMount) return;
@@ -144,6 +144,22 @@ function HomePage() {
     return targetSection?.replace("#", "") === "projects";
   });
 
+  useEffect(() => {
+    const targetSection =
+      location.hash ||
+      sessionStorage.getItem("targetSection") ||
+      (sessionStorage.getItem("pendingSectionScroll") === "true"
+        ? "#projects"
+        : null);
+    if (!targetSection) return;
+    const targetId = targetSection.replace("#", "");
+
+    if (targetId === "projects" && !forceMountProjects) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setForceMountProjects(true);
+    }
+  }, [location, forceMountProjects]);
+
   useLayoutEffect(() => {
     const targetSection =
       location.hash ||
@@ -154,35 +170,9 @@ function HomePage() {
     if (!targetSection) return;
 
     const targetId = targetSection.replace("#", "");
-    const projectsEl =
-      typeof document !== "undefined"
-        ? document.querySelector("#projects")
-        : null;
-    // #region agent log
-    fetch("http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "da1222",
-      },
-      body: JSON.stringify({
-        sessionId: "da1222",
-        location: "HomePage.tsx:useLayoutEffect(entry)",
-        message: "HomePage scroll-to-section",
-        data: {
-          targetSection,
-          targetId,
-          forceMountProjects,
-          projectsExists: !!projectsEl,
-          scrollYBefore: typeof window !== "undefined" ? window.scrollY : 0,
-        },
-        timestamp: Date.now(),
-        hypothesisId: "H-C,H-E",
-      }),
-    }).catch(() => {});
-    // #endregion
+    
+    // If we need to force mount but haven't yet, let the useEffect handle it
     if (targetId === "projects" && !forceMountProjects) {
-      setForceMountProjects(true);
       return;
     }
 
@@ -193,16 +183,13 @@ function HomePage() {
       const headerElement = document.querySelector("header");
       if (!headerElement) return 0;
 
-      // Measure only the main nav row height to avoid including dropdown if it's open/closing
       const navRow = headerElement.querySelector("div");
       const headerHeight = navRow
         ? navRow.getBoundingClientRect().height
         : headerElement.getBoundingClientRect().height;
 
-      // Responsive padding check (approximate based on Header.tsx classes)
       const isMobile = window.innerWidth < 768;
       const topPadding = isMobile ? 24 : 40;
-
       const extraGap = 8;
       return -(headerHeight + topPadding + extraGap);
     };
@@ -221,35 +208,12 @@ function HomePage() {
       sessionStorage.setItem("projectsFromNav", "true");
       const projectsSection = document.querySelector("#projects");
       if (projectsSection) {
-        const scrollYBefore = window.scrollY;
         alignToTargetTop(projectsSection);
-        const scrollYAfter = window.scrollY;
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7485/ingest/c3600584-6a50-43cc-836a-dd52b7cba410",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Debug-Session-Id": "da1222",
-            },
-            body: JSON.stringify({
-              sessionId: "da1222",
-              location: "HomePage.tsx:alignToTargetTop(projects) done",
-              message: "Scrolled to #projects",
-              data: { scrollYBefore, scrollYAfter },
-              timestamp: Date.now(),
-              hypothesisId: "H-E",
-            }),
-          },
-        ).catch(() => {});
-        // #endregion
         sessionStorage.removeItem("targetSection");
         sessionStorage.removeItem("pendingSectionScroll");
         requestAnimationFrame(clearScrollPendingClass);
         timeoutIds.push(setTimeout(clearScrollPendingClass, 100));
 
-        // Refine scroll to heading when it exists (lazy content may mount after)
         const refineToHeading = () => {
           const headingTarget = document.querySelector(
             "#projects .project-header-text",
@@ -274,30 +238,6 @@ function HomePage() {
           }
         };
         alignRafId = window.requestAnimationFrame(refineToHeading);
-      } else {
-        // Fallback: wait for section to appear (shouldn't happen with forceMount)
-        let attempts = 0;
-        const maxAttempts = 300;
-        const alignWhenProjectsHeadingReady = () => {
-          const section = document.querySelector("#projects");
-          if (section) {
-            alignToTargetTop(section);
-            sessionStorage.removeItem("targetSection");
-            sessionStorage.removeItem("pendingSectionScroll");
-            requestAnimationFrame(clearScrollPendingClass);
-            timeoutIds.push(setTimeout(clearScrollPendingClass, 100));
-            return;
-          }
-          attempts += 1;
-          if (attempts < maxAttempts) {
-            alignRafId = window.requestAnimationFrame(
-              alignWhenProjectsHeadingReady,
-            );
-          }
-        };
-        alignRafId = window.requestAnimationFrame(
-          alignWhenProjectsHeadingReady,
-        );
       }
     } else {
       const target = document.querySelector(targetSection);
@@ -350,15 +290,6 @@ function HomePage() {
           <Projects />
         </Suspense>
       </div>
-
-      {/* Services */}
-      {/*       <DeferredSection
-        className="mb-32 md:mb-48 lg:mb-32 xl:mb-64"
-        containIntrinsicSize="1200px"
-        fallbackClassName="w-full min-h-[900px] md:min-h-[1200px]"
-      >
-        <Services />
-      </DeferredSection> */}
 
       {/* Tech Stack Section */}
       <DeferredSection

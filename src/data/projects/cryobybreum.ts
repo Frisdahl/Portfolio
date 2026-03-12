@@ -25,6 +25,7 @@ export const cryobybreum: Project = {
   link: "",
   location: "Denmark",
   services: ["UI/UX Design", "Prototyping", "Frontend Development"],
+  tags: ["Elementor", "Wordpress", "CSS", "Figma", "Photoshop", "After Effects"],
   workedOn: {
     Design: [
       "Design in Figma",

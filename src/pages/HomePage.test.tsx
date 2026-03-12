@@ -30,6 +30,5 @@ describe("HomePage", () => {
 
     expect(screen.getByTestId("hero")).toBeDefined();
     expect(await screen.findByTestId("projects")).toBeDefined();
-    expect(await screen.findByTestId("services")).toBeDefined();
   });
 });

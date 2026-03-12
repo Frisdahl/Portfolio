@@ -16,14 +16,14 @@ const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isPastHero, setIsPastHero] = useState(false);
-  const [isInProjectsSection, setIsInProjectsSection] = useState(false);
+  const [isInProjectsSection] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const navLinksRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLAnchorElement>(null);
-  const burgerRef = useRef<HTMLButtonElement>(null);
+  const burgerRef = useRef<HTMLDivElement>(null);
   const menuContentRef = useRef<HTMLDivElement>(null);
   const shakaIconRef = useRef<HTMLSpanElement>(null);
 
@@ -140,7 +140,7 @@ const Header: React.FC = () => {
       borderRadius: targetRadius,
       width: targetWidth,
       height: targetHeight,
-      duration: 0.6,
+      duration: 0.45,
       ease: "expo.inOut",
       force3D: true,
     });
@@ -157,10 +157,10 @@ const Header: React.FC = () => {
           {
             opacity: 1,
             pointerEvents: "auto",
-            duration: 0.3,
+            duration: 0.2,
             ease: "power2.out",
           },
-          0.3,
+          0.2,
         );
 
         // Entrance animation with natural flow
@@ -170,10 +170,10 @@ const Header: React.FC = () => {
           { 
             opacity: 1, 
             scale: 1, 
-            duration: 0.6, 
+            duration: 0.4, 
             ease: "power2.out" 
           },
-          0.4
+          0.3
         )
         .fromTo(
           greetingElements,
@@ -181,11 +181,11 @@ const Header: React.FC = () => {
           { 
             y: 0, 
             opacity: 1, 
-            duration: 0.6, 
-            stagger: 0.1, 
+            duration: 0.4, 
+            stagger: 0.06, 
             ease: "power3.out" 
           },
-          0.5
+          0.35
         )
         .fromTo(
           menuElements,
@@ -193,12 +193,12 @@ const Header: React.FC = () => {
           {
             y: 0,
             opacity: 1,
-            duration: 0.6,
-            stagger: 0.08,
+            duration: 0.45,
+            stagger: 0.05,
             ease: "power3.out",
             clearProps: "all",
           },
-          0.6,
+          0.4,
         );
       } else {
         tl.to(
@@ -206,8 +206,8 @@ const Header: React.FC = () => {
           {
             y: 20,
             opacity: 0,
-            duration: 0.3,
-            stagger: 0.03,
+            duration: 0.2,
+            stagger: 0.02,
             ease: "power2.in",
           },
           0,
@@ -215,8 +215,8 @@ const Header: React.FC = () => {
 
         tl.to(
           shakaElement,
-          { opacity: 0, scale: 0.8, duration: 0.3, ease: "power2.in" },
-          0.1
+          { opacity: 0, scale: 0.8, duration: 0.2, ease: "power2.in" },
+          0.05
         );
 
         tl.to(
@@ -224,10 +224,10 @@ const Header: React.FC = () => {
           {
             opacity: 0,
             pointerEvents: "none",
-            duration: 0.3,
+            duration: 0.2,
             ease: "power2.in",
           },
-          0.2,
+          0.1,
         );
       }
     }

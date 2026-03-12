@@ -68,7 +68,7 @@ const Links: React.FC<LinksProps> = ({
         >
           {/* Animated Dot */}
           <div
-            ref={(el) => (dotRefs.current[i] = el)}
+            ref={(el) => { dotRefs.current[i] = el; }}
             className="w-2.5 h-2.5 rounded-full bg-current opacity-0 scale-0 -translate-x-[10px]"
             style={{ willChange: "transform, opacity" }}
           />

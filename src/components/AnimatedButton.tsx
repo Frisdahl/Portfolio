@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 
 interface AnimatedButtonProps {
   text: string;
@@ -40,20 +40,6 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   disabled = false,
 }) => {
   const ButtonComponent = link ? "a" : "button";
-
-  const content = (
-    <div
-      className={`inline-flex items-center gap-2 relative z-10 overflow-hidden`}
-    >
-      {icon && iconPosition === "left" && (
-        <span className="shrink-0">{icon}</span>
-      )}
-      <span className="block font-medium whitespace-nowrap">{text}</span>
-      {icon && iconPosition === "right" && (
-        <span className="shrink-0">{icon}</span>
-      )}
-    </div>
-  );
 
   return (
     <ButtonComponent

@@ -6,6 +6,10 @@ export const nordwear: Project = {
   title: "Nordwear",
   description:
     "NordWear is a modern e-commerce platform inspired by Scandinavian minimalism, focused on performance, clean design, and seamless shopping.",
+  descriptionSecondary:
+    "The website features a sleek and minimalist design with smooth animations, responsive layout, and an intuitive user interface to provide an engaging experience for visitors.",
+  disclaimer:
+    "This project is a conceptual case study. Visual direction and design are inspired by Errant.dk, with the product images and text being ai generated from their content.",
   projectType: "Website",
   thumbnail: "/images/projectImages/NordWear/NordWear-img-opt.webp",
   video: "/projectVideos/NordWear/NordWear-trailer.webm",
@@ -33,6 +37,8 @@ export const nordwear: Project = {
     "Performance Optimization",
   ],
   tags: ["React", "Typescript", "Next.js", "Gsap"],
+  workedOnHeading:
+    "My work covering frontend development, backend architecture and interface design.",
   workedOn: {
     Frontend: [
       "Responsive UI built with React and TypeScript",

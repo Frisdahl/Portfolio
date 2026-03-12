@@ -38,10 +38,10 @@ const CtaButton: React.FC<CtaButtonProps> = ({
   forceHover = false,
   arrowColor = "currentColor",
 }) => {
-  const elementRef = useRef<any>(null);
+  const elementRef = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
 
   // Apply the premium magnetic effect
-  useMagnetic(elementRef, { strength: magneticStrength });
+  useMagnetic(elementRef as React.RefObject<HTMLElement | null>, { strength: magneticStrength });
 
   const commonClasses = `group/talk inline-flex gap-x-4 py-2 px-8 rounded-full ${bgColor} ${textColor} ${fontSize || "text-md md:text-2xl"} font-cabinet font-medium tracking-tight transition-[opacity,background-color] duration-500 hover:opacity-90 cursor-pointer items-center justify-center overflow-hidden relative ${className}`;
 
@@ -72,10 +72,10 @@ const CtaButton: React.FC<CtaButtonProps> = ({
   if (to) {
     return (
       <Link
-        ref={elementRef}
+        ref={elementRef as React.RefObject<HTMLAnchorElement>}
         to={to}
         className={commonClasses}
-        onClick={onClick as any}
+        onClick={onClick as React.MouseEventHandler<HTMLAnchorElement>}
       >
         {content}
       </Link>
@@ -85,12 +85,12 @@ const CtaButton: React.FC<CtaButtonProps> = ({
   if (href) {
     return (
       <a
-        ref={elementRef}
+        ref={elementRef as React.RefObject<HTMLAnchorElement>}
         href={href}
         target={target}
         rel={rel}
         className={commonClasses}
-        onClick={onClick as any}
+        onClick={onClick as React.MouseEventHandler<HTMLAnchorElement>}
       >
         {content}
       </a>
@@ -98,7 +98,7 @@ const CtaButton: React.FC<CtaButtonProps> = ({
   }
 
   return (
-    <button ref={elementRef} onClick={onClick} className={commonClasses}>
+    <button ref={elementRef as React.RefObject<HTMLButtonElement>} onClick={onClick} className={commonClasses}>
       {content}
     </button>
   );

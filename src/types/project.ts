@@ -3,6 +3,8 @@ export type Project = {
   slug: string;
   title: string;
   description: string;
+  descriptionSecondary?: string;
+  disclaimer?: string;
   projectType: "Mobile Application" | "Website" | "Prototype";
   thumbnail: string;
   video?: string;
@@ -13,6 +15,7 @@ export type Project = {
   location?: string;
   services?: string[];
   tags: string[]; // Used for the list in Projects section
+  workedOnHeading?: string; // Optional heading for the workedOn section
   workedOn?: Record<string, string[]>;
   tagsByCategory?: Record<string, string[]>;
 };

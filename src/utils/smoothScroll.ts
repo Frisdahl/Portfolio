@@ -35,7 +35,7 @@ export const scrollTo = (
   }
 
   if (lenis) {
-    lenis.scrollTo(target as any, {
+    lenis.scrollTo(target as string | number | HTMLElement, {
       duration,
       offset,
       immediate,

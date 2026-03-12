@@ -6,6 +6,8 @@ export const freshCut: Project = {
   title: "Fresh Cut",
   description:
     "A one page website for a fictional barber shop called Fresh Cut, showcasing their services, team, and booking options with a sleek and modern design.",
+  descriptionSecondary:
+    "The website features a clean and modern design with smooth animations, responsive layout, and an intuitive user interface to provide an engaging experience for visitors.",
   projectType: "Website",
   thumbnail: "/images/projectImages/freshCut/freshCut-thumbnail.webp",
   video: "/projectVideos/fresh-cut-iphone-trailer.mp4",
@@ -24,9 +26,17 @@ export const freshCut: Project = {
   year: "2026",
   link: "#",
   location: "Denmark",
-  services: ["Mobile Development", "UI/UX Design"],
+  services: [
+    "Responsive Development",
+    "UI/UX Design",
+    "Animation",
+    "Frontend Development",
+  ],
   tags: ["React", "Typescript", "Express", "Gsap"],
+  workedOnHeading:
+    "For Fresh Cut, I focused on frontend development, creating a responsive and visually pleasing experience for users.",
   tagsByCategory: {
-    "Tech Stack": ["React Native", "TypeScript", "UI/UX", "Prototype"],
+    frontend: ["React", "TypeScript", "Tailwind CSS", "Vite", "GSAP"],
+    deployment: ["Vercel"],
   },
 };

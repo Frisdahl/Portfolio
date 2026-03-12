@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useEffect } from "react";
+import React, { useLayoutEffect, useRef, useEffect, useCallback } from "react";
 import { gsap } from "gsap";
 import SplitType from "split-type";
 
@@ -51,41 +51,41 @@ const AnimatedNavLink: React.FC<AnimatedNavLinkProps> = ({
     };
   }, [label]);
 
-  const playHover = () => {
+  const playHover = useCallback(() => {
     if (isActive) return;
     gsap.to(splitRef.current?.chars || [], {
       yPercent: -100,
-      duration: 0.6,
-      stagger: 0.025,
+      duration: 0.45,
+      stagger: 0.015,
       ease: "expo.inOut",
       overwrite: true,
     });
     gsap.to(hoverSplitRef.current?.chars || [], {
       yPercent: 0,
-      duration: 0.6,
-      stagger: 0.025,
+      duration: 0.45,
+      stagger: 0.015,
       ease: "expo.inOut",
       overwrite: true,
     });
-  };
+  }, [isActive]);
 
-  const reverseHover = () => {
+  const reverseHover = useCallback(() => {
     if (isActive) return;
     gsap.to(splitRef.current?.chars || [], {
       yPercent: 0,
-      duration: 0.6,
-      stagger: 0.02,
+      duration: 0.4,
+      stagger: 0.01,
       ease: "expo.inOut",
       overwrite: true,
     });
     gsap.to(hoverSplitRef.current?.chars || [], {
       yPercent: 100,
-      duration: 0.6,
-      stagger: 0.02,
+      duration: 0.4,
+      stagger: 0.01,
       ease: "expo.inOut",
       overwrite: true,
     });
-  };
+  }, [isActive]);
 
   // React to external hover changes
   useEffect(() => {
@@ -94,7 +94,7 @@ const AnimatedNavLink: React.FC<AnimatedNavLinkProps> = ({
     } else {
       reverseHover();
     }
-  }, [externalHover]);
+  }, [externalHover, playHover, reverseHover]);
 
   return (
     <a
