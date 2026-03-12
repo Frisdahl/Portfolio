@@ -33,49 +33,25 @@ type DeferredSectionProps = {
 function ThemeTransition() {
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Set initial light theme values explicitly
-      gsap.set(":root", {
-        "--background": "#e7e7e7",
-        "--foreground": "#1b1b1a",
-        "--foreground-muted": "#666",
-        "--menu-bg": "#131313",
-        "--menu-text": "rgb(230, 230, 231)",
-      });
+      // Set initial theme
+      document.documentElement.setAttribute("data-theme", "light");
 
-      // Single timeline for the entire projects window
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: "#projects",
-          start: "top 80%", // Start fading to dark when projects are 20% up
-          end: "bottom 100%", // Return to light exactly when projects section ends
-          scrub: 1,
+      ScrollTrigger.create({
+        trigger: "#projects",
+        start: "top 80%",
+        end: "bottom 100%",
+        onToggle: (self) => {
+          document.documentElement.setAttribute(
+            "data-theme",
+            self.isActive ? "dark" : "light",
+          );
         },
       });
-
-      // 1. Fade to Dark
-      tl.to(":root", {
-        "--background": "#131313",
-        "--foreground": "rgb(230, 230, 231)",
-        "--foreground-muted": "#a1a1a1",
-        "--menu-bg": "rgb(230, 230, 231)",
-        "--menu-text": "#131313",
-        duration: 0.1,
-        ease: "none",
-      })
-        // 2. Stay Dark through the projects
-        .to({}, { duration: 0.8 })
-        // 3. Fade back to Light immediately after projects
-        .to(":root", {
-          "--background": "#e7e7e7",
-          "--foreground": "#1b1b1a",
-          "--foreground-muted": "#666",
-          "--menu-bg": "#131313",
-          "--menu-text": "rgb(230, 230, 231)",
-          duration: 0.1,
-          ease: "none",
-        });
     });
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      document.documentElement.removeAttribute("data-theme");
+    };
   }, []);
 
   return null;
@@ -122,7 +98,7 @@ function DeferredSection({
       id={sectionId}
       ref={sectionRef}
       className={className}
-      style={{ contentVisibility: "auto", containIntrinsicSize }}
+      style={{ containIntrinsicSize }}
     >
       {shouldMount ? (
         <Suspense fallback={<div className={fallbackClassName} />}>
