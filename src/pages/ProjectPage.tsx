@@ -133,18 +133,21 @@ const ProjectPage: React.FC = () => {
       }
 
       // Dynamic entrance animation for images
-      const allImageWrappers = containerRef.current?.querySelectorAll(".image-animate-wrapper");
+      const allImageWrappers = containerRef.current?.querySelectorAll(
+        ".image-animate-wrapper",
+      );
       if (allImageWrappers) {
         allImageWrappers.forEach((wrapper) => {
           const isLeft = wrapper.classList.contains("rotate-left-start");
           const isRight = wrapper.classList.contains("rotate-right-start");
-          
-          gsap.fromTo(wrapper, 
-            { 
-              opacity: 0, 
+
+          gsap.fromTo(
+            wrapper,
+            {
+              opacity: 0,
               y: 60,
               rotate: isLeft ? -2 : isRight ? 2 : 0,
-              scale: 0.98
+              scale: 0.98,
             },
             {
               scrollTrigger: {
@@ -156,16 +159,18 @@ const ProjectPage: React.FC = () => {
               rotate: 0,
               scale: 1,
               duration: 1.6,
-              ease: "power3.out"
-            }
+              ease: "power3.out",
+            },
           );
         });
       }
 
       // Special handling for the single full-width detail image
-      const fullWidthDetail = containerRef.current?.querySelector(".full-width-detail");
+      const fullWidthDetail =
+        containerRef.current?.querySelector(".full-width-detail");
       if (fullWidthDetail) {
-        gsap.fromTo(fullWidthDetail,
+        gsap.fromTo(
+          fullWidthDetail,
           { opacity: 0, y: 40, scale: 1.02 },
           {
             scrollTrigger: {
@@ -176,8 +181,8 @@ const ProjectPage: React.FC = () => {
             y: 0,
             scale: 1,
             duration: 1.4,
-            ease: "power2.out"
-          }
+            ease: "power2.out",
+          },
         );
       }
 
@@ -223,9 +228,11 @@ const ProjectPage: React.FC = () => {
 
   const marqueeText = "Other Projects ✦ Explore More ✦ Creative Work ✦ ";
 
-  const otherProjects = projects
-    .filter((p) => p.slug !== (slug || "nordwear"))
-    .map((p) => ({ ...p }));
+  // Reorder projects so current one is last, keeping all 3 visible
+  const displayProjects = [
+    ...projects.filter((p) => p.slug !== (slug || "nordwear")),
+    project,
+  ];
 
   return (
     <div
@@ -274,7 +281,7 @@ const ProjectPage: React.FC = () => {
           className="w-full aspect-[16/9] overflow-hidden mb-32 rounded-sm"
         >
           <img
-            src={project.image}
+            src={project.thumbnail}
             alt={project.title}
             className="w-full h-full object-cover"
           />
@@ -298,7 +305,9 @@ const ProjectPage: React.FC = () => {
               <CtaButton
                 text="Visit Website"
                 href={
-                  project.title === "Nordwear" ? "https://nordwear-shop.dk/" : "#"
+                  project.title === "Nordwear"
+                    ? "https://nordwear-shop.dk/"
+                    : "#"
                 }
                 target="_blank"
                 rel="noopener noreferrer"
@@ -559,7 +568,7 @@ const ProjectPage: React.FC = () => {
               />
             </div>
 
-            {otherProjects.map((p, index) => (
+            {displayProjects.map((p, index) => (
               <div
                 key={p.slug}
                 className={`hidden md:flex flex-col gap-1 transition-all duration-700 ease-in-out ${activeHoveredIndex === index + 1 ? "flex-[1.6]" : "flex-1"}`}
@@ -578,7 +587,7 @@ const ProjectPage: React.FC = () => {
                   className={`w-full bg-[#dbdbdb] rounded-sm overflow-hidden group/thumb relative transition-all duration-700 ease-in-out cursor-pointer ${activeHoveredIndex === index + 1 ? (index === 0 ? "h-[800px]" : "h-[750px]") : index === 0 ? "h-[600px]" : "h-[550px]"} backface-hidden transform-gpu`}
                 >
                   <img
-                    src={p.image}
+                    src={p.thumbnail}
                     alt={p.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover/thumb:scale-105 will-change-transform scale-[1.01]"
                   />
@@ -595,16 +604,6 @@ const ProjectPage: React.FC = () => {
                     </div>
                   </div>
                 </Link>
-              </div>
-            ))}
-
-            {[...Array(Math.max(0, 3 - otherProjects.length))].map((_, i) => (
-              <div
-                key={`empty-${i}`}
-                className="hidden md:flex flex-col gap-1 flex-1 transition-all duration-700 ease-in-out"
-              >
-                <div className="h-8" />
-                <div className="w-full bg-[#dbdbdb] rounded-sm h-[550px]" />
               </div>
             ))}
           </div>

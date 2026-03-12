@@ -39,8 +39,8 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       // Reset fading state after the fade duration
       setTimeout(() => {
         setFadingIndex(null);
-      }, 600);
-    }, 2000);
+      }, 400);
+    }, 1500);
 
     return () => clearInterval(interval);
   }, [isHovered, project.videoImages, activeIndex]);
@@ -204,9 +204,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
             // - If fading out: only transition opacity
             // - If it just finished fading out and is now at the back: snap instantly (no transition)
             // - Otherwise: smooth slide forward
-            let transition = "all 1.2s cubic-bezier(0.7, 0, 0.3, 1)";
+            let transition = "all 0.8s cubic-bezier(0.7, 0, 0.3, 1)";
             if (isFadingOut) {
-              transition = "opacity 0.6s ease-out";
+              transition = "opacity 0.4s ease-out";
             } else if (stackPos === 2 && fadingIndex === null) {
               transition = "none";
             }

@@ -6,7 +6,7 @@ export const freshCut: Project = {
   title: "Fresh Cut",
   description:
     "A one page website for a fictional barber shop called Fresh Cut, showcasing their services, team, and booking options with a sleek and modern design.",
-  projectType: "Mobile Application",
+  projectType: "Website",
   thumbnail: "/images/projectImages/freshCut/freshCut-thumbnail.webp",
   video: "/projectVideos/fresh-cut-iphone-trailer.mp4",
   videoImages: [
@@ -15,10 +15,13 @@ export const freshCut: Project = {
     "/images/projectImages/freshCut/videoimages/freshCut-img3.webp",
   ],
   smallImages: [
-    "/images/projectImages/freshCut/smallimages/freshCut-img1.webp",
-    "/images/projectImages/freshCut/smallimages/freshCut-img2.webp",
+    "/images/projectImages/freshCut/freshCut-mobile1.webp",
+    "/images/projectImages/freshCut/freshCut-mobile2.webp",
+    "/images/projectImages/freshCut/freshCut-horizontal.webp",
+    "/images/projectImages/freshCut/freshCut-smallimg1.webp",
+    "/images/projectImages/freshCut/freshCut-smallimg2.webp",
   ],
-  year: "2024",
+  year: "2026",
   link: "#",
   location: "Denmark",
   services: ["Mobile Development", "UI/UX Design"],
