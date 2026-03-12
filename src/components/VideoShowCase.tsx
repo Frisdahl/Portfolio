@@ -27,13 +27,13 @@ const VideoShowCase = () => {
         {
           scale: 0.85,
           y: 80,
-          clipPath: "inset(15% 15% 15% 15% round 20px)",
+          clipPath: "inset(15% 15% 15% 15% round 2rem)",
           opacity: 0.4,
         },
         {
           scale: 1,
           y: 0,
-          clipPath: "inset(0% 0% 0% 0% round 0px)",
+          clipPath: "inset(0% 0% 0% 0% round 2rem)",
           opacity: 1,
           ease: "power2.out",
         }
@@ -65,7 +65,7 @@ const VideoShowCase = () => {
     <div ref={sectionRef} className="flex justify-center py-20">
       <div
         ref={videoWrapperRef}
-        className="w-[90vw] max-w-[1400px] aspect-[16/9] overflow-hidden origin-center shadow-2xl"
+        className="w-[90vw] max-w-[1400px] aspect-[16/9] overflow-hidden origin-center shadow-2xl rounded-[2rem] md:rounded-[2.5rem]"
       >
         <video
           ref={videoRef}

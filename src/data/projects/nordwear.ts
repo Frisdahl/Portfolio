@@ -7,8 +7,13 @@ export const nordwear: Project = {
   description:
     "NordWear is a modern e-commerce platform inspired by Scandinavian minimalism, focused on performance, clean design, and seamless shopping.",
   projectType: "Website",
-  image: "/images/projectImages/NordWear/NordWear-img-opt.webp",
+  thumbnail: "/images/projectImages/NordWear/NordWear-img-opt.webp",
   video: "/projectVideos/NordWear/NordWear-trailer.webm",
+  videoImages: [
+    "/images/projectImages/NordWear/videoimages/nordwear-img1.webp",
+    "/images/projectImages/NordWear/videoimages/nordwear-img2.webp",
+    "/images/projectImages/NordWear/videoimages/nordwear-img3.webp",
+  ],
   smallImages: [
     "/images/projectImages/NordWear/Nordwear-mobile.webp",
     "/images/projectImages/NordWear/Nordwear-mobile2.webp",

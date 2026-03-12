@@ -104,7 +104,7 @@ const Projects: React.FC = () => {
                     className="relative flex items-center group/thumb"
                   >
                     <img
-                      src={project.image}
+                      src={project.thumbnail}
                       alt={project.title}
                       onClick={() => {
                         const el = document.getElementById(

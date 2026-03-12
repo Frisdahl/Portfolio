@@ -4,8 +4,9 @@ export type Project = {
   title: string;
   description: string;
   projectType: "Mobile Application" | "Website" | "Prototype";
-  image: string;
+  thumbnail: string;
   video?: string;
+  videoImages?: string[];
   smallImages?: string[];
   year: string;
   link: string;

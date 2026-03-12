@@ -7,7 +7,7 @@ export const cryobybreum: Project = {
   description:
     "A digital storefront for CryoByBreum, showcasing specialized cryotherapy services with a clean, medical-grade aesthetic.",
   projectType: "Website",
-  image: "/images/projectImages/CryobyBreum/cryobybreum-thumbnail.webp",
+  thumbnail: "/images/projectImages/CryobyBreum/cryobybreum-thumbnail.webp",
   smallImages: [
     "/images/projectImages/CryobyBreum/cryobybreum-mobile.webp",
     "/images/projectImages/CryobyBreum/cryobybreum-mobile2.webp",
@@ -16,6 +16,11 @@ export const cryobybreum: Project = {
     "/images/projectImages/CryobyBreum/cryobybreum-square2.webp",
   ],
   video: "/projectVideos/CryobyBreum/cryobybreum-trailer.webm",
+  videoImages: [
+    "/images/projectImages/CryobyBreum/cryobybreum-mobile.webp",
+    "/images/projectImages/CryobyBreum/cryobybreum-mobile2.webp",
+    "/images/projectImages/CryobyBreum/cryobybreum-square.webp",
+  ],
   year: "2023",
   link: "",
   location: "Denmark",
