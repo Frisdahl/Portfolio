@@ -112,7 +112,6 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
   // Trigger Timeline on Hover
   useEffect(() => {
     if (isHovered) {
-      setHasBeenHovered(true);
       tlRef.current?.play();
     } else {
       tlRef.current?.reverse();
@@ -126,6 +125,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
 
   const handleMouseEnter = () => {
     setIsHovered(true);
+    if (!hasBeenHovered) {
+      setHasBeenHovered(true);
+    }
   };
 
   const handleMouseLeave = () => {
