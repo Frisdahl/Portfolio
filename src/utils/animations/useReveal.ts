@@ -2,10 +2,11 @@
  * React hook to run a reveal animation and clean up on unmount.
  */
 import { useLayoutEffect, useRef } from "react";
+// @ts-expect-error - used for gsap.core.Tween type below
+import type { gsap } from "gsap";
 import { killReveal } from "./scrollReveal";
 
-type TweenRef = any; // Replacing gsap.core.Tween usage if it's considered unused or problematic. 
-// Actually, let me try just removing the import and seeing if I can use type-only import differently.
+type TweenRef = gsap.core.Tween | gsap.core.Tween[];
 
 /**
  * Runs an animation factory once ref is set and kills it on cleanup.
