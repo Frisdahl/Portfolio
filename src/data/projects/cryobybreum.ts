@@ -17,15 +17,22 @@ export const cryobybreum: Project = {
   ],
   video: "/projectVideos/CryobyBreum/cryobybreum-trailer.webm",
   videoImages: [
-    "/images/projectImages/CryobyBreum/cryobybreum-mobile.webp",
-    "/images/projectImages/CryobyBreum/cryobybreum-mobile2.webp",
-    "/images/projectImages/CryobyBreum/cryobybreum-square.webp",
+    "/images/projectImages/CryobyBreum/videoImages/cryobybreum-img1.webp",
+    "/images/projectImages/CryobyBreum/videoImages/cryobybreum-img2.webp",
+    "/images/projectImages/CryobyBreum/videoImages/cryobybreum-img3.webp",
   ],
   year: "2023",
   link: "",
   location: "Denmark",
   services: ["UI/UX Design", "Prototyping", "Frontend Development"],
-  tags: ["Elementor", "Wordpress", "CSS", "Figma", "Photoshop", "After Effects"],
+  tags: [
+    "Elementor",
+    "Wordpress",
+    "CSS",
+    "Figma",
+    "Photoshop",
+    "After Effects",
+  ],
   workedOn: {
     Design: [
       "Design in Figma",

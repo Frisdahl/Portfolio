@@ -22,19 +22,19 @@ const ExperienceItem: React.FC<ExperienceItemProps> = ({
       className={`about-experience-item w-full py-8 md:py-10 first:pt-0 ${className}`}
     >
       <div className="flex flex-col gap-3 mb-4 overflow-hidden">
-        <h3 className="about-experience-title text-3xl md:text-3xl font-aeonik font-bold text-[#1b1b1a] uppercase">
+        <h3 className="about-experience-title text-2xl md:text-2xl font-cabinet font-semibold text-[#1b1b1a] uppercase">
           {title}
         </h3>
         <div className="about-experience-subtitle-wrap flex flex-col md:flex-row md:items-baseline justify-between gap-4 overflow-hidden">
-          <p className="about-experience-subtitle text-lg md:text-xl font-aeonik font-bold text-[#7d7d7d] uppercase tracking-wide">
+          <p className="about-experience-subtitle text-lg md:text-xl font-cabinet font-bold text-[#7d7d7d] uppercase tracking-wide">
             {subtitle}
           </p>
-          <span className="about-experience-date text-lg md:text-xl font-aeonik font-bold text-[#7d7d7d] md:text-right whitespace-nowrap">
+          <span className="about-experience-date text-lg md:text-xl font-cabinet font-bold text-[#7d7d7d] md:text-right whitespace-nowrap">
             {dates}
           </span>
         </div>
       </div>
-      <p className="about-experience-description text-lg md:text-xl font-aeonik text-[#1b1b1a]/70 leading-relaxed max-w-2xl">
+      <p className="about-experience-description text-lg md:text-xl font-cabinet text-[#1b1b1a]/70 leading-relaxed max-w-2xl">
         {description}
       </p>
       {showDivider && (

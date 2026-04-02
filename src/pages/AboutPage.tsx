@@ -291,55 +291,41 @@ const AboutPage: React.FC = () => {
     >
       <div className="w-full flex flex-col items-center pb-64">
         {/* Top Section */}
-        <div className="w-full mb-48 px-6 md:px-10 lg:px-12 xl:px-48">
-          <div className="overflow-hidden mb-10">
-            <h1 className="about-heading project-header-text text-5xl sm:text-6xl md:text-7xl lg:text-9xl w-full text-left font-aeonik font-medium text-[#1b1b1a] leading-[1.25] tracking-tight whitespace-normal md:whitespace-nowrap">
-              About Me
-            </h1>
-          </div>
-
-          <div className=" grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-14 lg:gap-16 items-start lg:items-stretch">
-            <div className="overflow-hidden rounded-[2rem]">
-              <div className="about-image-reveal w-full max-w-lg lg:max-w-none aspect-[3/4] lg:aspect-auto lg:h-full overflow-hidden rounded-[2rem] border border-[#1b1b1a]/10 bg-[#1b1b1a]/5">
-                <img
-                  src="/images/portrait-about.webp"
-                  alt="Alexander - Product Designer"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+        <div className="w-full mb-48 max-w-[100rem] md:px-10 lg:px-12 xl:px-48 md:pt-32">
+          <div className="flex flex-col lg:flex-row gap-10 md:gap-14 lg:gap-32 justify-center items-center">
+            <div className="about-image-reveal w-full max-w-xs lg:max-w-sm aspect-[3/4] lg:aspect-[3/4] overflow-hidden rounded-[12rem] border border-[#1b1b1a]/10 bg-[#1b1b1a]/5">
+              <img
+                src="/images/portrait-about.webp"
+                alt="Alexander - Product Designer"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             <div className="w-full flex flex-col items-start text-left">
-              <div className="overflow-hidden">
-                <p className="about-right-text font-aeonik text-sm md:text-base uppercase tracking-[0.2em] text-[#1b1b1a]/70">
-                  my story
-                </p>
-              </div>
-
               <div className="overflow-hidden mt-4">
                 <div className="overflow-hidden">
-                  <p className="about-right-text text-2xl md:text-3xl lg:text-4xl font-aeonik text-[#1b1b1a] leading-tight mb-8 font-regular">
+                  <p className="about-right-text text-xl md:text-2xl 3xl:text-xl font-cabinet font-regular leading-[1.2] tracking-tight">
                     Based in Copenhagen , I’m a frontend developer focused on
                     crafting modern web experiences.
                   </p>
                 </div>
-                <div className="overflow-hidden">
-                  <p className="about-right-text text-2xl md:text-3xl lg:text-4xl font-aeonik text-[#1b1b1a] leading-tight font-regular">
-                    I work primarily with React, TypeScript and GSAP —
-                    combining performance, motion, and thoughtful design to
-                    build interfaces that feel fast, refined, and engaging.
+                <div className="overflow-hidden mt-6">
+                  <p className="about-right-text text-xl md:text-2xl 3xl:text-xl font-cabinet font-regular leading-[1.2] tracking-tight">
+                    I work primarily with React, TypeScript and GSAP — combining
+                    performance, motion, and thoughtful design to build
+                    interfaces that feel fast, refined, and engaging.
                   </p>
                 </div>
               </div>
 
-              <div className="about-button-fade mt-8">
+              <div className="about-button-fade mt-16">
                 <AnimatedButton
-                  text="download resume"
+                  text="Download resume"
                   padding="px-8 py-4"
-                  fontSize="text-lg md:text-xl"
+                  fontSize="text-md md:text-lg"
                   baseBgColor="bg-[#1b1b1a]"
                   baseTextColor="text-white"
-                  hoverBgColor="bg-[#f5f5f3]"
+                  hoverBgColor="bg-[#e7e7e7]"
                   hoverTextColor="text-[#1b1b1a]"
                   baseBorderColor="border-[#1b1b1a]"
                   hoverBorderColor="border-[#1b1b1a]"
@@ -353,7 +339,7 @@ const AboutPage: React.FC = () => {
         <section className="stuff-i-do-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-24 px-6 md:px-10 lg:px-12 xl:px-16">
           {/* Left Column: Section Title */}
           <div className="w-full md:w-1/3">
-            <h2 className="about-section-title text-4xl md:text-5xl font-aeonik font-bold text-[#1b1b1a] uppercase md:sticky md:top-32">
+            <h2 className="about-section-title text-4xl md:text-5xl font-cabinet font-semibold text-[#1b1b1a] uppercase md:sticky md:top-32">
               stuff i do
             </h2>
           </div>
@@ -381,7 +367,7 @@ const AboutPage: React.FC = () => {
         <section className="experience-section w-full flex flex-col md:flex-row text-left gap-16 md:gap-0 pt-32 px-6 md:px-10 lg:px-12 xl:px-16">
           {/* Left Column: Section Title */}
           <div className="w-full md:w-1/3">
-            <h2 className="about-section-title text-4xl md:text-5xl font-aeonik font-bold text-[#1b1b1a] uppercase md:sticky md:top-32">
+            <h2 className="about-section-title text-4xl md:text-5xl font-cabinet font-semibold text-[#1b1b1a] uppercase md:sticky md:top-32">
               EXPERIENCE & <br /> EDUCATION
             </h2>
           </div>
